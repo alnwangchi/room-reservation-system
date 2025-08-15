@@ -189,7 +189,7 @@ export const roomService = {
       const yearMonth = dayjs(dateStr).format('YYYY-MM');
       const monthDocRef = doc(userBookingsRef, yearMonth);
 
-            // 使用 Firestore 事務進行原子性操作
+      // 使用 Firestore 事務進行原子性操作
       const result = await runTransaction(db, async transaction => {
         // 🔒 先進行所有讀取操作
         // 1. 檢查時段是否已被預訂

@@ -5,7 +5,7 @@ import { useHintDialog } from '../contexts/HintDialogContext';
 import { userService } from '../services/firestore';
 import { formatTimeRange } from '../utils/dateUtils';
 
-function BookingCard({ booking, onCancel }) {
+function BookingCard({ booking, onCancel, isGrouped = false }) {
   const { toggleHintDialog } = useHintDialog();
   const { user, isAdmin, userProfile, updateUserProfile } = useAuth();
   const [isCanceling, setIsCanceling] = useState(false);
@@ -13,27 +13,44 @@ function BookingCard({ booking, onCancel }) {
   const handleCancelBooking = async () => {
     if (isCanceling) return;
 
-    // 檢查預訂時間，只有未開始的預訂才能取消並退還金額
     const now = dayjs();
-    const bookingTime = dayjs(`${booking.date} ${booking.startTime}`);
-    const endTime = dayjs(`${booking.date} ${booking.endTime}`);
-
-    if (now.isAfter(bookingTime)) {
-      // 如果預訂已開始但未結束，顯示不同提示
-      if (now.isBefore(endTime)) {
+    
+    // 對於分組預訂，檢查是否有任何時段已經開始
+    if (isGrouped && booking.timeSlots) {
+      const hasStartedSlots = booking.timeSlots.some(slot => {
+        const slotStartTime = dayjs(`${booking.date} ${slot.startTime}`);
+        return now.isAfter(slotStartTime);
+      });
+      
+      if (hasStartedSlots) {
         toggleHintDialog({
           title: '無法取消',
-          desc: '預訂時段正在進行中，無法取消',
+          desc: '部分時段已開始或結束，無法取消整個預訂。請聯絡管理員處理。',
           type: 'warning',
         });
-      } else {
-        toggleHintDialog({
-          title: '無法取消',
-          desc: '預訂時段已結束，無法取消',
-          type: 'warning',
-        });
+        return;
       }
-      return;
+    } else {
+      // 單一預訂的原有邏輯
+      const bookingTime = dayjs(`${booking.date} ${booking.startTime}`);
+      const endTime = dayjs(`${booking.date} ${booking.endTime}`);
+
+      if (now.isAfter(bookingTime)) {
+        if (now.isBefore(endTime)) {
+          toggleHintDialog({
+            title: '無法取消',
+            desc: '預訂時段正在進行中，無法取消',
+            type: 'warning',
+          });
+        } else {
+          toggleHintDialog({
+            title: '無法取消',
+            desc: '預訂時段已結束，無法取消',
+            type: 'warning',
+          });
+        }
+        return;
+      }
     }
 
     // 檢查權限：只有預訂本人或管理員可以取消
@@ -51,21 +68,40 @@ function BookingCard({ booking, onCancel }) {
     }
 
     // 計算退費金額
-    let refundAmount = booking.cost;
+    let refundAmount = isGrouped ? booking.totalCost : booking.cost;
+    const cancelMessage = isGrouped 
+      ? `確定要取消這個預訂嗎？\n共 ${booking.timeSlots.length} 個時段，將退還 NT$ ${refundAmount} 到您的餘額`
+      : `確定要取消這筆預訂嗎？\n將退還 NT$ ${refundAmount} 到您的餘額`;
 
     // 使用 HintDialog 顯示確認對話框
     toggleHintDialog({
       title: '確認取消預訂',
-      desc: '確定要取消這筆預訂嗎？',
+      desc: cancelMessage,
       type: 'warning',
       showCancel: true,
       onOk: async () => {
         try {
           setIsCanceling(true);
 
-          // 調用取消預訂服務，使用正確的 userId 格式
           const userId = user.email.split('@')[0];
-          await userService.cancelBooking(userId, booking, refundAmount);
+          
+          if (isGrouped && booking.timeSlots) {
+            // 分組預訂：需要取消所有時段
+            const cancelPromises = booking.timeSlots.map(slot => 
+              userService.cancelBooking(userId, {
+                ...booking,
+                id: slot.id,
+                startTime: slot.startTime,
+                endTime: slot.endTime,
+                cost: booking.cost / booking.timeSlots.length, // 平均分配費用
+              }, booking.cost / booking.timeSlots.length)
+            );
+            
+            await Promise.all(cancelPromises);
+          } else {
+            // 單一預訂：使用原有邏輯
+            await userService.cancelBooking(userId, booking, refundAmount);
+          }
 
           // 更新本地使用者資料的餘額
           if (userProfile && updateUserProfile && refundAmount > 0) {
@@ -132,23 +168,42 @@ function BookingCard({ booking, onCancel }) {
 
           <div className="flex flex-col gap-1">
             <p className="text-sm text-gray-500">使用時數</p>
-            <p className="font-medium text-gray-900">{booking.duration} 小時</p>
+            <p className="font-medium text-gray-900">
+              {isGrouped ? booking.totalDuration : booking.duration} 小時
+            </p>
           </div>
 
           <div className="flex flex-col gap-1">
             <p className="text-sm text-gray-500">費用</p>
-            <p className="font-medium text-gray-900">NT$ {booking.cost}</p>
+            <p className="font-medium text-gray-900">
+              NT$ {isGrouped ? booking.totalCost : booking.cost}
+            </p>
           </div>
         </div>
       </div>
 
       {/* 時段詳情 */}
       <div className="p-6">
-        <h4 className="text-lg font-semibold text-gray-900 mb-4">預訂時段</h4>
+        <h4 className="text-lg font-semibold text-gray-900 mb-4">
+          {isGrouped ? `預訂時段 (共 ${booking.timeSlots.length} 個)` : '預訂時段'}
+        </h4>
         <div className="mb-4">
-          <div className="inline-block px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium">
-            {formatTimeRange(booking.startTime, booking.endTime)}
-          </div>
+          {isGrouped && booking.timeSlots ? (
+            <div className="flex flex-wrap gap-2">
+              {booking.timeSlots.map((slot, index) => (
+                <div 
+                  key={index}
+                  className="inline-block px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium"
+                >
+                  {formatTimeRange(slot.startTime, slot.endTime)}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="inline-block px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium">
+              {formatTimeRange(booking.startTime, booking.endTime)}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-between">
