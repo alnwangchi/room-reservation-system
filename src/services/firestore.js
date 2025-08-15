@@ -9,6 +9,7 @@ import {
   limit,
   orderBy,
   query,
+  runTransaction,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -182,7 +183,7 @@ export const roomService = {
       const dateRef = doc(roomRef, dateStr, timeSlot);
 
       // 使用 Firestore 事務進行原子性操作
-      const result = await db.runTransaction(async transaction => {
+      const result = await runTransaction(db, async transaction => {
         // 🔒 核心檢查：防止同一時段被多人預訂
         const existingBooking = await transaction.get(dateRef);
         if (existingBooking.exists()) {
