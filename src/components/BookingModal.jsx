@@ -142,11 +142,12 @@ function BookingModal({
             >
               {isProcessing ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="text-sm animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   <span>{processingMessage}</span>
                 </div>
               ) : userInfo &&
-                userInfo.balance < selectedTimeSlots.length * roomInfo?.price ? (
+                userInfo.balance <
+                  selectedTimeSlots.length * roomInfo?.price ? (
                 '餘額不足'
               ) : (
                 '確認預訂'

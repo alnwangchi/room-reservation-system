@@ -69,14 +69,11 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
 
     // 計算退費金額
     let refundAmount = isGrouped ? booking.totalCost : booking.cost;
-    const cancelMessage = isGrouped
-      ? `確定要取消這個預訂嗎？\n共 ${booking.timeSlots.length} 個時段，將退還 NT$ ${refundAmount} 到您的餘額`
-      : `確定要取消這筆預訂嗎？\n將退還 NT$ ${refundAmount} 到您的餘額`;
 
     // 使用 HintDialog 顯示確認對話框
     toggleHintDialog({
       title: '確認取消預訂',
-      desc: cancelMessage,
+      desc: '確定要取消這個預訂嗎？',
       type: 'warning',
       showCancel: true,
       onOk: async () => {
@@ -119,7 +116,7 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
           // 顯示成功訊息
           toggleHintDialog({
             title: '成功',
-            desc: `預訂已成功取消，已退還 NT$ ${refundAmount} 到您的餘額`,
+            desc: `預訂已成功取消`,
             type: 'success',
           });
 
@@ -162,22 +159,22 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
         </div>
 
         {/* 預訂詳情 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex flex-col gap-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+          <div className="flex flex-col">
             <p className="text-sm text-gray-500">預訂日期</p>
             <p className="font-medium text-gray-900">
               {dayjs(booking.date).format('YYYY-MM-DD')}
             </p>
           </div>
 
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col">
             <p className="text-sm text-gray-500">使用時數</p>
             <p className="font-medium text-gray-900">
               {isGrouped ? booking.totalDuration : booking.duration} 小時
             </p>
           </div>
 
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col">
             <p className="text-sm text-gray-500">費用</p>
             <p className="font-medium text-gray-900">
               NT$ {isGrouped ? booking.totalCost : booking.cost}
@@ -222,10 +219,6 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
             )}
             <p className="text-sm text-gray-600">
               <span className="font-medium">預訂人:</span> {booking.booker}
-            </p>
-            <p className="text-sm text-gray-600">
-              <span className="font-medium">房型單價:</span> NT${' '}
-              {booking.roomPrice}/半小時
             </p>
           </div>
 

@@ -447,7 +447,7 @@ function Booking() {
           }
 
           setProcessingMessage('預訂完成！');
-          
+
           // 預訂成功後先關閉 modal
           setShowBookingForm(false);
           setSelectedTimeSlots([]);
@@ -499,7 +499,7 @@ function Booking() {
 
           // 先關閉 modal
           setShowBookingForm(false);
-          
+
           // 短暫延遲後顯示錯誤訊息，確保 modal 已關閉
           setTimeout(() => {
             toggleHintDialog({
