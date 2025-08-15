@@ -29,7 +29,7 @@ function BookingModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b">
           <h3 className="text-lg font-semibold">
             預訂 {selectedTimeSlots.length} 個時段
@@ -42,7 +42,7 @@ function BookingModal({
           </button>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-4 md:p-6 space-y-3 md:space-y-4">
           {/* 餘額顯示 */}
           {userInfo && <BalanceCard balance={userInfo.balance || 0} />}
 
@@ -103,13 +103,12 @@ function BookingModal({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               使用說明
             </label>
-            <textarea
+            <input
               value={bookingForm.description}
               onChange={e =>
                 setBookingForm({ ...bookingForm, description: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              rows="3"
               placeholder=""
             />
           </div>

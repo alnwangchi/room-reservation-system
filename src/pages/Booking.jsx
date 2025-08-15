@@ -150,7 +150,7 @@ function Booking() {
         onClick={() => !isDisabled && handleDateClick(day.date)}
         disabled={isDisabled}
         className={`
-          p-3 text-sm relative transition-colors
+          p-2 md:p-3 text-sm relative transition-colors
           ${
             !isDisabled
               ? 'text-gray-900 hover:bg-blue-50 cursor-pointer'
@@ -527,7 +527,7 @@ function Booking() {
     const isLastCategory = category === TIME_CATEGORIES.EVENING;
 
     return (
-      <div className={`col-span-full ${!isLastCategory ? 'mb-4' : ''}`}>
+      <div className={`col-span-full ${!isLastCategory ? 'mb-2 md:mb-4' : ''}`}>
         <h4 className="text-sm font-medium text-gray-700 mb-2 px-2">
           {category.name}
         </h4>
@@ -574,13 +574,13 @@ function Booking() {
       {/* 標題列 */}
       <PageHeader title={`${currentRoom?.name}預訂日曆`} onBack={goToHome} />
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="space-y-6">
+      <div className="max-w-6xl mx-auto px-4 py-4 md:py-6">
+        <div className="space-y-4 md:space-y-6">
           {/* 日曆區塊 */}
           <div className="bg-white rounded-xl shadow-sm">
-            <div className="p-6">
+            <div className="p-4 md:p-6">
               {/* 日曆標題 */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-4 md:mb-6">
                 <h2 className="text-xl font-semibold">
                   {currentDate.format('YYYY年 M月')}
                 </h2>
@@ -605,7 +605,7 @@ function Booking() {
                 {WEEK_DAYS.map(day => (
                   <div
                     key={day}
-                    className="p-3 text-center text-sm font-medium text-gray-500"
+                    className="p-2 md:p-3 text-center text-sm font-medium text-gray-500"
                   >
                     {day}
                   </div>
@@ -624,8 +624,8 @@ function Booking() {
           {/* 時間槽區塊 */}
           {showTimeSlots && selectedDate && (
             <div className="bg-white rounded-xl shadow-sm">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
+              <div className="p-4 md:p-6">
+                <div className="flex items-center justify-between mb-4 md:mb-6">
                   <h3 className="text-xl font-semibold">
                     {selectedDate.format('M月D日')}
                   </h3>
@@ -635,7 +635,7 @@ function Booking() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-4 p-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-3 md:mb-4 p-1 md:p-2">
                   {/* 上午時段 */}
                   {renderTimeCategory(TIME_CATEGORIES.MORNING)}
 
