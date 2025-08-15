@@ -189,17 +189,30 @@ export const roomService = {
       const yearMonth = dayjs(dateStr).format('YYYY-MM');
       const monthDocRef = doc(userBookingsRef, yearMonth);
 
-      // 使用 Firestore 事務進行原子性操作
+            // 使用 Firestore 事務進行原子性操作
       const result = await runTransaction(db, async transaction => {
-        // 🔒 核心檢查：防止同一時段被多人預訂
+        // 🔒 先進行所有讀取操作
+        // 1. 檢查時段是否已被預訂
         const existingBooking = await transaction.get(dateRef);
         if (existingBooking.exists()) {
           throw new Error('該時段已被預訂');
         }
 
+        // 2. 讀取現有的月份預訂資料
+        let monthDocSnap = null;
+        let monthBookings = {};
+        if (customId) {
+          monthDocSnap = await transaction.get(monthDocRef);
+          monthBookings = monthDocSnap.exists()
+            ? monthDocSnap.data()
+            : {
+                'general-piano-room': [],
+                'standard-recording-studio': [],
+              };
+        }
+
         // Calculate end time, duration, and cost
         const endTime = calculateEndTime(timeSlot, 30);
-
         const startTime = dayjs(`2000-01-01T${timeSlot}:00`);
         const endTimeDate = dayjs(`2000-01-01T${endTime}:00`);
         const durationHours = endTimeDate.diff(startTime, 'hour', true);
@@ -208,7 +221,8 @@ export const roomService = {
         // room.price 已經是半小時（一個時段）的價格
         const bookingCost = room ? room.price : 0;
 
-        // 建立預訂記錄到 rooms 集合
+        // 🔒 然後進行所有寫入操作
+        // 1. 建立預訂記錄到 rooms 集合
         const bookingData = {
           bookerId: userInfo.uid || userInfo.id,
           booker: userInfo.displayName || userInfo.booker,
@@ -223,18 +237,8 @@ export const roomService = {
 
         transaction.set(dateRef, bookingData);
 
-        // 🔒 同時更新用戶預訂記錄（在同一事務中）
+        // 2. 同時更新用戶預訂記錄
         if (customId) {
-          // 獲取現有的月份預訂資料
-          const monthDocSnap = await transaction.get(monthDocRef);
-          
-          let monthBookings = monthDocSnap.exists()
-            ? monthDocSnap.data()
-            : {
-                'general-piano-room': [],
-                'standard-recording-studio': [],
-              };
-
           // 創建新的預訂記錄
           const newBooking = {
             roomId: roomId.toString(),
