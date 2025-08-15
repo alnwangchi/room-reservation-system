@@ -198,8 +198,8 @@ export const roomService = {
         const durationHours = endTimeDate.diff(startTime, 'hour', true);
 
         const room = ROOMS.find(r => r.id === roomId);
-        const pricePerHour = room ? room.price / 0.5 : 0;
-        const bookingCost = durationHours * pricePerHour;
+        // room.price 已經是半小時（一個時段）的價格
+        const bookingCost = room ? room.price : 0;
 
         // 建立預訂記錄到 rooms 集合
         const bookingData = {

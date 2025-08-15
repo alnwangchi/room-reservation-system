@@ -71,7 +71,7 @@ function BookingModal({
                 費用計算：
               </span>
               <span className="text-sm text-green-600">
-                {selectedTimeSlots.length} 個時段 × ${roomInfo?.price / 2}/時段
+                {selectedTimeSlots.length} 個時段 × ${roomInfo?.price}/時段
               </span>
             </div>
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-green-200">
@@ -79,7 +79,7 @@ function BookingModal({
                 總費用：
               </span>
               <span className="text-lg font-bold text-green-800">
-                ${selectedTimeSlots.length * (roomInfo?.price / 2)}
+                ${selectedTimeSlots.length * roomInfo?.price}
               </span>
             </div>
           </div>
@@ -127,13 +127,13 @@ function BookingModal({
                 !bookingForm.booker.trim() ||
                 (userInfo &&
                   userInfo.balance <
-                    selectedTimeSlots.length * (roomInfo?.price / 2))
+                    selectedTimeSlots.length * roomInfo?.price)
               }
               className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
                 bookingForm.booker.trim() &&
                 (!userInfo ||
                   userInfo.balance >=
-                    selectedTimeSlots.length * (roomInfo?.price / 2))
+                    selectedTimeSlots.length * roomInfo?.price)
                   ? 'bg-blue-600 hover:bg-blue-700 text-white'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}

@@ -163,8 +163,7 @@ function BookingCard({ booking, onCancel }) {
               <span className="font-medium">預訂人:</span> {booking.booker}
             </p>
             <p className="text-sm text-gray-600">
-              <span className="font-medium">房型單價:</span> NT${' '}
-              {booking.roomPrice}/小時
+              <span className="font-medium">房型單價:</span> NT$ {booking.roomPrice}/半小時(一個時段)
             </p>
           </div>
 

@@ -66,7 +66,7 @@ function RevenueCalculator() {
       const dailyOccupiedSlots = calculateDailyOccupiedSlots(occupancyRate);
 
       // 每日基本收入
-      const dailyBaseRevenue = dailyOccupiedSlots * (room.price / 2); // 每個時段是每小時價格的一半
+      const dailyBaseRevenue = dailyOccupiedSlots * room.price; // 每個時段的價格
 
       // 每日清潔費支出
       const dailyCleaningFee = dailyBaseRevenue * cleaningFeeRate;

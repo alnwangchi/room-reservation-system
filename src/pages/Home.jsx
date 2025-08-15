@@ -44,9 +44,9 @@ function Home() {
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold text-blue-600">
-                        NT$ {room.price}
+                        NT$ {room.price}/半小時(一個時段)
                       </div>
-                      <div className="text-sm text-gray-500">/ 小時</div>
+
                     </div>
                   </div>
 

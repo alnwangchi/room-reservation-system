@@ -24,7 +24,7 @@ export const ROOMS = [
     name: '一般琴房',
     capacity: 2,
     color: '#3b82f6',
-    price: 200,
+    price: 100,
     description: '琴房配備鋼琴和舒適環境，適合個人練習和教學',
   },
   {
@@ -32,7 +32,7 @@ export const ROOMS = [
     name: '標準錄音室',
     capacity: 4,
     color: '#10b981',
-    price: 700,
+    price: 350,
     description: '專業錄音設備和隔音環境，適合音樂錄製和製作',
   },
 ];

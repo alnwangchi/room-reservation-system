@@ -40,7 +40,7 @@ function RevenueAnalysis() {
               <div>
                 <h4 className="font-medium text-gray-800 mb-2">收益構成</h4>
                 <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• 基本租金：時段數量 × 房間單價 ÷ 2</li>
+                  <li>• 基本租金：時段數量 × 房間單價（每時段）</li>
                   <li>• 清潔費用：基本租金 × 5%</li>
                   <li>• 總收益：基本租金 + 清潔費用</li>
                   <li>• 月度收益：日收益 × 30天</li>

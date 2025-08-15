@@ -247,7 +247,7 @@ function Booking() {
       const currentRoom = ROOMS.find(room => room.id === selectedRoom);
       if (currentRoom) {
         const newTotalCost =
-          (selectedTimeSlots.length + 1) * (currentRoom.price / 2);
+          (selectedTimeSlots.length + 1) * currentRoom.price;
         if (userProfile.balance < newTotalCost) {
           toggleHintDialog({
             title: '餘額不足',
@@ -286,7 +286,7 @@ function Booking() {
     if (userProfile && userProfile.balance !== undefined) {
       const currentRoom = ROOMS.find(room => room.id === selectedRoom);
       if (currentRoom) {
-        const totalCost = selectedTimeSlots.length * (currentRoom.price / 2);
+        const totalCost = selectedTimeSlots.length * currentRoom.price;
         if (userProfile.balance < totalCost) {
           toggleHintDialog({
             title: '餘額不足',
@@ -341,7 +341,7 @@ function Booking() {
       return;
     }
 
-    const totalCost = selectedTimeSlots.length * (currentRoom.price / 2); // 每個時段是每小時價格的一半
+    const totalCost = selectedTimeSlots.length * currentRoom.price; // 每個時段的價格
 
     // 檢查餘額是否足夠
     if (userProfile.balance < totalCost) {
@@ -634,7 +634,7 @@ function Booking() {
                     className="text-gray-600"
                     style={{ color: currentRoom?.color }}
                   >
-                    {currentRoom?.name} - {currentRoom?.price}/小時
+                    {currentRoom?.name} - NT$ {currentRoom?.price}/半小時(一個時段)
                   </p>
                 </div>
 
