@@ -246,8 +246,7 @@ function Booking() {
     if (userProfile && userProfile.balance !== undefined) {
       const currentRoom = ROOMS.find(room => room.id === selectedRoom);
       if (currentRoom) {
-        const newTotalCost =
-          (selectedTimeSlots.length + 1) * currentRoom.price;
+        const newTotalCost = (selectedTimeSlots.length + 1) * currentRoom.price;
         if (userProfile.balance < newTotalCost) {
           toggleHintDialog({
             title: '餘額不足',
@@ -634,7 +633,8 @@ function Booking() {
                     className="text-gray-600"
                     style={{ color: currentRoom?.color }}
                   >
-                    {currentRoom?.name} - NT$ {currentRoom?.price}/半小時(一個時段)
+                    {currentRoom?.name} - NT$ {currentRoom?.price}
+                    /半小時(一個時段)
                   </p>
                 </div>
 

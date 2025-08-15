@@ -182,6 +182,13 @@ export const roomService = {
       const roomRef = doc(db, 'rooms', roomId.toString());
       const dateRef = doc(roomRef, dateStr, timeSlot);
 
+      // 準備用戶預訂記錄相關的引用
+      const customId = userInfo.email.split('@')[0];
+      const userRef = doc(db, 'users', customId);
+      const userBookingsRef = collection(userRef, 'bookings');
+      const yearMonth = dayjs(dateStr).format('YYYY-MM');
+      const monthDocRef = doc(userBookingsRef, yearMonth);
+
       // 使用 Firestore 事務進行原子性操作
       const result = await runTransaction(db, async transaction => {
         // 🔒 核心檢查：防止同一時段被多人預訂
@@ -216,24 +223,11 @@ export const roomService = {
 
         transaction.set(dateRef, bookingData);
 
-        return { bookingData, cost: bookingCost, duration: durationHours };
-      });
-
-      // 在使用者文檔下創建 bookings 子集合記錄
-      try {
-        const customId = userInfo.email.split('@')[0];
+        // 🔒 同時更新用戶預訂記錄（在同一事務中）
         if (customId) {
-          const userRef = doc(db, 'users', customId);
-          const userBookingsRef = collection(userRef, 'bookings');
-
-          // 創建年份月份格式的 bookingID
-          const yearMonth = dayjs(dateStr).format('YYYY-MM');
-          const bookingId = yearMonth;
-
-          // 獲取現有的月份預訂資料，如果不存在則初始化
-          const monthDocRef = doc(userBookingsRef, bookingId);
-          const monthDocSnap = await getDoc(monthDocRef);
-
+          // 獲取現有的月份預訂資料
+          const monthDocSnap = await transaction.get(monthDocRef);
+          
           let monthBookings = monthDocSnap.exists()
             ? monthDocSnap.data()
             : {
@@ -247,10 +241,9 @@ export const roomService = {
             roomName: ROOMS.find(r => r.id === roomId)?.name || '未知房型',
             date: dateStr,
             startTime: timeSlot,
-            endTime:
-              result.bookingData.endTime || calculateEndTime(timeSlot, 30),
-            duration: result.duration,
-            cost: result.cost,
+            endTime: endTime,
+            duration: durationHours,
+            cost: bookingCost,
             description: userInfo.description || '',
             booker: userInfo.displayName || userInfo.booker,
             bookedAt: dayjs().toDate(),
@@ -261,22 +254,27 @@ export const roomService = {
           // 將新預訂添加到對應房型的陣列中
           monthBookings[roomId].push(newBooking);
 
-          // 更新月份文檔
-          await setDoc(monthDocRef, monthBookings);
+          // 在事務中更新月份文檔
+          transaction.set(monthDocRef, monthBookings);
+        }
 
-          // 更新使用者的房型統計
-          await this.updateUserRoomBookingsStats(customId, roomId, {
+        return { bookingData, cost: bookingCost, duration: durationHours };
+      });
+
+      // 更新使用者的房型統計（事務外進行，不影響核心預訂邏輯）
+      try {
+        if (customId) {
+          await this.updateUserRoomBookingsStats(customId, roomId.toString(), {
             date: dateStr,
             startTime: timeSlot,
-            endTime:
-              result.bookingData.endTime || calculateEndTime(timeSlot, 30),
+            endTime: calculateEndTime(timeSlot, 30),
             duration: result.duration,
             cost: result.cost,
             description: userInfo.description || '',
           });
         }
-      } catch (userBookingError) {
-        console.error('Error creating user booking record:', userBookingError);
+      } catch (statsError) {
+        console.error('Error updating user booking stats:', statsError);
         // 不阻擋預訂流程，只記錄錯誤
       }
 
