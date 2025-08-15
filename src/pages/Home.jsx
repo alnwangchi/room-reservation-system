@@ -44,23 +44,19 @@ function Home() {
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold text-blue-600">
-                        NT$ {room.price}/半小時(一個時段)
+                        NT$ {room.price}
                       </div>
-
+                      <p className="text-sm font-bold text-blue-600">/半小時</p>
                     </div>
                   </div>
 
                   <p className="text-gray-600 mb-4">{room.description}</p>
 
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <div className="flex flex-col items-start space-x-4 text-sm text-gray-500">
                       <div className="flex items-center space-x-1">
                         <Clock className="w-4 h-4" />
                         <span>09:00-21:00</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>可預訂</span>
                       </div>
                     </div>
 

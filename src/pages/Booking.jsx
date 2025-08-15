@@ -629,16 +629,13 @@ function Booking() {
                   <h3 className="text-xl font-semibold">
                     {selectedDate.format('M月D日')}
                   </h3>
-                  <p
-                    className="text-gray-600"
-                    style={{ color: currentRoom?.color }}
-                  >
+                  <p className="text-sm" style={{ color: currentRoom?.color }}>
                     {currentRoom?.name} - NT$ {currentRoom?.price}
-                    /半小時(一個時段)
+                    /半小時
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 max-h-96 overflow-y-auto mb-4 p-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-4 p-2">
                   {/* 上午時段 */}
                   {renderTimeCategory(TIME_CATEGORIES.MORNING)}
 
