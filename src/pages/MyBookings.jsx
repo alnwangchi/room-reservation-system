@@ -58,7 +58,7 @@ function MyBookings() {
         const targetUserId =
           userProfile.role === 'admin' && selectedUser
             ? selectedUser.id
-            : userProfile.id || user.uid;
+            : userProfile.id;
 
         // 如果沒有有效的用戶ID，則不載入預訂
         if (!targetUserId) return;
@@ -92,7 +92,7 @@ function MyBookings() {
       const targetUserId =
         userProfile.role === 'admin' && selectedUser
           ? selectedUser.id
-          : userProfile.id || user.uid;
+          : userProfile.id;
 
       // 如果沒有有效的用戶ID，則不載入預訂
       if (!targetUserId) return;

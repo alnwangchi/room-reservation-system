@@ -435,7 +435,7 @@ function Booking() {
 
           setProcessingMessage('正在更新餘額...');
           // 預訂成功後扣除使用者餘額
-          const userId = userProfile.id || user.uid;
+          const userId = userProfile.id;
           await userService.updateBalance(userId, -totalCost);
 
           // 更新本地使用者資料的餘額

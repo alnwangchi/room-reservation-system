@@ -222,9 +222,8 @@ export const roomService = {
       // 在使用者文檔下創建 bookings 子集合記錄
       try {
         const customId = userInfo.email.split('@')[0];
-        const fullUserId = `${userInfo.email}_${customId}`;
         if (customId) {
-          const userRef = doc(db, 'users', fullUserId);
+          const userRef = doc(db, 'users', customId);
           const userBookingsRef = collection(userRef, 'bookings');
 
           // 創建年份月份格式的 bookingID
@@ -266,7 +265,7 @@ export const roomService = {
           await setDoc(monthDocRef, monthBookings);
 
           // 更新使用者的房型統計
-          await this.updateUserRoomBookingsStats(fullUserId, roomId, {
+          await this.updateUserRoomBookingsStats(customId, roomId, {
             date: dateStr,
             startTime: timeSlot,
             endTime:
@@ -515,7 +514,7 @@ export const userService = {
   // 添加新使用者
   async addUser(userData) {
     try {
-      const customId = `${userData.email}_${userData.email.split('@')[0]}`;
+      const customId = userData.email.split('@')[0];
       const userRef = doc(db, 'users', customId);
 
       // 檢查使用者是否已存在

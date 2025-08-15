@@ -26,7 +26,7 @@ const UserProfileCard = ({
     if (onDeposit) {
       try {
         // 確保有有效的用戶 ID
-        const userId = userProfile?.id || user?.uid || userProfile?.uid;
+        const userId = userProfile?.id;
         if (!userId) {
           throw new Error('無法識別用戶 ID');
         }
