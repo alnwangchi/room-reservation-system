@@ -447,7 +447,8 @@ function Booking() {
           }
 
           setProcessingMessage('預訂完成！');
-          // 預訂成功後更新本地狀態
+          
+          // 預訂成功後先關閉 modal
           setShowBookingForm(false);
           setSelectedTimeSlots([]);
           setBookingForm({
@@ -455,13 +456,15 @@ function Booking() {
             description: '',
           });
 
-          // 顯示成功訊息
-          const newBalance = userProfile.balance - totalCost;
-          toggleHintDialog({
-            title: '預訂成功',
-            desc: `共預訂 ${selectedTimeSlots.length} 個時段，已扣除 NT$ ${totalCost}，剩餘餘額 NT$ ${newBalance}`,
-            type: 'success',
-          });
+          // 短暫延遲後顯示成功訊息，確保 modal 已關閉
+          setTimeout(() => {
+            const newBalance = userProfile.balance - totalCost;
+            toggleHintDialog({
+              title: '預訂成功',
+              desc: `共預訂 ${selectedTimeSlots.length} 個時段，已扣除 NT$ ${totalCost}，剩餘餘額 NT$ ${newBalance}`,
+              type: 'success',
+            });
+          }, 200);
 
           // 重新載入該日期的預訂資料
           await loadBookingsForDate(selectedDate, selectedRoom);
@@ -494,21 +497,26 @@ function Booking() {
             errorMessage = '系統配額已滿，請稍後再試';
           }
 
-          // 顯示錯誤訊息
-          toggleHintDialog({
-            title: '預訂失敗',
-            desc: errorMessage,
-            type: 'error',
-            onOk: async () => {
-              // 根據錯誤類型執行相應的恢復操作
-              if (shouldRefresh) {
-                await loadBookingsForDate(selectedDate, selectedRoom);
-              }
-              if (shouldResetSelection) {
-                setSelectedTimeSlots([]);
-              }
-            },
-          });
+          // 先關閉 modal
+          setShowBookingForm(false);
+          
+          // 短暫延遲後顯示錯誤訊息，確保 modal 已關閉
+          setTimeout(() => {
+            toggleHintDialog({
+              title: '預訂失敗',
+              desc: errorMessage,
+              type: 'error',
+              onOk: async () => {
+                // 根據錯誤類型執行相應的恢復操作
+                if (shouldRefresh) {
+                  await loadBookingsForDate(selectedDate, selectedRoom);
+                }
+                if (shouldResetSelection) {
+                  setSelectedTimeSlots([]);
+                }
+              },
+            });
+          }, 200);
         } finally {
           setIsProcessing(false);
           setProcessingMessage('');
@@ -687,6 +695,8 @@ function Booking() {
         setBookingForm={setBookingForm}
         roomInfo={ROOMS.find(room => room.id === selectedRoom)}
         userInfo={userProfile}
+        isProcessing={isProcessing}
+        processingMessage={processingMessage}
       />
     </div>
   );

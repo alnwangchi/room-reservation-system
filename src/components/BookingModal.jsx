@@ -12,6 +12,8 @@ function BookingModal({
   setBookingForm,
   roomInfo,
   userInfo,
+  isProcessing = false,
+  processingMessage = '處理中...',
 }) {
   // 當 Modal 開啟且有使用者資訊時，自動填入預訂人姓名
   useEffect(() => {
@@ -42,13 +44,13 @@ function BookingModal({
           </button>
         </div>
 
-        <div className="p-4 md:p-6 space-y-3 md:space-y-4">
+        <div className="p-4 md:p-6 space-y-2">
           {/* 餘額顯示 */}
           {userInfo && <BalanceCard balance={userInfo.balance || 0} />}
 
           {/* 選中時段顯示 */}
           <div className="p-3 bg-blue-50 rounded-lg">
-            <p className="text-sm font-medium text-blue-800 mb-2">
+            <p className="text-sm font-medium text-blue-800 mb-1">
               選中的時段：
             </p>
             <div className="text-xs text-blue-600">
@@ -71,11 +73,11 @@ function BookingModal({
                 費用計算：
               </span>
               <span className="text-sm text-green-600">
-                {selectedTimeSlots.length} 個時段 × ${roomInfo?.price}/時段
+                {selectedTimeSlots.length} × ${roomInfo?.price}/時段
               </span>
             </div>
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-green-200">
-              <span className="text-base font-semibold text-green-800">
+              <span className="text-sm font-semibold text-green-800">
                 總費用：
               </span>
               <span className="text-lg font-bold text-green-800">
@@ -85,7 +87,7 @@ function BookingModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               預訂人*
             </label>
             <input
@@ -100,7 +102,7 @@ function BookingModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               使用說明
             </label>
             <input
@@ -113,7 +115,7 @@ function BookingModal({
             />
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-2">
             <button
               onClick={onClose}
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
@@ -123,12 +125,13 @@ function BookingModal({
             <button
               onClick={onSubmit}
               disabled={
+                isProcessing ||
                 !bookingForm.booker.trim() ||
                 (userInfo &&
-                  userInfo.balance <
-                    selectedTimeSlots.length * roomInfo?.price)
+                  userInfo.balance < selectedTimeSlots.length * roomInfo?.price)
               }
               className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
+                !isProcessing &&
                 bookingForm.booker.trim() &&
                 (!userInfo ||
                   userInfo.balance >=
@@ -137,11 +140,17 @@ function BookingModal({
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              {userInfo &&
-              userInfo.balance <
-                selectedTimeSlots.length * (roomInfo?.price / 2)
-                ? '餘額不足'
-                : '確認預訂'}
+              {isProcessing ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>{processingMessage}</span>
+                </div>
+              ) : userInfo &&
+                userInfo.balance < selectedTimeSlots.length * roomInfo?.price ? (
+                '餘額不足'
+              ) : (
+                '確認預訂'
+              )}
             </button>
           </div>
         </div>
