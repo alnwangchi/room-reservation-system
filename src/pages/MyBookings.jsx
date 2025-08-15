@@ -184,10 +184,10 @@ function MyBookings() {
     } else {
       // 一般用戶: 同一房型同一天的時段合併顯示
       const groupedBookings = new Map();
-      
+
       bookings.forEach(booking => {
         const groupKey = `${booking.roomId}-${booking.date}`;
-        
+
         if (groupedBookings.has(groupKey)) {
           // 如果已有相同房型和日期的預訂，合併時段
           const existingGroup = groupedBookings.get(groupKey);
@@ -204,23 +204,25 @@ function MyBookings() {
           // 創建新的分組
           groupedBookings.set(groupKey, {
             ...booking,
-            timeSlots: [{
-              startTime: booking.startTime,
-              endTime: booking.endTime,
-              id: booking.id,
-            }],
+            timeSlots: [
+              {
+                startTime: booking.startTime,
+                endTime: booking.endTime,
+                id: booking.id,
+              },
+            ],
             totalCost: booking.cost,
             totalDuration: booking.duration,
             isGrouped: true,
           });
         }
       });
-      
+
       // 對每個分組的時段按時間排序
       Array.from(groupedBookings.values()).forEach(group => {
         group.timeSlots.sort((a, b) => a.startTime.localeCompare(b.startTime));
       });
-      
+
       // 轉換為陣列並按日期排序
       return Array.from(groupedBookings.values()).sort((a, b) => {
         const dateComparison = b.date.localeCompare(a.date);
@@ -233,7 +235,7 @@ function MyBookings() {
   // 渲染預訂列表
   const renderBookingsList = () => {
     const processedBookings = processBookingsForDisplay();
-    
+
     return (
       <div className="space-y-4">
         {processedBookings.map(booking => (

@@ -14,14 +14,14 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
     if (isCanceling) return;
 
     const now = dayjs();
-    
+
     // 對於分組預訂，檢查是否有任何時段已經開始
     if (isGrouped && booking.timeSlots) {
       const hasStartedSlots = booking.timeSlots.some(slot => {
         const slotStartTime = dayjs(`${booking.date} ${slot.startTime}`);
         return now.isAfter(slotStartTime);
       });
-      
+
       if (hasStartedSlots) {
         toggleHintDialog({
           title: '無法取消',
@@ -69,7 +69,7 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
 
     // 計算退費金額
     let refundAmount = isGrouped ? booking.totalCost : booking.cost;
-    const cancelMessage = isGrouped 
+    const cancelMessage = isGrouped
       ? `確定要取消這個預訂嗎？\n共 ${booking.timeSlots.length} 個時段，將退還 NT$ ${refundAmount} 到您的餘額`
       : `確定要取消這筆預訂嗎？\n將退還 NT$ ${refundAmount} 到您的餘額`;
 
@@ -84,19 +84,23 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
           setIsCanceling(true);
 
           const userId = user.email.split('@')[0];
-          
+
           if (isGrouped && booking.timeSlots) {
             // 分組預訂：需要取消所有時段
-            const cancelPromises = booking.timeSlots.map(slot => 
-              userService.cancelBooking(userId, {
-                ...booking,
-                id: slot.id,
-                startTime: slot.startTime,
-                endTime: slot.endTime,
-                cost: booking.cost / booking.timeSlots.length, // 平均分配費用
-              }, booking.cost / booking.timeSlots.length)
+            const cancelPromises = booking.timeSlots.map(slot =>
+              userService.cancelBooking(
+                userId,
+                {
+                  ...booking,
+                  id: slot.id,
+                  startTime: slot.startTime,
+                  endTime: slot.endTime,
+                  cost: booking.cost / booking.timeSlots.length, // 平均分配費用
+                },
+                booking.cost / booking.timeSlots.length
+              )
             );
-            
+
             await Promise.all(cancelPromises);
           } else {
             // 單一預訂：使用原有邏輯
@@ -185,15 +189,17 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
       {/* 時段詳情 */}
       <div className="p-6">
         <h4 className="text-lg font-semibold text-gray-900 mb-4">
-          {isGrouped ? `預訂時段 (共 ${booking.timeSlots.length} 個)` : '預訂時段'}
+          {isGrouped
+            ? `預訂時段 (共 ${booking.timeSlots.length} 個)`
+            : '預訂時段'}
         </h4>
         <div className="mb-4">
           {isGrouped && booking.timeSlots ? (
             <div className="flex flex-wrap gap-2">
               {booking.timeSlots.map((slot, index) => (
-                <div 
+                <div
                   key={index}
-                  className="inline-block px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium"
+                  className="text-center inline-block w-[128px] px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium"
                 >
                   {formatTimeRange(slot.startTime, slot.endTime)}
                 </div>
@@ -218,15 +224,14 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
               <span className="font-medium">預訂人:</span> {booking.booker}
             </p>
             <p className="text-sm text-gray-600">
-              <span className="font-medium">房型單價:</span> NT$ {booking.roomPrice}/半小時(一個時段)
+              <span className="font-medium">房型單價:</span> NT${' '}
+              {booking.roomPrice}/半小時(一個時段)
             </p>
           </div>
 
           <div className="flex space-x-2">
             {/* 允許預訂本人和管理員取消預訂 */}
-            {(isAdmin ||
-              userProfile?.id === user.email.split('@')[0] ||
-              user.uid === booking.bookerId) && (
+            {isAdmin && (
               <button
                 onClick={handleCancelBooking}
                 disabled={isCanceling}
