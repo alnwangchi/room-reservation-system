@@ -222,9 +222,10 @@ export const roomService = {
       // 在使用者文檔下創建 bookings 子集合記錄
       try {
         const customId = userInfo.email.split('@')[0];
+        const fullUserId = `${userInfo.email}_${customId}`;
         if (customId) {
-          const userRef = doc(db, 'users', customId);
-          const userBookingsRef = collection(userRef, customId);
+          const userRef = doc(db, 'users', fullUserId);
+          const userBookingsRef = collection(userRef, 'bookings');
 
           // 創建年份月份格式的 bookingID
           const yearMonth = dayjs(dateStr).format('YYYY-MM');
@@ -265,7 +266,7 @@ export const roomService = {
           await setDoc(monthDocRef, monthBookings);
 
           // 更新使用者的房型統計
-          await this.updateUserRoomBookingsStats(customId, roomId, {
+          await this.updateUserRoomBookingsStats(fullUserId, roomId, {
             date: dateStr,
             startTime: timeSlot,
             endTime:
