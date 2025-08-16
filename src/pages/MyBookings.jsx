@@ -12,6 +12,7 @@ import UserProfileCard from '@components/UserProfileCard';
 import { useAuth } from '@contexts/AuthContext';
 import { useAppNavigate } from '@hooks/useNavigate';
 import { userService } from '@services/firestore';
+import RenameModal from '@components/RenameModal';
 
 function MyBookings() {
   const { user, userProfile, loading, isAdmin } = useAuth();
@@ -22,6 +23,7 @@ function MyBookings() {
   const [allUsers, setAllUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
 
   // 載入所有用戶資料（僅 admin 需要）
   useEffect(() => {
@@ -108,10 +110,8 @@ function MyBookings() {
     if (!isAdmin) return null;
 
     return (
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          選擇用戶
-        </label>
+      <div className="mb-6 z-0">
+        <p className="block text-sm font-medium text-gray-700 mb-2">選擇用戶</p>
         <Listbox value={selectedUser} onChange={setSelectedUser}>
           <div className="relative">
             <ListboxButton className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
@@ -128,7 +128,7 @@ function MyBookings() {
                 />
               </span>
             </ListboxButton>
-            <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <ListboxOptions className="absolute z-0 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
               {loadingUsers ? (
                 <div className="relative cursor-default select-none py-2 px-3 text-gray-500">
                   載入用戶中...
@@ -317,61 +317,70 @@ function MyBookings() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
-      {/* 頁面標題 */}
-      <PageHeader
-        title="我的預訂"
-        description="查看和管理你的房間預訂"
-        icon={Calendar}
-        iconBgColor="bg-blue-100"
-        iconColor="text-blue-600"
+    <>
+      <RenameModal
+        isOpen={isRenameModalOpen}
+        onClose={() => setIsRenameModalOpen(false)}
+        value={user?.displayName || user?.email?.split('@')[0]}
       />
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
+        {/* 頁面標題 */}
+        <PageHeader
+          title="我的預訂"
+          description="查看和管理你的房間預訂"
+          icon={Calendar}
+          iconBgColor="bg-blue-100"
+          iconColor="text-blue-600"
+        />
 
-      <div className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* 左側用戶資訊卡片 */}
-            <div className="lg:col-span-1">
-              <UserProfileCard
-                user={user}
-                userProfile={userProfile}
-                isLoading={loading}
-                className="sticky top-6"
-              />
-            </div>
+        <div className="py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* 左側用戶資訊卡片 */}
+              <div className="lg:col-span-1">
+                <UserProfileCard
+                  user={user}
+                  userProfile={userProfile}
+                  isLoading={loading}
+                  className="sticky top-6"
+                  showRenameButton
+                  setIsRenameModalOpen={setIsRenameModalOpen}
+                />
+              </div>
 
-            {/* 右側預訂列表 */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow p-6">
-                {renderUserSelector()}
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    本月預訂記錄
-                  </h2>
-                  <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    <Calendar className="w-4 h-4" />
-                    <span>共 {bookings.length} 筆預訂</span>
+              {/* 右側預訂列表 */}
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-lg shadow p-6">
+                  {renderUserSelector()}
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      本月預訂記錄
+                    </h2>
+                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                      <Calendar className="w-4 h-4" />
+                      <span>共 {bookings.length} 筆預訂</span>
+                    </div>
                   </div>
+
+                  {loadingBookings ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                      <p className="mt-2 text-gray-600">載入預訂中...</p>
+                    </div>
+                  ) : error ? (
+                    renderErrorState()
+                  ) : bookings.length > 0 ? (
+                    renderBookingsList()
+                  ) : (
+                    renderEmptyState()
+                  )}
                 </div>
-
-                {loadingBookings ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">載入預訂中...</p>
-                  </div>
-                ) : error ? (
-                  renderErrorState()
-                ) : bookings.length > 0 ? (
-                  renderBookingsList()
-                ) : (
-                  renderEmptyState()
-                )}
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

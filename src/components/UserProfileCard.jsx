@@ -1,4 +1,4 @@
-import { Calendar, Clock, User } from 'lucide-react';
+import { Calendar, User, Pen } from 'lucide-react';
 import React, { useState } from 'react';
 import { useHintDialog } from '@contexts/HintDialogContext';
 import { formatDate } from '../utils/dateUtils';
@@ -14,8 +14,11 @@ const UserProfileCard = ({
   depositButton = false,
   className = '',
   onDeposit,
+  showRenameButton,
+  setIsRenameModalOpen,
 }) => {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+
   const { toggleHintDialog } = useHintDialog();
   const { isAdmin } = useAuth();
 
@@ -87,7 +90,14 @@ const UserProfileCard = ({
   return (
     <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
       {/* 用戶基本信息 */}
-      <div className="flex items-center mb-6">
+      <div className="flex items-center mb-6 relative">
+        {showRenameButton && (
+          <Pen
+            className="w-4 h-4 text-gray-500 mr-2 absolute right-2 top-2 cursor-pointer"
+            onClick={() => setIsRenameModalOpen(true)}
+          />
+        )}
+
         <div className="w-16 h-16 rounded-full overflow-hidden mr-4">
           {photoURL ? (
             <img

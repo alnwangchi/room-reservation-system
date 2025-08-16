@@ -137,7 +137,6 @@ function Booking() {
 
   // 渲染日期格子
   const renderDateCell = (day, index) => {
-    console.log('🚀 ~ day:', day);
     const isSelected = selectedDate && day.date.isSame(selectedDate, 'day');
     const hasBookings =
       getBookingsForDateAndRoom(day.date, selectedRoom).length > 0;
@@ -220,7 +219,6 @@ function Booking() {
   };
 
   const handleDateClick = date => {
-    console.log('🚀 ~ date:', date);
     // 如果選擇的是同一個日期，不做任何改變
     if (selectedDate && selectedDate.isSame(date, 'day')) {
       return;

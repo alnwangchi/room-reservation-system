@@ -5,7 +5,6 @@ export function useLineWebViewDetector() {
 
   useEffect(() => {
     const ua = navigator.userAgent || navigator.vendor || window?.opera;
-    console.log('🚀 ~ navigator:', navigator);
     setIsLineWebView(/Line/i.test(ua));
   }, []);
 
