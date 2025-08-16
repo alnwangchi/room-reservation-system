@@ -18,10 +18,18 @@ module.exports = {
   },
   plugins: ['react', 'unused-imports'],
   rules: {
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
-    'unused-imports/no-unused-imports': 'off',
-    'unused-imports/no-unused-vars': 'off',
+    // 未使用導入檢查
+    'no-unused-vars': 'off', // 關閉原生規則，使用 unused-imports 的規則
+    'unused-imports/no-unused-imports': 'error', // 檢查未使用的導入
+    'unused-imports/no-unused-vars': [
+      'error',
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+      },
+    ],
     // 檢查使用了但沒有 import 的錯誤
     'no-undef': 'error',
     // 檢查 React 相關的未定義變數

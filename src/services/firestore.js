@@ -436,7 +436,7 @@ export const roomService = {
   },
 
   // 取消預訂後更新使用者的房型統計
-  async updateUserRoomBookingsStatsAfterCancel(userId, roomId, duration) {
+  async updateUserRoomBookingsStatsAfterCancel(userId, roomId) {
     try {
       const userRef = doc(db, 'users', userId);
       const userDoc = await getDoc(userRef);

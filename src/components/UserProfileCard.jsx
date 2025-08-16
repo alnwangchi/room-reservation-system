@@ -1,10 +1,9 @@
-import { Calendar, User, Pen } from 'lucide-react';
-import React, { useState } from 'react';
 import { useHintDialog } from '@contexts/HintDialogContext';
+import { Calendar, Pen, User } from 'lucide-react';
+import React, { useState } from 'react';
 import { formatDate } from '../utils/dateUtils';
 import BalanceCard from './BalanceCard';
 import DepositModal from './DepositModal';
-import { useAuth } from '@contexts/AuthContext';
 
 const UserProfileCard = ({
   user,
@@ -20,7 +19,6 @@ const UserProfileCard = ({
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   const { toggleHintDialog } = useHintDialog();
-  const { isAdmin } = useAuth();
 
   const handleDepositClick = () => {
     setIsDepositModalOpen(true);
@@ -121,7 +119,7 @@ const UserProfileCard = ({
               會員自 {formatDate(createdAt)}
             </span>
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              {isAdmin ? '管理員' : '一般用戶'}
+              {userProfile.role === 'admin' ? '管理員' : '一般用戶'}
             </span>
           </div>
         </div>
@@ -129,7 +127,7 @@ const UserProfileCard = ({
       {/* 儲值餘額 */}
       {showBalance && <BalanceCard balance={balance} />}
       {/* 統計信息 */}
-      <div className="grid grid-cols-2 gap-3 mt-2">
+      <div className="grid grid-cols-1 gap-3 mt-2">
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center">
             <Calendar className="w-4 h-4 text-blue-600 mr-2" />

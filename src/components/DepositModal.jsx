@@ -7,7 +7,7 @@ const DepositModal = ({ isOpen, onClose, onConfirm, user, currentBalance }) => {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!amount || parseFloat(amount) <= 0) return;
+    if (!amount || parseFloat(amount) === 0) return;
 
     setLoading(true);
     try {
@@ -83,7 +83,7 @@ const DepositModal = ({ isOpen, onClose, onConfirm, user, currentBalance }) => {
               htmlFor="amount"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              儲值金額
+              儲值/扣款金額
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -94,9 +94,8 @@ const DepositModal = ({ isOpen, onClose, onConfirm, user, currentBalance }) => {
                 id="amount"
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
-                placeholder="請輸入儲值金額"
-                min="1"
-                step="0.01"
+                placeholder="正數為儲值，負數為扣款"
+                step="100"
                 className="w-full pl-12 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 required
               />
@@ -114,10 +113,22 @@ const DepositModal = ({ isOpen, onClose, onConfirm, user, currentBalance }) => {
             </button>
             <button
               type="submit"
-              disabled={!amount || parseFloat(amount) <= 0 || loading}
-              className="flex-1 bg-green-500 text-white font-medium py-3 px-4 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-green-600 transition-colors"
+              disabled={!amount || parseFloat(amount) === 0 || loading}
+              className={`flex-1 font-medium py-3 px-4 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors ${
+                parseFloat(amount) > 0
+                  ? 'bg-green-500 text-white hover:bg-green-600'
+                  : parseFloat(amount) < 0
+                    ? 'bg-red-500 text-white hover:bg-red-600'
+                    : 'bg-gray-300 text-gray-500'
+              }`}
             >
-              {loading ? '處理中...' : '確認儲值'}
+              {loading
+                ? '處理中...'
+                : parseFloat(amount) > 0
+                  ? '確認儲值'
+                  : parseFloat(amount) < 0
+                    ? '確認扣款'
+                    : '確認操作'}
             </button>
           </div>
         </form>

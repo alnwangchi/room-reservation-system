@@ -7,7 +7,7 @@ function ProtectedRoute({
   requireAuth = false,
   requireAdmin = false,
 }) {
-  const { user, userProfile, loading, isAuthenticated, isAdmin } = useAuth();
+  const { loading, isAuthenticated, isAdmin } = useAuth();
   const { goToHome, goToLogin } = useAppNavigate();
 
   // 載入中狀態

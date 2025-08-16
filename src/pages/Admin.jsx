@@ -76,7 +76,7 @@ function Admin() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <TabGroup>
             <TabList className="flex border-b border-gray-200 px-6">
-              {tabs.map((tab, index) => (
+              {tabs.map(tab => (
                 <Tab
                   key={tab.name}
                   className={({ selected }) =>

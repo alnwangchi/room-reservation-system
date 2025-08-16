@@ -3,20 +3,36 @@ import React, { useState, useEffect } from 'react';
 import { updateProfile } from 'firebase/auth';
 import { useAuth } from '@contexts/AuthContext';
 import { useHintDialog } from '@contexts/HintDialogContext';
+import { userService } from '@services/firestore';
 
 function RenameModal({ isOpen, onClose }) {
   const [value, setValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { user } = useAuth();
+  const { user, userProfile, updateUserProfile } = useAuth();
   const { toggleHintDialog } = useHintDialog();
 
-  const isDisabled = !value.trim() || isLoading || value === user?.displayName;
+  const isDisabled =
+    !value.trim() ||
+    isLoading ||
+    value === (userProfile?.displayName || user?.displayName);
 
   const onSubmit = async () => {
     try {
       setIsLoading(true);
+
+      // 1. 更新 Firebase Authentication 的 displayName
       await updateProfile(user, { displayName: value });
+
+      // 2. 更新 Firestore 中的 userProfile
+      if (userProfile?.id) {
+        await userService.updateUser(userProfile.id, { displayName: value });
+
+        // 3. 更新本地狀態
+        const updatedProfile = { ...userProfile, displayName: value };
+        updateUserProfile(updatedProfile);
+      }
+
       toggleHintDialog({
         type: 'success',
         title: '更新成功',
@@ -36,8 +52,9 @@ function RenameModal({ isOpen, onClose }) {
   };
 
   useEffect(() => {
-    setValue(user?.displayName);
-  }, [user]);
+    // 優先使用 userProfile 中的 displayName，如果沒有則使用 Firebase Auth 的 displayName
+    setValue(userProfile?.displayName || user?.displayName || '');
+  }, [user, userProfile]);
 
   if (!isOpen) return null;
   return (

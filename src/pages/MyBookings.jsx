@@ -78,9 +78,20 @@ function MyBookings() {
 
   // 處理取消預訂
   const handleCancelBooking = bookingId => {
-    setBookings(prevBookings =>
-      prevBookings.filter(booking => booking.id !== bookingId)
-    );
+    setBookings(prevBookings => {
+      // 如果是分組預訂，需要移除所有相關的原始預訂
+      if (bookingId.includes('_')) {
+        // 分組預訂的 ID 格式是 "id1_id2_id3"，我們需要移除所有這些原始預訂
+        const originalIds = bookingId.split('_');
+        return prevBookings.filter(booking => {
+          // 檢查這個預訂是否屬於被取消的分組
+          return !originalIds.some(id => booking.id === id);
+        });
+      } else {
+        // 單一預訂，直接移除
+        return prevBookings.filter(booking => booking.id !== bookingId);
+      }
+    });
   };
 
   // 重新載入預訂資料

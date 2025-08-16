@@ -1,9 +1,10 @@
-import Admin from '../pages/Admin';
-import Booking from '../pages/Booking';
-import Home from '../pages/Home';
-import Login from '../pages/Login';
-import MyBookings from '../pages/MyBookings';
-import RevenueAnalysis from '../pages/RevenueAnalysis';
+import Admin from '@pages/Admin';
+import Booking from '@pages/Booking';
+import Home from '@pages/Home';
+import Login from '@pages/Login';
+import MyBookings from '@pages/MyBookings';
+import RevenueAnalysis from '@pages/RevenueAnalysis';
+import RoomSelection from '@pages/RoomSelection';
 
 // 路由配置
 export const routes = [
@@ -13,6 +14,14 @@ export const routes = [
     label: '首頁',
     showInNav: true,
     requireAuth: false,
+    requireAdmin: false,
+  },
+  {
+    path: '/room-selection',
+    element: RoomSelection,
+    label: '選擇房間',
+    showInNav: true,
+    requireAuth: true,
     requireAdmin: false,
   },
   {

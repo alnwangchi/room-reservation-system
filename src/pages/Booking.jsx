@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import dayjs from 'dayjs';
@@ -26,7 +26,7 @@ function Booking() {
 
   const [currentDate, setCurrentDate] = useState(dayjs());
   const [selectedDate, setSelectedDate] = useState();
-  const [selectedRoom, _] = useState(roomId || 'general-piano-room');
+  const selectedRoom = roomId || 'general-piano-room';
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -89,7 +89,7 @@ function Booking() {
   };
 
   // 載入指定日期的 Firestore 預訂資料
-  const loadBookingsForDate = async (date, roomId) => {
+  const loadBookingsForDate = useCallback(async (date, roomId) => {
     if (!date || !roomId) return;
 
     try {
@@ -126,21 +126,18 @@ function Booking() {
     } catch (error) {
       console.error('載入預訂資料失敗:', error);
     }
-  };
+  }, []);
 
   // 頁面載入時初始化預訂資料
   useEffect(() => {
     if (selectedDate) {
       loadBookingsForDate(selectedDate, selectedRoom);
     }
-  }, [selectedRoom]);
+  }, [selectedDate, selectedRoom, loadBookingsForDate]);
 
   // 渲染日期格子
   const renderDateCell = (day, index) => {
     const isSelected = selectedDate && day.date.isSame(selectedDate, 'day');
-    const hasBookings =
-      getBookingsForDateAndRoom(day.date, selectedRoom).length > 0;
-
     // 檢查日期是否為今天以前（包含今天）
     const isTodayOrPast =
       day.date.isSame(dayjs(), 'day') || day.date.isBefore(dayjs(), 'day');
@@ -218,19 +215,22 @@ function Booking() {
     setCurrentDate(currentDate.add(direction, 'month').startOf('month'));
   };
 
-  const handleDateClick = date => {
-    // 如果選擇的是同一個日期，不做任何改變
-    if (selectedDate && selectedDate.isSame(date, 'day')) {
-      return;
-    }
+  const handleDateClick = useCallback(
+    date => {
+      // 如果選擇的是同一個日期，不做任何改變
+      if (selectedDate && selectedDate.isSame(date, 'day')) {
+        return;
+      }
 
-    // 選擇新日期時，重置所有相關狀態
-    setSelectedDate(date);
-    setSelectedTimeSlots([]); // 重置選中的時段
+      // 選擇新日期時，重置所有相關狀態
+      setSelectedDate(date);
+      setSelectedTimeSlots([]); // 重置選中的時段
 
-    // 載入該日期的 Firestore 預訂資料
-    loadBookingsForDate(date, selectedRoom);
-  };
+      // 載入該日期的 Firestore 預訂資料
+      loadBookingsForDate(date, selectedRoom);
+    },
+    [selectedDate, selectedRoom, loadBookingsForDate]
+  );
 
   const handleTimeSlotClick = timeSlot => {
     if (isTimeSlotBooked(timeSlot, selectedDate, selectedRoom)) {
@@ -488,6 +488,7 @@ function Booking() {
 
   const currentRoom = ROOMS.find(room => room.id === selectedRoom);
 
+  // 渲染房間選擇器
   // 渲染時間類別區塊的共用函數
   const renderTimeCategory = category => {
     const isLastCategory = category === TIME_CATEGORIES.EVENING;
@@ -539,9 +540,9 @@ function Booking() {
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       {/* 標題列 */}
       <PageHeader
-        title={`${currentRoom?.name}預訂日曆`}
-        onBack={goToHome}
-        description="無法預訂今天以前的日期"
+        title={roomId ? `${currentRoom?.name}預訂日曆` : '我要預訂'}
+        onBack={roomId ? goToHome : undefined}
+        description={roomId ? '無法預訂今天以前的日期' : '選擇琴房並預訂時段'}
       />
 
       <div className="max-w-6xl mx-auto px-4 py-4 md:py-6">
