@@ -6,13 +6,13 @@ function UserInfo({ user, onLogout, isMobile = false }) {
     : 'px-3 py-2 rounded-md text-sm font-medium text-secondary-200 hover:bg-secondary-700 hover:text-white transition-colors duration-200';
 
   const welcomeClasses = isMobile
-    ? 'px-3 py-2 text-secondary-200 text-sm border-t border-secondary-600 pt-3'
+    ? 'px-3 py-2 text-secondary-200 text-sm pt-3'
     : 'text-secondary-200 text-sm';
 
   return (
     <>
       <div className={welcomeClasses}>
-        歡迎，{user?.displayName || user?.email?.split('@')[0]}
+        {user?.displayName || user?.email?.split('@')[0]}
       </div>
       <button onClick={onLogout} className={buttonClasses}>
         登出

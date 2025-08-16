@@ -16,7 +16,7 @@ export const HintDialogProvider = ({ children }) => {
     isOpen: false,
     title: '',
     desc: '',
-    type: 'info',
+    type: '',
     onOk: null,
     onCancel: null,
   });
@@ -24,7 +24,7 @@ export const HintDialogProvider = ({ children }) => {
   const toggleHintDialog = ({
     title = '',
     desc = '',
-    type = 'info',
+    type,
     onOk = null,
     onCancel = null,
   } = {}) => {

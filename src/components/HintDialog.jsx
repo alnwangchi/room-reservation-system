@@ -7,7 +7,7 @@ function HintDialog({
   onClose,
   title,
   desc,
-  type = 'info',
+  type,
   onOk,
   onCancel,
   showCancel = false,

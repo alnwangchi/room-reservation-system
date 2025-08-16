@@ -8,11 +8,6 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
       // 更新用戶的儲值餘額
       const newBalance = await userService.updateBalance(userId, amount);
 
-      // 這裡可以添加成功提示或其他邏輯
-      console.log(
-        `Successfully deposited NT$ ${amount} for user ${userId}, new balance: ${newBalance}`
-      );
-
       // 儲值成功後觸發資料重新載入
       if (onRefresh) {
         onRefresh();

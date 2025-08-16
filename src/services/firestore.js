@@ -401,6 +401,7 @@ export const roomService = {
 
   // 更新使用者的房型預訂統計（內部方法）
   async updateUserRoomBookingsStats(userId, roomId, bookingInfo) {
+    console.log('🚀 ~ bookingInfo:', bookingInfo);
     try {
       const userRef = doc(db, 'users', userId);
       const userDoc = await getDoc(userRef);
@@ -411,23 +412,19 @@ export const roomService = {
       }
 
       const userData = userDoc.data();
-      const roomBookingsStats = userData.roomBookingsStats || {};
+      const totalBookings = userData.totalBookings || {};
 
       // 初始化房型統計
-      if (!roomBookingsStats[roomId]) {
-        roomBookingsStats[roomId] = {
-          totalBookings: 0,
-          totalHours: 0,
-        };
+      if (!totalBookings[roomId]) {
+        totalBookings[roomId] = 0;
       }
 
       // 更新統計
-      roomBookingsStats[roomId].totalBookings += 1;
-      roomBookingsStats[roomId].totalHours += bookingInfo.duration || 0;
+      totalBookings[roomId] += 1;
 
       // 更新使用者文檔
       await updateDoc(userRef, {
-        roomBookingsStats,
+        totalBookings,
         updatedAt: dayjs().toDate(), // 使用 dayjs 創建 Date 物件
       });
 
@@ -450,29 +447,14 @@ export const roomService = {
       }
 
       const userData = userDoc.data();
-      const roomBookingsStats = userData.roomBookingsStats || {};
-
-      // 初始化房型統計（如果不存在）
-      if (!roomBookingsStats[roomId]) {
-        roomBookingsStats[roomId] = {
-          totalBookings: 0,
-          totalHours: 0,
-        };
-      }
+      const totalBookings = userData.totalBookings || {};
 
       // 更新統計（減少）
-      roomBookingsStats[roomId].totalBookings = Math.max(
-        0,
-        roomBookingsStats[roomId].totalBookings - 1
-      );
-      roomBookingsStats[roomId].totalHours = Math.max(
-        0,
-        roomBookingsStats[roomId].totalHours - duration
-      );
+      totalBookings[roomId] -= 1;
 
       // 更新使用者文檔
       await updateDoc(userRef, {
-        roomBookingsStats,
+        totalBookings,
         updatedAt: dayjs().toDate(),
       });
 
@@ -501,11 +483,9 @@ export const userService = {
   // 根據 email 獲取使用者
   async getUserByEmail(email) {
     try {
-      console.log('🚀 ~ getUserByEmail ~ email:', email);
       const users = await firestoreService.query('users', [
         { field: 'email', operator: '==', value: email },
       ]);
-      console.log('🚀 ~ getUserByEmail ~ 查詢結果:', users);
       return users.length > 0 ? users[0] : null;
     } catch (error) {
       console.error('❌ Error in getUserByEmail:', error);
@@ -533,20 +513,6 @@ export const userService = {
       const newUserData = {
         ...userData,
         id: customId,
-        balance: 0,
-        roomBookingsStats: {
-          'general-piano-room': {
-            totalBookings: 0,
-            totalHours: 0,
-          },
-          'standard-recording-studio': {
-            totalBookings: 0,
-            totalHours: 0,
-          },
-        },
-        lastLoginAt: dayjs().toDate(), // 最後登入時間
-        createdAt: dayjs().toDate(), // 創建時間
-        updatedAt: dayjs().toDate(), // 更新時間
       };
 
       await setDoc(userRef, newUserData);

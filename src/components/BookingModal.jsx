@@ -2,6 +2,7 @@ import { X } from 'lucide-react';
 import React, { useEffect } from 'react';
 import { calculateEndTime } from '../utils/dateUtils';
 import BalanceCard from './BalanceCard';
+import { useAuth } from '../contexts/AuthContext';
 
 function BookingModal({
   isOpen,
@@ -15,6 +16,7 @@ function BookingModal({
   isProcessing = false,
   processingMessage = '處理中...',
 }) {
+  const { isAdmin } = useAuth();
   // 當 Modal 開啟且有使用者資訊時，自動填入預訂人姓名
   useEffect(() => {
     if (isOpen && userInfo?.displayName && !bookingForm.booker) {
@@ -46,7 +48,9 @@ function BookingModal({
 
         <div className="p-4 md:p-6 space-y-2">
           {/* 餘額顯示 */}
-          {userInfo && <BalanceCard balance={userInfo.balance || 0} />}
+          {userInfo && !isAdmin && (
+            <BalanceCard balance={userInfo.balance || 0} />
+          )}
 
           {/* 選中時段顯示 */}
           <div className="p-3 bg-blue-50 rounded-lg">
@@ -67,24 +71,26 @@ function BookingModal({
           </div>
 
           {/* 費用計算 */}
-          <div className="p-3 bg-green-50 rounded-lg">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-green-800">
-                費用計算：
-              </span>
-              <span className="text-sm text-green-600">
-                {selectedTimeSlots.length} × ${roomInfo?.price}/時段
-              </span>
+          {!isAdmin && (
+            <div className="p-3 bg-green-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-green-800">
+                  費用計算：
+                </span>
+                <span className="text-sm text-green-600">
+                  {selectedTimeSlots.length} × ${roomInfo?.price}/時段
+                </span>
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-green-200">
+                <span className="text-sm font-semibold text-green-800">
+                  總費用：
+                </span>
+                <span className="text-lg font-bold text-green-800">
+                  ${selectedTimeSlots.length * roomInfo?.price}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-green-200">
-              <span className="text-sm font-semibold text-green-800">
-                總費用：
-              </span>
-              <span className="text-lg font-bold text-green-800">
-                ${selectedTimeSlots.length * roomInfo?.price}
-              </span>
-            </div>
-          </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -101,19 +107,24 @@ function BookingModal({
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              使用說明
-            </label>
-            <input
-              value={bookingForm.description}
-              onChange={e =>
-                setBookingForm({ ...bookingForm, description: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder=""
-            />
-          </div>
+          {!isAdmin && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                使用說明
+              </label>
+              <input
+                value={bookingForm.description}
+                onChange={e =>
+                  setBookingForm({
+                    ...bookingForm,
+                    description: e.target.value,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder=""
+              />
+            </div>
+          )}
 
           <div className="flex gap-3 pt-2">
             <button
@@ -128,12 +139,14 @@ function BookingModal({
                 isProcessing ||
                 !bookingForm.booker.trim() ||
                 (userInfo &&
+                  !isAdmin &&
                   userInfo.balance < selectedTimeSlots.length * roomInfo?.price)
               }
               className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
                 !isProcessing &&
                 bookingForm.booker.trim() &&
                 (!userInfo ||
+                  !isAdmin ||
                   userInfo.balance >=
                     selectedTimeSlots.length * roomInfo?.price)
                   ? 'bg-blue-600 hover:bg-blue-700 text-white'
@@ -141,14 +154,10 @@ function BookingModal({
               }`}
             >
               {isProcessing ? (
-                <div className="flex items-center justify-center space-x-2">
+                <div className="flex items-center justify-center space-x-1">
                   <div className="text-sm animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   <span>{processingMessage}</span>
                 </div>
-              ) : userInfo &&
-                userInfo.balance <
-                  selectedTimeSlots.length * roomInfo?.price ? (
-                '餘額不足'
               ) : (
                 '確認預訂'
               )}

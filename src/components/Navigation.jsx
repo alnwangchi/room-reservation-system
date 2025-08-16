@@ -123,14 +123,14 @@ function Navigation() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden pb-6 sm:pb-8">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-secondary-700 rounded-lg mt-2">
+            <div className="px-2 pt-2 pb-3 space-y-2 sm:px-3 bg-secondary-700 rounded-lg mt-2">
               {navItems.map(item => (
                 <NavItem
                   key={item.path}
                   to={item.path}
                   isActive={isActive(item.path)}
-                  isMobile={true}
-                  show={true}
+                  isMobile
+                  show
                   onClick={closeMobileMenu}
                 >
                   {item.label}

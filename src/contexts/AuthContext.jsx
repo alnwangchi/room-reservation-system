@@ -1,7 +1,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '../config/firebase';
-import { userService } from '../services/firestore';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { auth } from '@config/firebase';
+import { userService } from '@services/firestore';
 
 const AuthContext = createContext();
 
@@ -16,7 +16,6 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
-  console.log('🚀 ~ AuthProvider ~ userProfile:', userProfile);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,13 +52,17 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  // 計算 isAdmin 狀態
+  const isAdmin = userProfile?.role === 'admin';
+  const isUser = userProfile?.role === 'user';
+
   const value = {
     user,
     userProfile,
     loading,
     isAuthenticated: !!user,
-    isAdmin: userProfile?.role === 'admin',
-    isUser: userProfile?.role === 'user',
+    isAdmin,
+    isUser,
     updateUserProfile: setUserProfile, // 提供更新使用者資料的函數
   };
 

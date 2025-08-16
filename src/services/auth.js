@@ -48,7 +48,7 @@ export const authService = {
     }
   },
 
-  // 登入
+  // 尚未開放密碼登入
   async login(email, password) {
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -78,21 +78,24 @@ export const authService = {
           uid: user.uid,
           email: user.email,
           displayName: user.displayName || user.email.split('@')[0],
-          role: 'admin', // 預設角色
+          role: 'user', // 預設角色
           isActive: true,
-          createdAt: dayjs().toDate(), // 使用 dayjs 創建 Date 物件
+          createdAt: dayjs().toDate(),
           photoURL: user.photoURL,
           provider: 'google',
           // 基本資料
-          balance: 1000, // 初始儲值金 1000 元
-          totalBookings: 0,
-          monthlyBookings: 0,
-          lastLoginAt: dayjs().toDate(), // 使用 dayjs 創建 Date 物件
+          balance: 100, // 初始儲值金 100 元
+          totalBookings: {
+            // 預訂房型統計時段數量
+            'general-piano-room': 0,
+            'standard-recording-studio': 0,
+          },
+          lastLoginAt: dayjs().toDate(),
         });
       } else {
         // 如果使用者已存在，更新最後登入時間和頭像
         await userService.updateUser(existingUser.id, {
-          lastLoginAt: dayjs().toDate(), // 使用 dayjs 創建 Date 物件
+          lastLoginAt: dayjs().toDate(),
           photoURL: user.photoURL,
         });
       }
@@ -193,8 +196,8 @@ export const authService = {
   },
 };
 
-// 自定義 Hook 用於管理認證狀態
-export const useAuth = () => {
+// 這邊只有的入的用戶訊息 主要會用 context 的 useAuth 才有他專案的中使用的資訊
+export const useAuthFromGoogle = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -211,6 +214,5 @@ export const useAuth = () => {
     user,
     loading,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin',
   };
 };

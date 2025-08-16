@@ -1,22 +1,23 @@
 import { Calendar, Clock, User } from 'lucide-react';
 import React, { useState } from 'react';
-import { useHintDialog } from '../contexts/HintDialogContext';
+import { useHintDialog } from '@contexts/HintDialogContext';
 import { formatDate } from '../utils/dateUtils';
 import BalanceCard from './BalanceCard';
 import DepositModal from './DepositModal';
+import { useAuth } from '@contexts/AuthContext';
 
 const UserProfileCard = ({
   user,
   userProfile,
   isLoading = false,
   showBalance = true,
-  showStats = true,
   depositButton = false,
   className = '',
   onDeposit,
 }) => {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const { toggleHintDialog } = useHintDialog();
+  const { isAdmin } = useAuth();
 
   const handleDepositClick = () => {
     setIsDepositModalOpen(true);
@@ -81,13 +82,7 @@ const UserProfileCard = ({
   }
 
   const { displayName, email, photoURL } = user;
-  const {
-    balance = 0,
-    totalBookings = 0,
-    monthlyBookings = 0,
-    createdAt,
-    role = 'user',
-  } = userProfile;
+  const { balance = 0, totalBookings, createdAt } = userProfile;
 
   return (
     <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
@@ -116,42 +111,27 @@ const UserProfileCard = ({
               會員自 {formatDate(createdAt)}
             </span>
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              {role === 'admin' ? '管理員' : '一般用戶'}
+              {isAdmin ? '管理員' : '一般用戶'}
             </span>
           </div>
         </div>
       </div>
-
       {/* 儲值餘額 */}
       {showBalance && <BalanceCard balance={balance} />}
-
       {/* 統計信息 */}
-      {showStats && (
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center">
-              <Calendar className="w-4 h-4 text-blue-600 mr-2" />
-              <span className="text-xs font-medium text-gray-700">總預訂</span>
-            </div>
-            <span className="text-lg font-bold text-gray-900">
-              {totalBookings}
+      <div className="grid grid-cols-2 gap-3 mt-2">
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center">
+            <Calendar className="w-4 h-4 text-blue-600 mr-2" />
+            <span className="text-xs font-medium text-gray-700">
+              預訂時段總數
             </span>
           </div>
-
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center">
-              <Clock className="w-4 h-4 text-green-600 mr-2" />
-              <span className="text-xs font-medium text-gray-700">
-                本月預訂
-              </span>
-            </div>
-            <span className="text-lg font-bold text-gray-900">
-              {monthlyBookings}
-            </span>
-          </div>
+          <span className="text-lg font-bold text-gray-900">
+            {Object.values(totalBookings).reduce((acc, curr) => acc + curr, 0)}
+          </span>
         </div>
-      )}
-
+      </div>
       {/* 儲值按鈕 */}
       {depositButton && (
         <div className="mt-4">
@@ -165,7 +145,6 @@ const UserProfileCard = ({
           </button>
         </div>
       )}
-
       <DepositModal
         isOpen={isDepositModalOpen}
         onClose={handleCloseModal}

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 function NavLink({ to, children, isActive, isMobile = false, onClick }) {
   const baseClasses = isMobile
-    ? 'block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200'
+    ? 'block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 w-full'
     : 'px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200';
 
   const activeClasses = isMobile

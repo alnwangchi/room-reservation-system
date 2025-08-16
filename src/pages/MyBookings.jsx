@@ -6,15 +6,15 @@ import {
 } from '@headlessui/react';
 import { Calendar, Check, ChevronDown } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import BookingCard from '../components/BookingCard';
-import PageHeader from '../components/PageHeader';
-import UserProfileCard from '../components/UserProfileCard';
-import { useAuth } from '../contexts/AuthContext';
-import { useAppNavigate } from '../hooks/useNavigate';
-import { userService } from '../services/firestore';
+import BookingCard from '@components/BookingCard';
+import PageHeader from '@components/PageHeader';
+import UserProfileCard from '@components/UserProfileCard';
+import { useAuth } from '@contexts/AuthContext';
+import { useAppNavigate } from '@hooks/useNavigate';
+import { userService } from '@services/firestore';
 
 function MyBookings() {
-  const { user, userProfile, loading } = useAuth();
+  const { user, userProfile, loading, isAdmin } = useAuth();
   const { goToHome } = useAppNavigate();
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
@@ -26,7 +26,7 @@ function MyBookings() {
   // 載入所有用戶資料（僅 admin 需要）
   useEffect(() => {
     const loadAllUsers = async () => {
-      if (userProfile?.role !== 'admin') return;
+      if (!isAdmin) return;
 
       try {
         setLoadingUsers(true);
@@ -56,9 +56,7 @@ function MyBookings() {
 
         // 如果是 admin，載入選中用戶的預訂資料，否則載入當前用戶的預訂資料
         const targetUserId =
-          userProfile.role === 'admin' && selectedUser
-            ? selectedUser.id
-            : userProfile.id;
+          isAdmin && selectedUser ? selectedUser.id : userProfile.id;
 
         // 如果沒有有效的用戶ID，則不載入預訂
         if (!targetUserId) return;
@@ -74,7 +72,7 @@ function MyBookings() {
     };
 
     loadBookings();
-  }, [user, userProfile, selectedUser]);
+  }, [user, userProfile, selectedUser, isAdmin]);
 
   // 處理取消預訂
   const handleCancelBooking = bookingId => {
@@ -90,9 +88,7 @@ function MyBookings() {
     try {
       setLoadingBookings(true);
       const targetUserId =
-        userProfile.role === 'admin' && selectedUser
-          ? selectedUser.id
-          : userProfile.id;
+        isAdmin && selectedUser ? selectedUser.id : userProfile.id;
 
       // 如果沒有有效的用戶ID，則不載入預訂
       if (!targetUserId) return;
@@ -109,7 +105,7 @@ function MyBookings() {
 
   // 渲染用戶選擇器（僅 admin 可見）
   const renderUserSelector = () => {
-    if (userProfile?.role !== 'admin') return null;
+    if (!isAdmin) return null;
 
     return (
       <div className="mb-6">
@@ -178,7 +174,7 @@ function MyBookings() {
 
   // 根據用戶角色處理預訂數據
   const processBookingsForDisplay = () => {
-    if (userProfile?.role === 'admin') {
+    if (isAdmin) {
       // Admin: 維持原有的多筆顯示
       return bookings;
     } else {

@@ -7,7 +7,6 @@ import BookingModal from '../components/BookingModal';
 import PageHeader from '../components/PageHeader';
 import TimeSlotButton from '../components/TimeSlotButton';
 import {
-  DEFAULT_BOOKINGS,
   ROOMS,
   TIME_CATEGORIES,
   TIME_SLOT_CONFIG,
@@ -23,25 +22,28 @@ function Booking() {
   const { roomId } = useParams();
   const { goToHome } = useAppNavigate();
   const { toggleHintDialog } = useHintDialog();
-  const { user, userProfile, updateUserProfile } = useAuth();
+  const { user, userProfile, updateUserProfile, isAdmin } = useAuth();
 
   const [currentDate, setCurrentDate] = useState(dayjs());
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState();
   const [selectedRoom, _] = useState(roomId || 'general-piano-room');
-  const [showTimeSlots, setShowTimeSlots] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingMessage, setProcessingMessage] = useState('');
 
   // 預訂資料
-  const [bookings, setBookings] = useState(DEFAULT_BOOKINGS);
+  const [bookings, setBookings] = useState([]);
 
   // 預訂表單
   const [bookingForm, setBookingForm] = useState({
     booker: '',
     description: '',
   });
+
+  useEffect(() => {
+    setSelectedDate(dayjs().add(1, 'day'));
+  }, []);
 
   const generateTimeSlots = () => {
     const slots = [];
@@ -135,6 +137,7 @@ function Booking() {
 
   // 渲染日期格子
   const renderDateCell = (day, index) => {
+    console.log('🚀 ~ day:', day);
     const isSelected = selectedDate && day.date.isSame(selectedDate, 'day');
     const hasBookings =
       getBookingsForDateAndRoom(day.date, selectedRoom).length > 0;
@@ -161,12 +164,6 @@ function Booking() {
         `}
       >
         {day.date.date()}
-        {hasBookings && !isDisabled && (
-          <div
-            className="absolute bottom-1 right-1 w-2 h-2 rounded-full"
-            style={{ backgroundColor: currentRoom?.color }}
-          />
-        )}
       </button>
     );
   };
@@ -223,6 +220,7 @@ function Booking() {
   };
 
   const handleDateClick = date => {
+    console.log('🚀 ~ date:', date);
     // 如果選擇的是同一個日期，不做任何改變
     if (selectedDate && selectedDate.isSame(date, 'day')) {
       return;
@@ -231,7 +229,6 @@ function Booking() {
     // 選擇新日期時，重置所有相關狀態
     setSelectedDate(date);
     setSelectedTimeSlots([]); // 重置選中的時段
-    setShowTimeSlots(true);
 
     // 載入該日期的 Firestore 預訂資料
     loadBookingsForDate(date, selectedRoom);
@@ -242,8 +239,8 @@ function Booking() {
       return; // 已被預訂的時段不能點擊
     }
 
-    // 檢查餘額是否足夠支付新增的時段
-    if (userProfile && userProfile.balance !== undefined) {
+    // 檢查餘額是否足夠支付新增的時段（admin 無需檢查餘額）
+    if (userProfile && userProfile.balance !== undefined && isAdmin) {
       const currentRoom = ROOMS.find(room => room.id === selectedRoom);
       if (currentRoom) {
         const newTotalCost = (selectedTimeSlots.length + 1) * currentRoom.price;
@@ -272,17 +269,11 @@ function Booking() {
   };
 
   const handleOpenBookingForm = () => {
-    if (selectedTimeSlots.length === 0) {
-      toggleHintDialog({
-        title: '提示',
-        desc: '請至少選擇一個時段',
-        type: 'warning',
-      });
+    // 檢查餘額是否足夠（admin 無需檢查餘額）
+    if (isAdmin) {
+      setShowBookingForm(true);
       return;
-    }
-
-    // 檢查餘額是否足夠
-    if (userProfile && userProfile.balance !== undefined) {
+    } else {
       const currentRoom = ROOMS.find(room => room.id === selectedRoom);
       if (currentRoom) {
         const totalCost = selectedTimeSlots.length * currentRoom.price;
@@ -295,32 +286,14 @@ function Booking() {
           return;
         }
       }
-    }
 
-    setShowBookingForm(true);
+      setShowBookingForm(true);
+    }
   };
 
-  const handleBooking = async () => {
-    if (!bookingForm.booker.trim()) {
-      toggleHintDialog({
-        title: '提示',
-        desc: '請填寫預訂人姓名',
-        type: 'warning',
-      });
-      return;
-    }
-
-    if (!user) {
-      toggleHintDialog({
-        title: '錯誤',
-        desc: '請先登入後再進行預訂',
-        type: 'error',
-      });
-      return;
-    }
-
-    // 檢查使用者餘額
-    if (!userProfile || userProfile.balance === undefined) {
+  const onSubmit = async () => {
+    // 檢查使用者餘額（admin 無需檢查餘額）
+    if (!isAdmin && (!userProfile || userProfile.balance === undefined)) {
       toggleHintDialog({
         title: '錯誤',
         desc: '無法獲取使用者餘額資訊，請稍後再試',
@@ -341,16 +314,6 @@ function Booking() {
     }
 
     const totalCost = selectedTimeSlots.length * currentRoom.price; // 每個時段的價格
-
-    // 檢查餘額是否足夠
-    if (userProfile.balance < totalCost) {
-      toggleHintDialog({
-        title: '餘額不足',
-        desc: `您的餘額為 NT$ ${userProfile.balance}，不足以支付預訂費用 NT$ ${totalCost}。請先儲值後再進行預訂。`,
-        type: 'error',
-      });
-      return;
-    }
 
     // 🔒 預訂前的最終衝突檢查
     try {
@@ -396,8 +359,7 @@ function Booking() {
     // 顯示確認對話框
     toggleHintDialog({
       title: '確認預訂',
-      desc: `確定要預訂 ${selectedTimeSlots.length} 個時段嗎？\n\n費用：NT$ ${totalCost}\n當前餘額：NT$ ${userProfile.balance}\n預訂後餘額：NT$ ${userProfile.balance - totalCost}`,
-      type: 'warning',
+      desc: `確定要預訂 ${selectedTimeSlots.length} 個時段嗎？`,
       showCancel: true,
       onOk: async () => {
         try {
@@ -428,25 +390,25 @@ function Booking() {
             }
           );
 
-          setProcessingMessage('正在處理預訂...');
+          setProcessingMessage('預訂中...');
           // 等待所有預訂完成
           await Promise.all(bookingPromises);
 
-          setProcessingMessage('正在更新餘額...');
-          // 預訂成功後扣除使用者餘額
-          const userId = userProfile.id;
-          await userService.updateBalance(userId, -totalCost);
+          // 預訂成功後扣除使用者餘額（admin 無需扣除餘額）
+          if (!isAdmin) {
+            setProcessingMessage('正在更新餘額...');
+            const userId = userProfile.id;
+            await userService.updateBalance(userId, -totalCost);
 
-          // 更新本地使用者資料的餘額
-          if (userProfile) {
-            const updatedProfile = {
-              ...userProfile,
-              balance: userProfile.balance - totalCost,
-            };
-            updateUserProfile(updatedProfile);
+            // 更新本地使用者資料的餘額
+            if (userProfile) {
+              const updatedProfile = {
+                ...userProfile,
+                balance: userProfile.balance - totalCost,
+              };
+              updateUserProfile(updatedProfile);
+            }
           }
-
-          setProcessingMessage('預訂完成！');
 
           // 預訂成功後先關閉 modal
           setShowBookingForm(false);
@@ -458,10 +420,8 @@ function Booking() {
 
           // 短暫延遲後顯示成功訊息，確保 modal 已關閉
           setTimeout(() => {
-            const newBalance = userProfile.balance - totalCost;
             toggleHintDialog({
               title: '預訂成功',
-              desc: `共預訂 ${selectedTimeSlots.length} 個時段，已扣除 NT$ ${totalCost}，剩餘餘額 NT$ ${newBalance}`,
               type: 'success',
             });
           }, 200);
@@ -580,7 +540,11 @@ function Booking() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       {/* 標題列 */}
-      <PageHeader title={`${currentRoom?.name}預訂日曆`} onBack={goToHome} />
+      <PageHeader
+        title={`${currentRoom?.name}預訂日曆`}
+        onBack={goToHome}
+        description="無法預訂今天以前的日期"
+      />
 
       <div className="max-w-6xl mx-auto px-4 py-4 md:py-6">
         <div className="space-y-4 md:space-y-6">
@@ -630,7 +594,7 @@ function Booking() {
           </div>
 
           {/* 時間槽區塊 */}
-          {showTimeSlots && selectedDate && (
+          {selectedDate && (
             <div className="bg-white rounded-xl shadow-sm">
               <div className="p-4 md:p-6">
                 <div className="flex items-center justify-between mb-4 md:mb-6">
@@ -690,7 +654,7 @@ function Booking() {
         isOpen={showBookingForm}
         onClose={() => setShowBookingForm(false)}
         selectedTimeSlots={selectedTimeSlots}
-        onSubmit={handleBooking}
+        onSubmit={onSubmit}
         bookingForm={bookingForm}
         setBookingForm={setBookingForm}
         roomInfo={ROOMS.find(room => room.id === selectedRoom)}

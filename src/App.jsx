@@ -1,10 +1,10 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import Navigation from './components/Navigation';
-import ProtectedRoute from './components/ProtectedRoute';
-import { routes } from './config/routes';
-import { AuthProvider } from './contexts/AuthContext';
-import { HintDialogProvider } from './contexts/HintDialogContext';
+import Navigation from '@components/Navigation';
+import ProtectedRoute from '@components/ProtectedRoute';
+import { routes } from '@config/routes';
+import { AuthProvider } from '@contexts/AuthContext';
+import { HintDialogProvider } from '@contexts/HintDialogContext';
 
 function App() {
   return (
