@@ -7,7 +7,7 @@ import { ROOMS } from '../constants';
 import { useAppNavigate } from '../hooks';
 
 function Home() {
-  const { goToBookingPage } = useAppNavigate();
+  const { goToBooking } = useAppNavigate();
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
@@ -75,7 +75,7 @@ function Home() {
                     </div>
 
                     <button
-                      onClick={() => goToBookingPage(room.id)}
+                      onClick={() => goToBooking(room.id)}
                       className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
                     >
                       立即預訂

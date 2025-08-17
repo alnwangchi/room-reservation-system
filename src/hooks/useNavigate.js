@@ -31,11 +31,10 @@ export const useAppNavigate = () => {
   return {
     // 基本導航
     goToHome,
-    goToBookingPage: goToBooking,
-    goToMyBookings: goToMyBookings,
+    goToBooking,
+    goToMyBookings,
     goToRevenueAnalysis,
     goToLogin,
-    goToMyBookingsAfterBooking: goToMyBookings,
     navigate,
   };
 };

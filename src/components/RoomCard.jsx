@@ -2,11 +2,11 @@ import React from 'react';
 import { useAppNavigate } from '../hooks';
 
 function RoomCard({ room }) {
-  const { goToBookingPage } = useAppNavigate();
+  const { goToBooking } = useAppNavigate();
 
   const handleBooking = () => {
     if (room.available) {
-      goToBookingPage(room.id);
+      goToBooking(room.id);
     }
   };
 

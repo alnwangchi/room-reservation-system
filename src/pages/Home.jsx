@@ -61,7 +61,8 @@ function Home() {
                     預訂流程
                   </h3>
                   <p className="text-sm text-orange-700">
-                    完成轉帳後提供轉帳資訊傳至官方賴待人員確認即可預訂！
+                    完成轉帳後提供轉帳資訊傳至官方 line
+                    待人員確認，確認後會立即為您儲值
                   </p>
                 </div>
               </div>

@@ -1,22 +1,17 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import dayjs from 'dayjs';
 import BookingModal from '../components/BookingModal';
+import Calendar from '../components/Calendar';
 import PageHeader from '../components/PageHeader';
 import TimeSlotButton from '../components/TimeSlotButton';
-import {
-  ROOMS,
-  TIME_CATEGORIES,
-  TIME_SLOT_CONFIG,
-  WEEK_DAYS,
-} from '../constants';
+import { ROOMS, TIME_CATEGORIES, TIME_SLOT_CONFIG } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useHintDialog } from '../contexts/HintDialogContext';
-import { useAppNavigate } from '../hooks';
+import { useAppNavigate, useBooking } from '../hooks';
 import { roomService, userService } from '../services/firestore';
-import { calculateEndTime, isTimeInRange } from '../utils/dateUtils';
+import { isTimeInRange } from '../utils/dateUtils';
 
 function Booking() {
   const { roomId } = useParams();
@@ -25,25 +20,26 @@ function Booking() {
   const { user, userProfile, updateUserProfile, isAdmin } = useAuth();
 
   const [currentDate, setCurrentDate] = useState(dayjs());
-  const [selectedDate, setSelectedDate] = useState();
   const selectedRoom = roomId || 'general-piano-room';
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingMessage, setProcessingMessage] = useState('');
 
-  // 預訂資料
-  const [bookings, setBookings] = useState([]);
-
-  // 預訂表單
   const [bookingForm, setBookingForm] = useState({
     booker: '',
     description: '',
   });
 
-  useEffect(() => {
-    setSelectedDate(dayjs().add(1, 'day'));
-  }, []);
+  // 使用新的 custom hook
+  const {
+    selectedDate,
+    setSelectedDate,
+    bookings: _bookings,
+    setBookings: _setBookings,
+    loadBookingsForDate,
+    getBookingsForDateAndRoom,
+  } = useBooking(selectedRoom);
 
   const generateTimeSlots = () => {
     const slots = [];
@@ -79,91 +75,6 @@ function Booking() {
     return slots;
   };
 
-  // 獲取指定日期和琴房的預訂
-  const getBookingsForDateAndRoom = (date, roomId) => {
-    if (!date) return [];
-    const dateStr = date.format('YYYY-MM-DD');
-    return bookings.filter(
-      booking => booking.roomId === roomId && booking.date === dateStr
-    );
-  };
-
-  // 載入指定日期的 Firestore 預訂資料
-  const loadBookingsForDate = useCallback(async (date, roomId) => {
-    if (!date || !roomId) return;
-
-    try {
-      const firestoreBookings = await roomService.getRoomBookingsForDate(
-        roomId,
-        date
-      );
-
-      // 轉換 Firestore 資料格式為本地格式
-      const localBookings = firestoreBookings.map(booking => ({
-        id: booking.id,
-        roomId: booking.roomId,
-        booker: booking.booker,
-        date: booking.date,
-        startTime: booking.timeSlot,
-        endTime: calculateEndTime(booking.timeSlot, 30),
-        description: booking.description,
-        bookerId: booking.bookerId,
-      }));
-
-      // 更新本地預訂狀態
-      setBookings(prev => {
-        // 移除該日期的舊預訂
-        const filtered = prev.filter(
-          booking =>
-            !(
-              booking.roomId === roomId &&
-              booking.date === date.format('YYYY-MM-DD')
-            )
-        );
-        // 添加新的預訂
-        return [...filtered, ...localBookings];
-      });
-    } catch (error) {
-      console.error('載入預訂資料失敗:', error);
-    }
-  }, []);
-
-  // 頁面載入時初始化預訂資料
-  useEffect(() => {
-    if (selectedDate) {
-      loadBookingsForDate(selectedDate, selectedRoom);
-    }
-  }, [selectedDate, selectedRoom, loadBookingsForDate]);
-
-  // 渲染日期格子
-  const renderDateCell = (day, index) => {
-    const isSelected = selectedDate && day.date.isSame(selectedDate, 'day');
-    // 檢查日期是否為今天以前（包含今天）
-    const isTodayOrPast =
-      day.date.isSame(dayjs(), 'day') || day.date.isBefore(dayjs(), 'day');
-    const isDisabled = !day.isCurrentMonth || isTodayOrPast;
-
-    return (
-      <button
-        key={index}
-        onClick={() => !isDisabled && handleDateClick(day.date)}
-        disabled={isDisabled}
-        className={`
-          p-2 md:p-3 text-sm relative transition-colors
-          ${
-            !isDisabled
-              ? 'text-gray-900 hover:bg-blue-50 cursor-pointer'
-              : 'text-gray-300 cursor-not-allowed'
-          }
-          ${isSelected ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}
-          rounded-lg
-        `}
-      >
-        {day.date.date()}
-      </button>
-    );
-  };
-
   // 檢查時間槽是否被預訂
   const isTimeSlotBooked = (timeSlot, date, roomId) => {
     const roomBookings = getBookingsForDateAndRoom(date, roomId);
@@ -180,42 +91,7 @@ function Booking() {
     });
   };
 
-  // 日曆相關函數
-  const getDaysInMonth = date => {
-    const firstDay = date.startOf('month');
-    const lastDay = date.endOf('month');
-    const daysInMonth = lastDay.date();
-    const startingDay = firstDay.day();
-
-    const days = [];
-
-    // 上個月的日期
-    for (let i = startingDay - 1; i >= 0; i--) {
-      const prevDate = firstDay.subtract(i + 1, 'day');
-      days.push({ date: prevDate, isCurrentMonth: false });
-    }
-
-    // 本月的日期
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = firstDay.date(day);
-      days.push({ date, isCurrentMonth: true });
-    }
-
-    // 補足42格
-    const remainingCells = 42 - days.length;
-    for (let day = 1; day <= remainingCells; day++) {
-      const nextDate = lastDay.add(day);
-      days.push({ date: nextDate, isCurrentMonth: false });
-    }
-
-    return days;
-  };
-
-  const navigateMonth = direction => {
-    setCurrentDate(currentDate.add(direction, 'month').startOf('month'));
-  };
-
-  const handleDateClick = useCallback(
+  const handleDateSelect = useCallback(
     date => {
       // 如果選擇的是同一個日期，不做任何改變
       if (selectedDate && selectedDate.isSame(date, 'day')) {
@@ -548,49 +424,15 @@ function Booking() {
       <div className="max-w-6xl mx-auto px-4 py-4 md:py-6">
         <div className="space-y-4 md:space-y-6">
           {/* 日曆區塊 */}
-          <div className="bg-white rounded-xl shadow-sm">
-            <div className="p-4 md:p-6">
-              {/* 日曆標題 */}
-              <div className="flex items-center justify-between mb-4 md:mb-6">
-                <h2 className="text-xl font-semibold">
-                  {currentDate.format('YYYY年 M月')}
-                </h2>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => navigateMonth(-1)}
-                    className="p-2 hover:bg-gray-100 rounded-lg"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => navigateMonth(1)}
-                    className="p-2 hover:bg-gray-100 rounded-lg"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* 週標題 */}
-              <div className="grid grid-cols-7 gap-1 mb-2">
-                {WEEK_DAYS.map(day => (
-                  <div
-                    key={day}
-                    className="p-2 md:p-3 text-center text-sm font-medium text-gray-500"
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              {/* 日期格子 */}
-              <div className="grid grid-cols-7 gap-1">
-                {getDaysInMonth(currentDate).map((day, index) =>
-                  renderDateCell(day, index)
-                )}
-              </div>
-            </div>
-          </div>
+          <Calendar
+            currentDate={currentDate}
+            selectedDate={selectedDate}
+            onDateSelect={handleDateSelect}
+            onMonthChange={setCurrentDate}
+            disabledDateRange={{
+              end: dayjs(), // 禁用今天及以前的日期
+            }}
+          />
 
           {/* 時間槽區塊 */}
           {selectedDate && (

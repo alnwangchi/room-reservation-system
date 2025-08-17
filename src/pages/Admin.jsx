@@ -2,6 +2,7 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Calendar, Shield, Users } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import PageHeader from '../components/PageHeader';
+import RoomManage from '../components/RoomManage';
 import UserList from '../components/UserList';
 import { userService } from '../services/firestore';
 
@@ -9,6 +10,7 @@ function Admin() {
   const [users, setUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [errorUsers, setErrorUsers] = useState(null);
+  const [selectedRoomId, setSelectedRoomId] = useState('general-piano-room');
 
   // 載入所有用戶資料
   useEffect(() => {
@@ -62,7 +64,14 @@ function Admin() {
     {
       name: '教室管理',
       icon: Calendar,
-      content: <div className="p-6">{/* 留白 */}</div>,
+      content: (
+        <div className="p-6">
+          <RoomManage
+            selectedRoomId={selectedRoomId}
+            onRoomChange={setSelectedRoomId}
+          />
+        </div>
+      ),
     },
   ];
 
@@ -75,26 +84,22 @@ function Admin() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <TabGroup>
-            <TabList className="flex border-b border-gray-200 px-6">
+            <TabList className="flex border-b border-gray-200">
               {tabs.map(tab => (
                 <Tab
                   key={tab.name}
                   className={({ selected }) =>
-                    `relative flex-1 flex items-center justify-center space-x-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    `relative flex-1 flex items-center justify-center space-x-2 py-3 text-sm font-medium transition-colors ${
                       selected
                         ? 'text-indigo-600'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                     }`
                   }
                 >
-                  {({ selected }) => (
+                  {() => (
                     <>
                       <tab.icon className="w-5 h-5" />
                       <span>{tab.name}</span>
-                      {/* Active 底線 - 延伸到邊框 */}
-                      {selected && (
-                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
-                      )}
                     </>
                   )}
                 </Tab>
