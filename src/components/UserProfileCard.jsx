@@ -110,9 +110,7 @@ const UserProfileCard = ({
           )}
         </div>
         <div className="flex-1">
-          <h3 className="text-xl font-bold text-gray-900 mb-1">
-            {displayName || email.split('@')[0]}
-          </h3>
+          <h3 className="mb-1">{displayName || email.split('@')[0]}</h3>
           <p className="text-gray-600 text-sm mb-1">{email}</p>
           <div className="flex items-center space-x-2">
             <span className="text-xs text-gray-500">

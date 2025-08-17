@@ -64,7 +64,7 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
             />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">載入失敗</h3>
+        <h3 className="mb-2">載入失敗</h3>
         <p className="text-gray-500 mb-6">{error}</p>
         <button
           onClick={() => window.location.reload()}
@@ -94,7 +94,7 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
             />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">沒有用戶資料</h3>
+        <h3 className="mb-2">沒有用戶資料</h3>
         <p className="text-gray-500">目前系統中還沒有任何用戶</p>
       </div>
     );

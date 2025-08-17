@@ -105,7 +105,7 @@ function RevenueCalculator() {
           <Calculator className="w-6 h-6 text-green-600" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-gray-900">收益分析計算器</h2>
+          <h2>收益分析計算器</h2>
           <p className="text-sm text-gray-600">
             基於租用率和清潔費支出的淨收益計算
           </p>
@@ -201,9 +201,7 @@ function RevenueCalculator() {
       <div className="space-y-4 mb-6">
         {revenueData.map((room, index) => (
           <div key={index} className="p-4 border border-gray-200 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              {room.roomName}
-            </h3>
+            <h3 className="mb-3">{room.roomName}</h3>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>

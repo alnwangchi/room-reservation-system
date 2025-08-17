@@ -1,9 +1,9 @@
-import { X } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-import { updateProfile } from 'firebase/auth';
 import { useAuth } from '@contexts/AuthContext';
 import { useHintDialog } from '@contexts/HintDialogContext';
 import { userService } from '@services/firestore';
+import { updateProfile } from 'firebase/auth';
+import { X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 function RenameModal({ isOpen, onClose }) {
   const [value, setValue] = useState('');
@@ -62,7 +62,7 @@ function RenameModal({ isOpen, onClose }) {
       <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
         {/* 標題 + 關閉按鈕 */}
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">更改名稱</h3>
+          <h3>更改名稱</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"

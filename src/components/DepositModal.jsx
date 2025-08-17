@@ -32,7 +32,7 @@ const DepositModal = ({ isOpen, onClose, onConfirm, user, currentBalance }) => {
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         {/* 標題和關閉按鈕 */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">為用戶儲值</h3>
+          <h3>為用戶儲值</h3>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"

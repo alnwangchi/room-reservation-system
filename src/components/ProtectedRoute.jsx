@@ -24,7 +24,7 @@ function ProtectedRoute({
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">需要登入</h2>
+          <h2 className="mb-4">需要登入</h2>
           <p className="text-gray-600 mb-6">請先登入以訪問此頁面</p>
           <button
             onClick={goToLogin}
@@ -42,7 +42,7 @@ function ProtectedRoute({
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">權限不足</h2>
+          <h2 className="mb-4">權限不足</h2>
           <p className="text-gray-600 mb-6">您沒有權限訪問此頁面</p>
           <button
             onClick={goToHome}

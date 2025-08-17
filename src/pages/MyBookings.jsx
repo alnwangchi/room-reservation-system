@@ -1,18 +1,18 @@
+import BookingCard from '@components/BookingCard';
+import PageHeader from '@components/PageHeader';
+import RenameModal from '@components/RenameModal';
+import UserProfileCard from '@components/UserProfileCard';
+import { useAuth } from '@contexts/AuthContext';
 import {
   Listbox,
   ListboxButton,
   ListboxOption,
   ListboxOptions,
 } from '@headlessui/react';
-import { Calendar, Check, ChevronDown } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import BookingCard from '@components/BookingCard';
-import PageHeader from '@components/PageHeader';
-import UserProfileCard from '@components/UserProfileCard';
-import { useAuth } from '@contexts/AuthContext';
 import { useAppNavigate } from '@hooks/useNavigate';
 import { userService } from '@services/firestore';
-import RenameModal from '@components/RenameModal';
+import { Calendar, Check, ChevronDown } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 function MyBookings() {
   const { user, userProfile, loading, isAdmin } = useAuth();

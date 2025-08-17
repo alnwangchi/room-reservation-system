@@ -11,4 +11,24 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  h1 {
+    @apply text-2xl font-bold text-gray-900;
+  }
+
+  h2 {
+    @apply text-xl font-bold text-gray-900;
+  }
+
+  h3 {
+    @apply text-lg font-semibold text-gray-900;
+  }
+
+  h4 {
+    @apply font-medium text-gray-800;
+  }
+
+  h5 {
+    @apply text-sm font-medium text-gray-800;
+  }
 }

@@ -69,7 +69,7 @@ function RoomManage({ selectedRoomId = 'general-piano-room', onRoomChange }) {
     <div className="space-y-6 relative">
       {/* 房間選擇器 */}
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">選擇房間</h3>
+        <h3 className="mb-4">選擇房間</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {ROOMS.map(room => (
             <div
@@ -85,7 +85,7 @@ function RoomManage({ selectedRoomId = 'general-piano-room', onRoomChange }) {
                 }
               }}
             >
-              <h4 className="font-medium text-gray-800">{room.name}</h4>
+              <h4>{room.name}</h4>
               <p className="text-sm text-gray-600">{room.description}</p>
             </div>
           ))}
@@ -108,7 +108,7 @@ function RoomManage({ selectedRoomId = 'general-piano-room', onRoomChange }) {
           {/* 時段開關設定 */}
           {selectedDate && (
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              <h3 className="mb-4">
                 時段開關設定
                 <span className="text-sm font-normal text-gray-500 ml-2">
                   ({selectedDate.format('YYYY年MM月DD日')})

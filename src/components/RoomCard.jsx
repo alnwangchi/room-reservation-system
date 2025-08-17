@@ -14,9 +14,7 @@ function RoomCard({ room }) {
     <div className="bg-white rounded-lg sm:rounded-xl shadow-md sm:shadow-lg overflow-hidden">
       <div className="p-4 sm:p-5 md:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5 sm:mb-6">
-          <h3 className="text-lg sm:text-xl font-bold text-secondary-800 mb-2 sm:mb-0">
-            {room.name}
-          </h3>
+          <h3 className="mb-2 sm:mb-0">{room.name}</h3>
           <span
             className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-semibold self-start sm:self-auto ${
               room.available
