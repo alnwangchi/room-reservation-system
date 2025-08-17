@@ -180,7 +180,7 @@ export const roomService = {
     try {
       const dateStr = date.format('YYYY-MM-DD');
       const roomRef = doc(db, 'rooms', roomId.toString());
-      const dateRef = doc(roomRef, dateStr, timeSlot);
+      const dateRef = doc(roomRef, dateStr, 'timeSlot');
 
       // 準備用戶預訂記錄相關的引用
       const customId = userInfo.email.split('@')[0];
@@ -194,7 +194,13 @@ export const roomService = {
         // 🔒 先進行所有讀取操作
         // 1. 檢查時段是否已被預訂
         const existingBooking = await transaction.get(dateRef);
+        let existingTimeSlots = {};
         if (existingBooking.exists()) {
+          existingTimeSlots = existingBooking.data();
+        }
+
+        // 檢查該時段是否已被預訂
+        if (existingTimeSlots[timeSlot]) {
           throw new Error('該時段已被預訂');
         }
 
@@ -235,7 +241,9 @@ export const roomService = {
           duration: durationHours,
         };
 
-        transaction.set(dateRef, bookingData);
+        // 將新的預訂添加到現有的 timeSlots 物件中
+        existingTimeSlots[timeSlot] = bookingData;
+        transaction.set(dateRef, existingTimeSlots);
 
         // 2. 同時更新用戶預訂記錄
         if (customId) {
@@ -294,17 +302,20 @@ export const roomService = {
     try {
       const dateStr = date.format('YYYY-MM-DD');
       const roomRef = doc(db, 'rooms', roomId.toString());
-      const dateRef = collection(roomRef, dateStr);
+      const dateRef = doc(roomRef, dateStr, 'timeSlot');
 
-      const querySnapshot = await getDocs(dateRef);
+      const docSnap = await getDoc(dateRef);
       const bookings = [];
 
-      querySnapshot.forEach(doc => {
-        bookings.push({
-          id: doc.id,
-          ...doc.data(),
+      if (docSnap.exists()) {
+        const timeSlots = docSnap.data();
+        Object.keys(timeSlots).forEach(timeSlot => {
+          bookings.push({
+            id: timeSlot,
+            ...timeSlots[timeSlot],
+          });
         });
-      });
+      }
 
       return bookings;
     } catch (error) {
@@ -318,9 +329,25 @@ export const roomService = {
     try {
       const dateStr = date.format('YYYY-MM-DD');
       const roomRef = doc(db, 'rooms', roomId.toString());
-      const dateRef = doc(roomRef, dateStr, timeSlot);
+      const dateRef = doc(roomRef, dateStr, 'timeSlot');
 
-      await deleteDoc(dateRef);
+      // 使用事務來原子性地移除特定的 timeSlot
+      await runTransaction(db, async transaction => {
+        const docSnap = await transaction.get(dateRef);
+        if (docSnap.exists()) {
+          const timeSlots = docSnap.data();
+          if (timeSlots[timeSlot]) {
+            delete timeSlots[timeSlot];
+            // 如果沒有其他預訂了，刪除整個文檔
+            if (Object.keys(timeSlots).length === 0) {
+              transaction.delete(dateRef);
+            } else {
+              transaction.set(dateRef, timeSlots);
+            }
+          }
+        }
+      });
+
       return true;
     } catch (error) {
       console.error('Error canceling room booking:', error);
@@ -341,12 +368,25 @@ export const roomService = {
 
       // 1. 從 rooms 集合中刪除預訂
       const roomRef = doc(db, 'rooms', roomId);
-      const dateRef = doc(roomRef, date, timeSlot);
-      console.log(
-        '🚀 ~ 刪除 rooms 文檔:',
-        `rooms/${roomId}/${date}/${timeSlot}`
-      );
-      await deleteDoc(dateRef);
+      const dateRef = doc(roomRef, date, 'timeSlot');
+      console.log('🚀 ~ 刪除 rooms 文檔:', `rooms/${roomId}/${date}/timeSlot`);
+
+      // 使用事務來原子性地移除特定的 timeSlot
+      await runTransaction(db, async transaction => {
+        const docSnap = await transaction.get(dateRef);
+        if (docSnap.exists()) {
+          const timeSlots = docSnap.data();
+          if (timeSlots[timeSlot]) {
+            delete timeSlots[timeSlot];
+            // 如果沒有其他預訂了，刪除整個文檔
+            if (Object.keys(timeSlots).length === 0) {
+              transaction.delete(dateRef);
+            } else {
+              transaction.set(dateRef, timeSlots);
+            }
+          }
+        }
+      });
       console.log('✅ rooms 文檔刪除成功');
 
       // 2. 從 users 集合中刪除預訂記錄
@@ -465,6 +505,68 @@ export const roomService = {
         error
       );
       return false;
+    }
+  },
+
+  // 控制房間開放設定
+  async updateRoomOpenSetting(roomId, date, openSettings) {
+    try {
+      const dateStr = date.format('YYYY-MM-DD');
+      const roomRef = doc(db, 'rooms', roomId.toString());
+      const openSettingRef = doc(roomRef, dateStr, 'openSetting');
+
+      // 驗證輸入的設定
+      const { morning, afternoon, evening } = openSettings;
+      if (
+        typeof morning !== 'boolean' ||
+        typeof afternoon !== 'boolean' ||
+        typeof evening !== 'boolean'
+      ) {
+        throw new Error('開放設定必須是布林值');
+      }
+
+      // 更新開放設定
+      await setDoc(openSettingRef, {
+        morning,
+        afternoon,
+        evening,
+        updatedAt: dayjs().toDate(),
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error updating room open setting:', error);
+      throw error;
+    }
+  },
+
+  // 獲取房間開放設定
+  async getRoomOpenSetting(roomId, date) {
+    try {
+      const dateStr = date.format('YYYY-MM-DD');
+      const roomRef = doc(db, 'rooms', roomId.toString());
+      const openSettingRef = doc(roomRef, dateStr, 'openSetting');
+
+      const docSnap = await getDoc(openSettingRef);
+
+      if (docSnap.exists()) {
+        return docSnap.data();
+      } else {
+        // 如果沒有設定，返回預設值（全部開放）
+        return {
+          morning: true,
+          afternoon: true,
+          evening: true,
+        };
+      }
+    } catch (error) {
+      console.error('Error getting room open setting:', error);
+      // 發生錯誤時返回預設值
+      return {
+        morning: true,
+        afternoon: true,
+        evening: true,
+      };
     }
   },
 };

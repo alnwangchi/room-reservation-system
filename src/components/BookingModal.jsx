@@ -14,7 +14,6 @@ function BookingModal({
   roomInfo,
   userInfo,
   isProcessing = false,
-  processingMessage = '處理中...',
 }) {
   const { isAdmin } = useAuth();
   // 當 Modal 開啟且有使用者資訊時，自動填入預訂人姓名
@@ -154,7 +153,7 @@ function BookingModal({
               {isProcessing ? (
                 <div className="flex items-center justify-center space-x-1">
                   <div className="text-sm animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>{processingMessage}</span>
+                  <span>處理中</span>
                 </div>
               ) : (
                 '確認預訂'

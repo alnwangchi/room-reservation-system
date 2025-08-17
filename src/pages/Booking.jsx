@@ -9,7 +9,7 @@ import TimeSlotButton from '../components/TimeSlotButton';
 import { ROOMS, TIME_CATEGORIES, TIME_SLOT_CONFIG } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useHintDialog } from '../contexts/HintDialogContext';
-import { useAppNavigate, useBooking } from '../hooks';
+import { useAppNavigate, useBooking, useOpenSettings } from '../hooks';
 import { roomService, userService } from '../services/firestore';
 import { isTimeInRange } from '../utils/dateUtils';
 
@@ -24,7 +24,6 @@ function Booking() {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [processingMessage, setProcessingMessage] = useState('');
 
   const [bookingForm, setBookingForm] = useState({
     booker: '',
@@ -40,6 +39,9 @@ function Booking() {
     loadBookingsForDate,
     getBookingsForDateAndRoom,
   } = useBooking(selectedRoom);
+
+  // 使用 useOpenSettings hook 獲取開放設定
+  const { timeSlots } = useOpenSettings(selectedRoom, selectedDate);
 
   const generateTimeSlots = () => {
     const slots = [];
@@ -238,39 +240,30 @@ function Booking() {
       onOk: async () => {
         try {
           setIsProcessing(true);
-          setProcessingMessage('正在檢查時段可用性...');
 
           // 為每個選中的時段建立 Firestore 預訂記錄
-          const bookingPromises = selectedTimeSlots.map(
-            async (timeSlot, index) => {
-              setProcessingMessage(
-                `正在預訂第 ${index + 1}/${selectedTimeSlots.length} 個時段...`
-              );
+          const bookingPromises = selectedTimeSlots.map(async timeSlot => {
+            const userInfo = {
+              uid: user.uid,
+              displayName: user.displayName || bookingForm.booker,
+              booker: bookingForm.booker,
+              description: bookingForm.description,
+              email: user.email,
+            };
 
-              const userInfo = {
-                uid: user.uid,
-                displayName: user.displayName || bookingForm.booker,
-                booker: bookingForm.booker,
-                description: bookingForm.description,
-                email: user.email,
-              };
+            return await roomService.bookRoomTimeSlot(
+              selectedRoom,
+              selectedDate,
+              timeSlot.time,
+              userInfo
+            );
+          });
 
-              return await roomService.bookRoomTimeSlot(
-                selectedRoom,
-                selectedDate,
-                timeSlot.time,
-                userInfo
-              );
-            }
-          );
-
-          setProcessingMessage('預訂中...');
           // 等待所有預訂完成
           await Promise.all(bookingPromises);
 
           // 預訂成功後扣除使用者餘額（admin 無需扣除餘額）
           if (!isAdmin) {
-            setProcessingMessage('正在更新餘額...');
             const userId = userProfile.id;
             await userService.updateBalance(userId, -totalCost);
 
@@ -353,7 +346,6 @@ function Booking() {
           }, 200);
         } finally {
           setIsProcessing(false);
-          setProcessingMessage('');
         }
       },
       onCancel: () => {
@@ -369,45 +361,68 @@ function Booking() {
   const renderTimeCategory = category => {
     const isLastCategory = category === TIME_CATEGORIES.EVENING;
 
+    // 獲取時段對應的開放狀態
+    const getCategoryKey = category => {
+      if (category === TIME_CATEGORIES.MORNING) return 'morning';
+      if (category === TIME_CATEGORIES.AFTERNOON) return 'afternoon';
+      if (category === TIME_CATEGORIES.EVENING) return 'evening';
+      return 'morning';
+    };
+
+    const categoryKey = getCategoryKey(category);
+    const isTimeSlotOpen = timeSlots[categoryKey];
+
     return (
       <div className={`col-span-full ${!isLastCategory ? 'mb-2 md:mb-4' : ''}`}>
         <h4 className="text-sm font-medium text-gray-700 mb-2 px-2">
           {category.name}
         </h4>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-          {generateTimeSlots()
-            .filter(
-              slot =>
-                slot.hour >= category.startHour && slot.hour < category.endHour
-            )
-            .map((slot, index) => {
-              const isBooked = isTimeSlotBooked(
-                slot,
-                selectedDate,
-                selectedRoom
-              );
-              const booking = getTimeSlotBooking(
-                slot,
-                selectedDate,
-                selectedRoom
-              );
-              const isSelected = selectedTimeSlots.some(
-                selectedSlot => selectedSlot.time === slot.time
-              );
+        {isTimeSlotOpen ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+            {generateTimeSlots()
+              .filter(
+                slot =>
+                  slot.hour >= category.startHour &&
+                  slot.hour < category.endHour
+              )
+              .map((slot, index) => {
+                const isBooked = isTimeSlotBooked(
+                  slot,
+                  selectedDate,
+                  selectedRoom
+                );
+                const booking = getTimeSlotBooking(
+                  slot,
+                  selectedDate,
+                  selectedRoom
+                );
+                const isSelected = selectedTimeSlots.some(
+                  selectedSlot => selectedSlot.time === slot.time
+                );
 
-              return (
-                <TimeSlotButton
-                  key={index}
-                  slot={slot}
-                  isBooked={isBooked}
-                  booking={booking}
-                  isSelected={isSelected}
-                  onClick={() => !isBooked && handleTimeSlotClick(slot)}
-                  disabled={isBooked}
-                />
-              );
-            })}
-        </div>
+                return (
+                  <TimeSlotButton
+                    key={index}
+                    slot={slot}
+                    isBooked={isBooked}
+                    booking={booking}
+                    isSelected={isSelected}
+                    onClick={() => !isBooked && handleTimeSlotClick(slot)}
+                    disabled={isBooked}
+                  />
+                );
+              })}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <div className="text-center">
+              <div className="text-gray-500 text-sm font-medium mb-1">
+                本時段不開放
+              </div>
+              <div className="text-gray-400 text-xs">此時段暫停預訂服務</div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -476,9 +491,7 @@ function Booking() {
                       <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                         <div className="flex items-center space-x-2">
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                          <span className="text-sm text-blue-700">
-                            {processingMessage}
-                          </span>
+                          <span className="text-sm text-blue-700">處理中</span>
                         </div>
                       </div>
                     )}
@@ -501,7 +514,6 @@ function Booking() {
         roomInfo={ROOMS.find(room => room.id === selectedRoom)}
         userInfo={userProfile}
         isProcessing={isProcessing}
-        processingMessage={processingMessage}
       />
     </div>
   );
