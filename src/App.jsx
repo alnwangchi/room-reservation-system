@@ -4,7 +4,7 @@ import ProtectedRoute from '@components/ProtectedRoute';
 import { routes } from '@config/routes';
 import { AuthProvider } from '@contexts/AuthContext';
 import { HintDialogProvider } from '@contexts/HintDialogContext';
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
