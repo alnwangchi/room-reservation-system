@@ -5,7 +5,11 @@ export function LineWebViewRedirect() {
   const { isLineWebView, isLoading, openExternal, openInSafari, openInChrome } =
     useLineWebViewDetector();
 
-  if (!isLineWebView) {
+  // 只在特定頁面（非登入頁面）顯示全螢幕遮罩
+  // 登入頁面會有自己的跳轉按鈕
+  const isLoginPage = window.location.pathname === '/login';
+
+  if (!isLineWebView || isLoginPage) {
     return null;
   }
 

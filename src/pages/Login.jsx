@@ -20,16 +20,6 @@ function Login() {
   }, [isAuthenticated, loading, goToHome]);
 
   const handleGoogleLogin = async () => {
-    // 如果在 LINE WebView 中，不執行登入，因為會被 LineWebViewRedirect 擋住
-    if (isLineWebView) {
-      toggleHintDialog({
-        title: '無法登入',
-        desc: '請使用上方的按鈕跳轉到外部瀏覽器進行登入',
-        type: 'warning',
-      });
-      return;
-    }
-
     setIsLoading(true);
     try {
       await authService.loginWithGoogle();
@@ -107,11 +97,82 @@ function Login() {
             {isLoading ? '登入中...' : '使用 Google 帳戶登入'}
           </button>
 
+          {/* LINE WebView 跳轉提示 */}
+          {true && (
+            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="text-center">
+                <h3 className="text-sm font-medium text-yellow-800 mb-2">
+                  檢測到 LINE 內建瀏覽器
+                </h3>
+                <p className="text-xs text-yellow-700 mb-3">
+                  為了正常進行 Google 登入，請使用外部瀏覽器開啟
+                </p>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => {
+                      const currentUrl = window.location.href;
+                      window.open(currentUrl, '_blank') ||
+                        (window.location.href = currentUrl);
+                    }}
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded text-sm hover:bg-blue-700 transition-colors"
+                  >
+                    🌐 在外部瀏覽器開啟
+                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        const currentUrl = window.location.href;
+                        const ua = navigator.userAgent;
+                        if (/iPhone|iPad|iPod/i.test(ua)) {
+                          window.location.href = currentUrl;
+                        } else {
+                          window.location.href = currentUrl;
+                        }
+                      }}
+                      className="flex-1 bg-gray-600 text-white py-1.5 px-3 rounded text-xs hover:bg-gray-700 transition-colors"
+                    >
+                      Safari
+                    </button>
+                    <button
+                      onClick={() => {
+                        const currentUrl = window.location.href;
+                        const ua = navigator.userAgent;
+                        if (/iPhone|iPad|iPod/i.test(ua)) {
+                          const chromeUrl = `googlechrome://${currentUrl.replace(/^https?:\/\//, '')}`;
+                          window.location.href = chromeUrl;
+                          setTimeout(() => {
+                            window.location.href = currentUrl;
+                          }, 1000);
+                        } else if (/Android/i.test(ua)) {
+                          const host = window.location.host;
+                          const path =
+                            window.location.pathname +
+                            window.location.search +
+                            window.location.hash;
+                          const intentUrl = `intent://${host}${path}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(currentUrl)};end`;
+                          window.location.href = intentUrl;
+                        } else {
+                          window.open(currentUrl, '_blank') ||
+                            (window.location.href = currentUrl);
+                        }
+                      }}
+                      className="flex-1 bg-green-600 text-white py-1.5 px-3 rounded text-xs hover:bg-green-700 transition-colors"
+                    >
+                      Chrome
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">請使用 Google 帳戶登入</p>
-            <p className="text-sm text-gray-600">
-              Line 內建瀏覽器若無法登入，請使用 safari 登入
-            </p>
+            {!isLineWebView && (
+              <p className="text-sm text-gray-600">
+                Line 內建瀏覽器若無法登入，請使用 safari 登入
+              </p>
+            )}
           </div>
         </div>
       </div>
