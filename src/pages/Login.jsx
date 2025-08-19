@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useHintDialog } from '../contexts/HintDialogContext';
 import { useAppNavigate } from '../hooks';
+import { useLineWebViewDetector } from '../hooks/useLineWebViewDetector';
 import { authService } from '../services/auth';
 
 function Login() {
@@ -9,6 +10,7 @@ function Login() {
   const { goToHome } = useAppNavigate();
   const { toggleHintDialog } = useHintDialog();
   const { isAuthenticated, loading } = useAuth();
+  const { isLineWebView } = useLineWebViewDetector();
 
   // 監聽認證狀態變化，登入成功後自動跳轉
   useEffect(() => {
@@ -18,6 +20,16 @@ function Login() {
   }, [isAuthenticated, loading, goToHome]);
 
   const handleGoogleLogin = async () => {
+    // 如果在 LINE WebView 中，不執行登入，因為會被 LineWebViewRedirect 擋住
+    if (isLineWebView) {
+      toggleHintDialog({
+        title: '無法登入',
+        desc: '請使用上方的按鈕跳轉到外部瀏覽器進行登入',
+        type: 'warning',
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       await authService.loginWithGoogle();
@@ -32,6 +44,10 @@ function Login() {
         errorMessage = '登入視窗被阻擋，請允許彈出視窗';
       } else if (error.code === 'auth/network-request-failed') {
         errorMessage = '網路連線失敗，請檢查網路設定';
+      } else if (error.code === 'auth/unauthorized-domain') {
+        errorMessage = '此網域未被授權進行 Google 登入';
+      } else if (error.message && error.message.includes('disallowed_useragent')) {
+        errorMessage = '目前的瀏覽器環境不支援 Google 登入，請使用外部瀏覽器';
       }
 
       toggleHintDialog({

@@ -96,7 +96,6 @@ function RoomManage({ selectedRoomId = 'general-piano-room', onRoomChange }) {
               }}
             >
               <h4>{room.name}</h4>
-              <p className="text-sm text-gray-600">{room.description}</p>
             </div>
           ))}
         </div>
