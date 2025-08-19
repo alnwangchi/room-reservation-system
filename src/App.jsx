@@ -1,4 +1,3 @@
-import { LineWebViewRedirect } from '@components/LineWebViewRedirect';
 import Navigation from '@components/Navigation';
 import ProtectedRoute from '@components/ProtectedRoute';
 import { routes } from '@config/routes';
@@ -13,7 +12,6 @@ function App() {
       <HintDialogProvider>
         <Router>
           <div className="App">
-            <LineWebViewRedirect />
             <Navigation />
             <main className="main-content">
               <Routes>

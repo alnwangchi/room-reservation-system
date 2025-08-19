@@ -46,7 +46,10 @@ function Login() {
         errorMessage = '網路連線失敗，請檢查網路設定';
       } else if (error.code === 'auth/unauthorized-domain') {
         errorMessage = '此網域未被授權進行 Google 登入';
-      } else if (error.message && error.message.includes('disallowed_useragent')) {
+      } else if (
+        error.message &&
+        error.message.includes('disallowed_useragent')
+      ) {
         errorMessage = '目前的瀏覽器環境不支援 Google 登入，請使用外部瀏覽器';
       }
 

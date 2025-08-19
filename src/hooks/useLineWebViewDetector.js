@@ -11,11 +11,14 @@ export function useLineWebViewDetector() {
       // 更精確的 LINE WebView 檢測
       const isLine = /Line/i.test(ua);
       const isWebView = /WebView/i.test(ua) || /wv/i.test(ua);
-      const isInApp = /FBAN|FBAV|Instagram|LINE|WeChat|MicroMessenger/i.test(ua);
-      
+      const isInApp = /FBAN|FBAV|Instagram|LINE|WeChat|MicroMessenger/i.test(
+        ua
+      );
+
       // 檢測是否為 LINE 內建瀏覽器
-      const isLineApp = /Line/i.test(ua) && (/Mobile/i.test(ua) || /App/i.test(ua));
-      
+      const isLineApp =
+        /Line/i.test(ua) && (/Mobile/i.test(ua) || /App/i.test(ua));
+
       // 任何一種情況都被視為需要跳轉的環境
       const isRestrictedWebView = isLine || (isWebView && isInApp) || isLineApp;
 
@@ -25,7 +28,7 @@ export function useLineWebViewDetector() {
         isWebView,
         isInApp,
         isLineApp,
-        isRestrictedWebView
+        isRestrictedWebView,
       });
 
       setIsLineWebView(isRestrictedWebView);
@@ -49,7 +52,7 @@ export function useLineWebViewDetector() {
         // iOS 設備：多種方式嘗試跳轉
         // 方法1: 嘗試 Universal Link
         window.open(currentUrl, '_blank');
-        
+
         // 方法2: 延遲後嘗試 Safari scheme
         setTimeout(() => {
           try {
@@ -62,8 +65,11 @@ export function useLineWebViewDetector() {
       } else if (isAndroid) {
         // Android 設備：改良的 Intent 處理
         const host = window.location.host;
-        const path = window.location.pathname + window.location.search + window.location.hash;
-        
+        const path =
+          window.location.pathname +
+          window.location.search +
+          window.location.hash;
+
         // 多種 Intent 方式
         const intents = [
           // Chrome Intent
@@ -71,7 +77,7 @@ export function useLineWebViewDetector() {
           // Firefox Intent
           `intent://${host}${path}#Intent;scheme=https;package=org.mozilla.firefox;S.browser_fallback_url=${encodeURIComponent(currentUrl)};end`,
           // Generic browser Intent
-          `intent://${host}${path}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(currentUrl)};end`
+          `intent://${host}${path}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(currentUrl)};end`,
         ];
 
         // 嘗試第一個 Intent
@@ -79,7 +85,8 @@ export function useLineWebViewDetector() {
 
         // 備用方案
         setTimeout(() => {
-          window.open(currentUrl, '_blank') || (window.location.href = currentUrl);
+          window.open(currentUrl, '_blank') ||
+            (window.location.href = currentUrl);
         }, 2000);
       } else {
         // 其他設備：使用 window.open 或直接跳轉
@@ -106,7 +113,7 @@ export function useLineWebViewDetector() {
   const openInSafari = useCallback(() => {
     const currentUrl = window.location.href;
     const ua = navigator.userAgent;
-    
+
     if (/iPhone|iPad|iPod/i.test(ua)) {
       // iOS: 嘗試多種方式打開 Safari
       try {
@@ -127,12 +134,12 @@ export function useLineWebViewDetector() {
   const openInChrome = useCallback(() => {
     const currentUrl = window.location.href;
     const ua = navigator.userAgent;
-    
+
     if (/iPhone|iPad|iPod/i.test(ua)) {
       // iOS: Chrome URL scheme
       const chromeUrl = `googlechrome://${currentUrl.replace(/^https?:\/\//, '')}`;
       window.location.href = chromeUrl;
-      
+
       // 備用方案：如果 Chrome 未安裝，跳轉到 Safari
       setTimeout(() => {
         window.location.href = currentUrl;
@@ -140,7 +147,10 @@ export function useLineWebViewDetector() {
     } else if (/Android/i.test(ua)) {
       // Android: Chrome Intent
       const host = window.location.host;
-      const path = window.location.pathname + window.location.search + window.location.hash;
+      const path =
+        window.location.pathname +
+        window.location.search +
+        window.location.hash;
       const intentUrl = `intent://${host}${path}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(currentUrl)};end`;
       window.location.href = intentUrl;
     } else {

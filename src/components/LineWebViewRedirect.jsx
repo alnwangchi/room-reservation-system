@@ -67,17 +67,20 @@ export function LineWebViewRedirect() {
 
           <button
             onClick={() => {
-              navigator.clipboard.writeText(window.location.href).then(() => {
-                alert('網址已複製！請貼到外部瀏覽器中開啟');
-              }).catch(() => {
-                const textArea = document.createElement('textarea');
-                textArea.value = window.location.href;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('網址已複製！請貼到外部瀏覽器中開啟');
-              });
+              navigator.clipboard
+                .writeText(window.location.href)
+                .then(() => {
+                  alert('網址已複製！請貼到外部瀏覽器中開啟');
+                })
+                .catch(() => {
+                  const textArea = document.createElement('textarea');
+                  textArea.value = window.location.href;
+                  document.body.appendChild(textArea);
+                  textArea.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(textArea);
+                  alert('網址已複製！請貼到外部瀏覽器中開啟');
+                });
             }}
             className="w-full bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors text-sm"
           >
@@ -90,14 +93,17 @@ export function LineWebViewRedirect() {
             <strong>為什麼需要跳轉？</strong>
           </p>
           <p className="text-xs text-gray-500">
-            Google 安全政策不允許在 LINE 內建瀏覽器中進行登入驗證，需要使用外部瀏覽器才能正常登入。
+            Google 安全政策不允許在 LINE
+            內建瀏覽器中進行登入驗證，需要使用外部瀏覽器才能正常登入。
           </p>
         </div>
 
         {/* 除錯資訊（僅在開發模式顯示） */}
         {import.meta.env.DEV && (
           <details className="mt-4">
-            <summary className="text-xs text-gray-400 cursor-pointer">除錯資訊</summary>
+            <summary className="text-xs text-gray-400 cursor-pointer">
+              除錯資訊
+            </summary>
             <div className="mt-2 p-2 bg-gray-100 rounded text-xs font-mono">
               <div>User Agent: {navigator.userAgent}</div>
               <div className="mt-1">Location: {window.location.href}</div>
