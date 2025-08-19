@@ -109,6 +109,9 @@ function Login() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">請使用 Google 帳戶登入</p>
+            <p className="text-sm text-gray-600">
+              Line 內建瀏覽器若無法登入，請使用 safari 登入
+            </p>
           </div>
         </div>
       </div>

@@ -30,7 +30,7 @@ function Home() {
                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
               >
                 {/* 房間圖片 */}
-                <div className="h-64 overflow-hidden">
+                <div className="h-80 overflow-hidden">
                   <img
                     src={
                       room.id === 'general-piano-room'
