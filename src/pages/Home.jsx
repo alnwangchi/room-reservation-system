@@ -34,7 +34,7 @@ function Home() {
             </div>
 
             <div className="space-y-6">
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <h3 className="font-semibold text-gray-800 text-lg">
                   轉帳資訊
                 </h3>
@@ -58,7 +58,7 @@ function Home() {
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <h3 className="font-semibold text-gray-800 text-lg">
                   預訂流程
                 </h3>
@@ -68,7 +68,7 @@ function Home() {
                 </p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <div className="flex items-center">
                   <Gift className="w-5 h-5 text-green-600 mr-2" />
                   <h3 className="font-semibold text-gray-800 text-lg">
@@ -86,7 +86,7 @@ function Home() {
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <h3 className="font-semibold text-gray-800 text-lg">
                   營業時間
                 </h3>
@@ -108,7 +108,7 @@ function Home() {
             </div>
 
             <div className="space-y-6">
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <h3 className="font-semibold text-gray-800 text-lg">
                   1. 預約方式
                 </h3>
@@ -124,7 +124,7 @@ function Home() {
                 </ul>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <h3 className="font-semibold text-gray-800 text-lg">
                   2. 取消與更改
                 </h3>
@@ -148,7 +148,7 @@ function Home() {
                 </ul>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <h3 className="font-semibold text-gray-800 text-lg">
                   3. 使用規範
                 </h3>
@@ -168,7 +168,7 @@ function Home() {
                 </ul>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <h3 className="font-semibold text-gray-800 text-lg">
                   4. 設備使用
                 </h3>
@@ -180,7 +180,7 @@ function Home() {
                 </ul>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <h3 className="font-semibold text-gray-800 text-lg">
                   5. 其他事項
                 </h3>
