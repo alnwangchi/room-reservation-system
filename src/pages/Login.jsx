@@ -108,24 +108,26 @@ function Login() {
                   為了正常進行 Google 登入，請使用外部瀏覽器開啟
                 </p>
                 <div className="space-y-2">
-                  <button
-                    onClick={() => {
-                      const currentUrl = window.location.href;
-                      window.open(currentUrl, '_blank') ||
-                        (window.location.href = currentUrl);
-                    }}
-                    className="w-full bg-blue-600 text-white py-2 px-4 rounded text-sm hover:bg-blue-700 transition-colors"
-                  >
-                    🌐 在外部瀏覽器開啟
-                  </button>
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
                         const currentUrl = window.location.href;
                         const ua = navigator.userAgent;
                         if (/iPhone|iPad|iPod/i.test(ua)) {
-                          window.location.href = currentUrl;
+                          // 使用 Safari 的 URL scheme 跳轉到外部 Safari
+                          const safariUrl = `x-web-search://?${encodeURIComponent(currentUrl)}`;
+                          window.location.href = safariUrl;
+
+                          // 如果無法跳轉到 Safari，則延遲後嘗試直接跳轉
+                          setTimeout(() => {
+                            window.location.href = currentUrl;
+                          }, 1000);
+                        } else if (/Android/i.test(ua)) {
+                          // Android 設備嘗試跳轉到預設瀏覽器
+                          window.open(currentUrl, '_blank') ||
+                            (window.location.href = currentUrl);
                         } else {
+                          // 其他設備直接跳轉
                           window.location.href = currentUrl;
                         }
                       }}

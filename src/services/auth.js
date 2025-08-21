@@ -84,9 +84,9 @@ export const authService = {
           photoURL: user.photoURL,
           provider: 'google',
           // 基本資料
-          balance: 100, // 初始儲值金 100 元
+          balance: 0,
+          // 預訂房型統計時段數量
           totalBookings: {
-            // 預訂房型統計時段數量
             'general-piano-room': 0,
             'standard-recording-studio': 0,
           },
