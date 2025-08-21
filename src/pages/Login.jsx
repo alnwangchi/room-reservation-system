@@ -114,14 +114,31 @@ function Login() {
                         const currentUrl = window.location.href;
                         const ua = navigator.userAgent;
                         if (/iPhone|iPad|iPod/i.test(ua)) {
-                          // 使用 Safari 的 URL scheme 跳轉到外部 Safari
-                          const safariUrl = `x-web-search://?${encodeURIComponent(currentUrl)}`;
-                          window.location.href = safariUrl;
+                          // iOS 設備：強制在新視窗開啟以跳轉到外部瀏覽器
+                          try {
+                            // 嘗試在新視窗開啟，這通常會強制使用外部瀏覽器
+                            const newWindow = window.open(currentUrl, '_blank');
 
-                          // 如果無法跳轉到 Safari，則延遲後嘗試直接跳轉
-                          setTimeout(() => {
+                            // 如果無法開啟新視窗，嘗試使用 Safari URL scheme
+                            if (!newWindow) {
+                              // 使用 Safari 的 URL scheme
+                              const safariUrl = `x-web-search://?${encodeURIComponent(currentUrl)}`;
+                              window.location.href = safariUrl;
+
+                              // 延遲後如果還在當前頁面，嘗試直接跳轉
+                              setTimeout(() => {
+                                if (
+                                  !document.hidden &&
+                                  !document.webkitHidden
+                                ) {
+                                  window.location.href = currentUrl;
+                                }
+                              }, 2000);
+                            }
+                          } catch (error) {
+                            // 如果出錯，直接跳轉
                             window.location.href = currentUrl;
-                          }, 1000);
+                          }
                         } else if (/Android/i.test(ua)) {
                           // Android 設備嘗試跳轉到預設瀏覽器
                           window.open(currentUrl, '_blank') ||
