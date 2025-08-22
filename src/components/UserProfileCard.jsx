@@ -4,8 +4,10 @@ import React, { useState } from 'react';
 import { formatDate } from '../utils/dateUtils';
 import BalanceCard from './BalanceCard';
 import DepositModal from './DepositModal';
+import UserBadge from './UserBadge';
 
 const UserProfileCard = ({
+  size,
   user,
   userProfile,
   isLoading = false,
@@ -88,36 +90,51 @@ const UserProfileCard = ({
   return (
     <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
       {/* 用戶基本信息 */}
-      <div className="flex items-center mb-6 relative">
+      <div
+        className={`flex items-center mb-3 relative ${
+          size === 'small' ? 'flex-col' : ''
+        }`}
+      >
         {showRenameButton && (
           <Pen
             className="w-4 h-4 text-gray-500 mr-2 absolute right-2 top-2 cursor-pointer"
             onClick={() => setIsRenameModalOpen(true)}
           />
         )}
-
-        <div className="w-16 h-16 rounded-full overflow-hidden mr-4">
-          {photoURL ? (
-            <img
-              src={photoURL}
-              alt={displayName || email}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <User className="w-8 h-8 text-white" />
-            </div>
+        {size === 'small' && (
+          <div className="absolute right-0 top-0">
+            <UserBadge role={userProfile.role} />
+          </div>
+        )}
+        <div className="flex flex-col justify-center items-center mr-4">
+          <div className="w-16 h-16 rounded-full overflow-hidden mb-1">
+            {photoURL ? (
+              <img
+                src={photoURL}
+                alt={displayName || email}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <User className="w-8 h-8 text-white" />
+              </div>
+            )}
+          </div>
+          {size === 'small' && (
+            <h3 className="text-center">
+              {displayName || email.split('@')[0]}
+            </h3>
           )}
         </div>
         <div className="flex-1">
-          <h3 className="mb-1">{displayName || email.split('@')[0]}</h3>
+          <div className="flex items-center gap-2">
+            {size !== 'small' && <h3>{displayName || email.split('@')[0]}</h3>}
+            {size !== 'small' && <UserBadge role={userProfile.role} />}
+          </div>
           <p className="text-gray-600 text-sm mb-1">{email}</p>
-          <div className="flex items-center space-x-2">
+          <div className="flex space-x-2">
             <span className="text-xs text-gray-500">
               會員自 {formatDate(createdAt)}
-            </span>
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              {userProfile.role === 'admin' ? '管理員' : '一般用戶'}
             </span>
           </div>
         </div>
@@ -140,9 +157,9 @@ const UserProfileCard = ({
       </div>
       {/* 儲值按鈕 */}
       {depositButton && (
-        <div className="mt-4">
+        <div className="mt-2">
           <button
-            className="w-full bg-green-500 text-white font-medium py-3 px-4 rounded-lg"
+            className="w-full bg-green-500 text-white font-medium py-2 rounded-lg"
             onClick={handleDepositClick}
           >
             <div className="flex items-center justify-center">

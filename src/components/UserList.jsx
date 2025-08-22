@@ -101,9 +101,10 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-4">
       {users.map(user => (
         <UserProfileCard
+          size="small"
           key={user.id || user.uid}
           user={{
             displayName:

@@ -3,8 +3,8 @@ import React from 'react';
 
 function BalanceCard({ balance }) {
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
-      <div className="flex items-center justify-between mb-2">
+    <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg px-4 py-2 text-white">
+      <div className="flex items-center justify-between">
         <span className="text-sm font-medium">儲值餘額</span>
         <CreditCard className="w-5 h-5" />
       </div>
