@@ -80,7 +80,9 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
         try {
           setIsCanceling(true);
 
-          const userId = user.email.split('@')[0];
+          // 使用預訂原始用戶的 ID，而不是當前登入用戶的 ID
+          // 優先使用 booking.bookerId，如果沒有則使用 booking.uid，最後才使用當前用戶 ID
+          const userId = booking.bookerId || booking.uid || userProfile?.id;
 
           if (isGrouped && booking.timeSlots) {
             // 分組預訂：需要取消所有時段
@@ -104,8 +106,13 @@ function BookingCard({ booking, onCancel, isGrouped = false }) {
             await userService.cancelBooking(userId, booking, refundAmount);
           }
 
-          // 更新本地使用者資料的餘額
-          if (userProfile && updateUserProfile && refundAmount > 0) {
+          // 只有當取消的是自己的預訂時，才更新本地使用者資料的餘額
+          if (
+            userProfile &&
+            updateUserProfile &&
+            refundAmount > 0 &&
+            userId === userProfile.id
+          ) {
             const updatedProfile = {
               ...userProfile,
               balance: userProfile.balance + refundAmount,
