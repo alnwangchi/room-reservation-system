@@ -116,7 +116,7 @@ function Booking() {
     }
 
     // 檢查餘額是否足夠支付新增的時段（admin 無需檢查餘額）
-    if (userProfile && userProfile.balance !== undefined && isAdmin) {
+    if (userProfile && !!userProfile.balance && !isAdmin) {
       const currentRoom = ROOMS.find(room => room.id === selectedRoom);
       if (currentRoom) {
         const newTotalCost = (selectedTimeSlots.length + 1) * currentRoom.price;
