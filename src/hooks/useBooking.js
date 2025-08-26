@@ -16,7 +16,6 @@ export const useBooking = selectedRoom => {
         roomId,
         date
       );
-      console.log('🚀 ~ firestoreBookings:', firestoreBookings);
 
       // 轉換 Firestore 資料格式為本地格式
       const localBookings = firestoreBookings.map(booking => ({

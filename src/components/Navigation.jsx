@@ -10,7 +10,7 @@ import UserInfo from './UserInfo';
 function Navigation() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { userProfile, isAuthenticated, isAdmin } = useAuth();
   const { toggleHintDialog } = useHintDialog();
 
   const isActive = path => {
@@ -79,7 +79,7 @@ function Navigation() {
 
             {isAuthenticated ? (
               <li className="flex items-center space-x-3">
-                <UserInfo user={user} onLogout={handleLogout} />
+                <UserInfo userProfile={userProfile} onLogout={handleLogout} />
               </li>
             ) : (
               <NavItem to="/login" isActive={isActive('/login')}>
@@ -139,7 +139,7 @@ function Navigation() {
 
               {isAuthenticated ? (
                 <UserInfo
-                  user={user}
+                  userProfile={userProfile}
                   onLogout={handleMobileLogout}
                   isMobile={true}
                 />

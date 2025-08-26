@@ -327,11 +327,9 @@ export const roomService = {
   // 取消房間預訂
   async cancelRoomBooking(roomId, date, timeSlot) {
     try {
-      const dateStr = date.format('YYYY-MM-DD');
       const roomRef = doc(db, 'rooms', roomId.toString());
-      const dateRef = doc(roomRef, dateStr, 'timeSlot');
+      const dateRef = doc(roomRef, date, 'timeSlot');
 
-      // 使用事務來原子性地移除特定的 timeSlot
       await runTransaction(db, async transaction => {
         const docSnap = await transaction.get(dateRef);
         if (docSnap.exists()) {
@@ -358,14 +356,6 @@ export const roomService = {
   // 取消使用者預訂記錄
   async cancelUserBooking(userId, bookingId, roomId, date, timeSlot) {
     try {
-      console.log('🚀 ~ cancelUserBooking ~ 參數:', {
-        userId,
-        bookingId,
-        roomId,
-        date,
-        timeSlot,
-      });
-
       // 1. 從 rooms 集合中刪除預訂
       const roomRef = doc(db, 'rooms', roomId);
       const dateRef = doc(roomRef, date, 'timeSlot');
@@ -703,7 +693,9 @@ export const userService = {
   },
 
   // 取消預訂
-  async cancelBooking(userId, booking, refundAmount = null) {
+  async cancelBooking(userId, booking) {
+    console.log('🚀 ~ userId:', userId);
+    console.log('🚀 ~ booking:', booking);
     try {
       // 調用 roomService 的取消預訂函數
       await roomService.cancelUserBooking(
@@ -715,10 +707,9 @@ export const userService = {
       );
 
       // 取消預訂後將金額儲回使用者餘額
-      const amountToRefund = refundAmount || booking.cost;
+      const amountToRefund = booking.cost;
       if (amountToRefund && amountToRefund > 0) {
         await this.updateBalance(userId, amountToRefund);
-        console.log(`已將 NT$ ${amountToRefund} 儲回使用者 ${userId} 的餘額`);
 
         // 記錄退費日誌（可選功能）
         // 這裡可以根據實際需求實現退費記錄

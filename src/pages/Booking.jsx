@@ -244,11 +244,11 @@ function Booking() {
           // 為每個選中的時段建立 Firestore 預訂記錄
           const bookingPromises = selectedTimeSlots.map(async timeSlot => {
             const userInfo = {
-              uid: user.uid,
-              displayName: user.displayName || bookingForm.booker,
+              uid: userProfile.uid,
+              displayName: userProfile.displayName || bookingForm.booker,
               booker: bookingForm.booker,
               description: bookingForm.description,
-              email: user.email,
+              email: userProfile.email,
             };
 
             return await roomService.bookRoomTimeSlot(

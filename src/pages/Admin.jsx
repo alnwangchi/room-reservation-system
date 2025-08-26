@@ -1,6 +1,7 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { Calendar, Shield, Users } from 'lucide-react';
+import { Calendar, Clock, Shield, Users } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import BookingManage from '../components/BookingManage';
 import PageHeader from '../components/PageHeader';
 import RoomManage from '../components/RoomManage';
 import UserList from '../components/UserList';
@@ -70,6 +71,15 @@ function Admin() {
             selectedRoomId={selectedRoomId}
             onRoomChange={setSelectedRoomId}
           />
+        </div>
+      ),
+    },
+    {
+      name: '預約管理',
+      icon: Clock,
+      content: (
+        <div className="p-6">
+          <BookingManage />
         </div>
       ),
     },

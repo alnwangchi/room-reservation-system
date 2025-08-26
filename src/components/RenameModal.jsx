@@ -13,9 +13,7 @@ function RenameModal({ isOpen, onClose }) {
   const { toggleHintDialog } = useHintDialog();
 
   const isDisabled =
-    !value.trim() ||
-    isLoading ||
-    value === (userProfile?.displayName || user?.displayName);
+    !value.trim() || isLoading || value === userProfile?.displayName;
 
   const onSubmit = async () => {
     try {
@@ -52,9 +50,9 @@ function RenameModal({ isOpen, onClose }) {
   };
 
   useEffect(() => {
-    // 優先使用 userProfile 中的 displayName，如果沒有則使用 Firebase Auth 的 displayName
-    setValue(userProfile?.displayName || user?.displayName || '');
-  }, [user, userProfile]);
+    // 使用 userProfile 中的 displayName
+    setValue(userProfile?.displayName || '');
+  }, [userProfile]);
 
   if (!isOpen) return null;
   return (

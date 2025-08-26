@@ -105,15 +105,14 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
       {users.map(user => (
         <UserProfileCard
           size="small"
-          key={user.id || user.uid}
-          user={{
+          key={user.id}
+          user={null}
+          userProfile={{
+            id: user.id,
             displayName:
               user.displayName || user.email?.split('@')[0] || '未知用戶',
             email: user.email || '無電子郵件',
             photoURL: user.photoURL || null,
-          }}
-          userProfile={{
-            id: user.id || user.uid, // 確保有 ID
             balance: user.balance || 0,
             totalBookings: user.totalBookings || 0,
             monthlyBookings: user.monthlyBookings || 0,

@@ -1,7 +1,13 @@
 import { X } from 'lucide-react';
 import React, { useState } from 'react';
 
-const DepositModal = ({ isOpen, onClose, onConfirm, user, currentBalance }) => {
+const DepositModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  userProfile,
+  currentBalance,
+}) => {
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -45,17 +51,17 @@ const DepositModal = ({ isOpen, onClose, onConfirm, user, currentBalance }) => {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3 mb-4">
             <div className="w-10 h-10 rounded-full overflow-hidden">
-              {user?.photoURL ? (
+              {userProfile?.photoURL ? (
                 <img
-                  src={user.photoURL}
-                  alt={user.displayName || user.email}
+                  src={userProfile.photoURL}
+                  alt={userProfile.displayName || userProfile.email}
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                   <span className="text-white text-sm font-medium">
-                    {user?.displayName?.charAt(0) ||
-                      user?.email?.charAt(0) ||
+                    {userProfile?.displayName?.charAt(0) ||
+                      userProfile?.email?.charAt(0) ||
                       'U'}
                   </span>
                 </div>
@@ -63,9 +69,11 @@ const DepositModal = ({ isOpen, onClose, onConfirm, user, currentBalance }) => {
             </div>
             <div>
               <p className="font-medium text-gray-900">
-                {user?.displayName || user?.email?.split('@')[0] || '未知用戶'}
+                {userProfile?.displayName ||
+                  userProfile?.email?.split('@')[0] ||
+                  '未知用戶'}
               </p>
-              <p className="text-sm text-gray-500">{user?.email}</p>
+              <p className="text-sm text-gray-500">{userProfile?.email}</p>
             </div>
           </div>
           <div className="bg-gray-50 rounded-lg p-3">

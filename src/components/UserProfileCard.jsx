@@ -41,7 +41,7 @@ const UserProfileCard = ({
         toggleHintDialog({
           type: 'success',
           title: '儲值成功',
-          message: `已成功為 ${user?.displayName || user?.email?.split('@')[0]} 儲值 NT$ ${amount.toLocaleString()}`,
+          message: `已成功為 ${userProfile?.displayName || userProfile?.email?.split('@')[0]} 儲值 NT$ ${amount.toLocaleString()}`,
         });
       } catch (error) {
         // 儲值失敗時顯示錯誤訊息
@@ -63,7 +63,7 @@ const UserProfileCard = ({
   };
 
   // 如果沒有傳入資料，顯示載入狀態
-  if (isLoading || !user || !userProfile) {
+  if (isLoading || !userProfile) {
     return (
       <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
         <div className="animate-pulse">
@@ -84,8 +84,14 @@ const UserProfileCard = ({
     );
   }
 
-  const { displayName, email, photoURL } = user;
-  const { balance = 0, totalBookings, createdAt } = userProfile;
+  const {
+    displayName,
+    email,
+    photoURL,
+    balance = 0,
+    totalBookings,
+    createdAt,
+  } = userProfile;
 
   return (
     <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
@@ -172,7 +178,7 @@ const UserProfileCard = ({
         isOpen={isDepositModalOpen}
         onClose={handleCloseModal}
         onConfirm={handleDepositConfirm}
-        user={user}
+        userProfile={userProfile}
         currentBalance={userProfile?.balance}
       />
     </div>
