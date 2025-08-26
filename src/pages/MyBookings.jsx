@@ -12,7 +12,7 @@ import { Calendar } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 function MyBookings() {
-  const { userProfile, loading, isAdmin } = useAuth();
+  const { userProfile, loading } = useAuth();
   const { goToHome } = useAppNavigate();
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
@@ -65,124 +65,119 @@ function MyBookings() {
 
   // 根據用戶角色處理預訂數據
   const processBookingsForDisplay = () => {
-    if (isAdmin) {
-      // Admin: 維持原有的多筆顯示
-      return bookings;
-    } else {
-      // 一般用戶: 同一房型同一天的時段合併顯示
-      const groupedBookings = new Map();
+    // 一般用戶: 同一房型同一天的時段合併顯示
+    const groupedBookings = new Map();
 
-      // 先按房型和日期分組
-      bookings.forEach(booking => {
-        const groupKey = `${booking.roomId}-${booking.date}`;
+    // 先按房型和日期分組
+    bookings.forEach(booking => {
+      const groupKey = `${booking.roomId}-${booking.date}`;
 
-        if (groupedBookings.has(groupKey)) {
-          // 如果已有相同房型和日期的預訂，合併時段
-          const existingGroup = groupedBookings.get(groupKey);
-          existingGroup.timeSlots.push({
-            startTime: booking.startTime,
-            endTime: booking.endTime,
-            id: booking.id,
-          });
-          // 累加費用和時長
-          existingGroup.totalCost =
-            (existingGroup.totalCost || 0) + (booking.cost || 0);
-          existingGroup.totalDuration =
-            (existingGroup.totalDuration || 0) + (booking.duration || 0);
-          // 更新合併ID以包含所有時段
-          existingGroup.id = `${existingGroup.id}_${booking.id}`;
-        } else {
-          // 創建新的分組
-          groupedBookings.set(groupKey, {
-            ...booking,
-            timeSlots: [
-              {
-                startTime: booking.startTime,
-                endTime: booking.endTime,
-                id: booking.id,
-              },
-            ],
-            totalCost: booking.cost || 0,
-            totalDuration: booking.duration || 0,
-            isGrouped: true,
-          });
-        }
-      });
-
-      // 對每個分組的時段按時間排序，並檢查是否可以合併連接的時段
-      Array.from(groupedBookings.values()).forEach(group => {
-        // 先按開始時間排序
-        group.timeSlots.sort((a, b) => a.startTime.localeCompare(b.startTime));
-
-        // 檢查並合併連接的時段
-        const mergedTimeSlots = [];
-        let currentSlot = null;
-
-        group.timeSlots.forEach(slot => {
-          if (!currentSlot) {
-            currentSlot = { ...slot };
-          } else {
-            // 檢查是否連接（當前時段的結束時間等於下一個時段的開始時間）
-            // 注意：這裡需要確保時段是連續的
-            const currentEndTime = currentSlot.endTime;
-            const nextStartTime = slot.startTime;
-
-            // 添加調試資訊
-            console.log(
-              `檢查連接: ${currentEndTime} === ${nextStartTime}`,
-              currentEndTime === nextStartTime
-            );
-
-            if (currentEndTime === nextStartTime) {
-              // 合併時段
-              currentSlot.endTime = slot.endTime;
-              currentSlot.id = `${currentSlot.id}_${slot.id}`;
-              console.log('合併時段:', currentSlot);
-            } else {
-              // 不連接，保存當前時段並開始新的時段
-              mergedTimeSlots.push(currentSlot);
-              currentSlot = { ...slot };
-            }
-          }
+      if (groupedBookings.has(groupKey)) {
+        // 如果已有相同房型和日期的預訂，合併時段
+        const existingGroup = groupedBookings.get(groupKey);
+        existingGroup.timeSlots.push({
+          startTime: booking.startTime,
+          endTime: booking.endTime,
+          id: booking.id,
         });
+        // 累加費用和時長
+        existingGroup.totalCost =
+          (existingGroup.totalCost || 0) + (booking.cost || 0);
+        existingGroup.totalDuration =
+          (existingGroup.totalDuration || 0) + (booking.duration || 0);
+        // 更新合併ID以包含所有時段
+        existingGroup.id = `${existingGroup.id}_${booking.id}`;
+      } else {
+        // 創建新的分組
+        groupedBookings.set(groupKey, {
+          ...booking,
+          timeSlots: [
+            {
+              startTime: booking.startTime,
+              endTime: booking.endTime,
+              id: booking.id,
+            },
+          ],
+          totalCost: booking.cost || 0,
+          totalDuration: booking.duration || 0,
+          isGrouped: true,
+        });
+      }
+    });
 
-        // 添加最後一個時段
-        if (currentSlot) {
-          mergedTimeSlots.push(currentSlot);
+    // 對每個分組的時段按時間排序，並檢查是否可以合併連接的時段
+    Array.from(groupedBookings.values()).forEach(group => {
+      // 先按開始時間排序
+      group.timeSlots.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+      // 檢查並合併連接的時段
+      const mergedTimeSlots = [];
+      let currentSlot = null;
+
+      group.timeSlots.forEach(slot => {
+        if (!currentSlot) {
+          currentSlot = { ...slot };
+        } else {
+          // 檢查是否連接（當前時段的結束時間等於下一個時段的開始時間）
+          // 注意：這裡需要確保時段是連續的
+          const currentEndTime = currentSlot.endTime;
+          const nextStartTime = slot.startTime;
+
+          // 添加調試資訊
+          console.log(
+            `檢查連接: ${currentEndTime} === ${nextStartTime}`,
+            currentEndTime === nextStartTime
+          );
+
+          if (currentEndTime === nextStartTime) {
+            // 合併時段
+            currentSlot.endTime = slot.endTime;
+            currentSlot.id = `${currentSlot.id}_${slot.id}`;
+            console.log('合併時段:', currentSlot);
+          } else {
+            // 不連接，保存當前時段並開始新的時段
+            mergedTimeSlots.push(currentSlot);
+            currentSlot = { ...slot };
+          }
         }
-
-        // 更新分組的時段
-        group.timeSlots = mergedTimeSlots;
-
-        // 重新計算總費用和時長（基於合併後的時段）
-        group.totalCost = mergedTimeSlots.reduce((sum, slot) => {
-          // 計算時段時長（以小時為單位）
-          const startTime = dayjs(`2000-01-01T${slot.startTime}:00`);
-          const endTime = dayjs(`2000-01-01T${slot.endTime}:00`);
-          const slotDuration = endTime.diff(startTime, 'hour', true);
-
-          const room = ROOMS.find(r => r.id === group.roomId);
-          // 每個時段是 30 分鐘，價格是每 30 分鐘的價格
-          const slotCost = room ? slotDuration * 2 * room.price : 0;
-          return sum + slotCost;
-        }, 0);
-
-        group.totalDuration = mergedTimeSlots.reduce((sum, slot) => {
-          // 計算時段時長（以小時為單位）
-          const startTime = dayjs(`2000-01-01T${slot.startTime}:00`);
-          const endTime = dayjs(`2000-01-01T${slot.endTime}:00`);
-          const slotDuration = endTime.diff(startTime, 'hour', true);
-          return sum + slotDuration;
-        }, 0);
       });
 
-      // 轉換為陣列並按日期排序
-      return Array.from(groupedBookings.values()).sort((a, b) => {
-        const dateComparison = b.date.localeCompare(a.date);
-        if (dateComparison !== 0) return dateComparison;
-        return a.timeSlots[0].startTime.localeCompare(b.timeSlots[0].startTime);
-      });
-    }
+      // 添加最後一個時段
+      if (currentSlot) {
+        mergedTimeSlots.push(currentSlot);
+      }
+
+      // 更新分組的時段
+      group.timeSlots = mergedTimeSlots;
+
+      // 重新計算總費用和時長（基於合併後的時段）
+      group.totalCost = mergedTimeSlots.reduce((sum, slot) => {
+        // 計算時段時長（以小時為單位）
+        const startTime = dayjs(`2000-01-01T${slot.startTime}:00`);
+        const endTime = dayjs(`2000-01-01T${slot.endTime}:00`);
+        const slotDuration = endTime.diff(startTime, 'hour', true);
+
+        const room = ROOMS.find(r => r.id === group.roomId);
+        // 每個時段是 30 分鐘，價格是每 30 分鐘的價格
+        const slotCost = room ? slotDuration * 2 * room.price : 0;
+        return sum + slotCost;
+      }, 0);
+
+      group.totalDuration = mergedTimeSlots.reduce((sum, slot) => {
+        // 計算時段時長（以小時為單位）
+        const startTime = dayjs(`2000-01-01T${slot.startTime}:00`);
+        const endTime = dayjs(`2000-01-01T${slot.endTime}:00`);
+        const slotDuration = endTime.diff(startTime, 'hour', true);
+        return sum + slotDuration;
+      }, 0);
+    });
+
+    // 轉換為陣列並按日期排序
+    return Array.from(groupedBookings.values()).sort((a, b) => {
+      const dateComparison = b.date.localeCompare(a.date);
+      if (dateComparison !== 0) return dateComparison;
+      return a.timeSlots[0].startTime.localeCompare(b.timeSlots[0].startTime);
+    });
   };
 
   // 渲染預訂列表
@@ -287,12 +282,8 @@ function MyBookings() {
                 <div className="bg-white rounded-lg shadow p-6">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold text-gray-900">
-                      本月預訂記錄
+                      預訂記錄
                     </h2>
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
-                      <Calendar className="w-4 h-4" />
-                      <span>共 {bookings.length} 筆預訂</span>
-                    </div>
                   </div>
 
                   {loadingBookings ? (

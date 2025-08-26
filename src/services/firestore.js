@@ -706,17 +706,16 @@ export const userService = {
         booking.startTime
       );
 
-      // 取消預訂後將金額儲回使用者餘額
-      const amountToRefund = booking.cost;
-      if (amountToRefund && amountToRefund > 0) {
-        await this.updateBalance(userId, amountToRefund);
+      // 獲取使用者資訊以檢查是否為管理員
+      const userRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userRef);
+      const userData = userDoc.data();
+      const isAdmin = userData?.role === 'admin';
 
-        // 記錄退費日誌（可選功能）
-        // 這裡可以根據實際需求實現退費記錄
-        // 例如：記錄到退費日誌集合、發送退費通知等
-        console.log(
-          `退費記錄: 使用者 ${userId} 取消預訂 ${booking.roomId} ${booking.date} ${booking.startTime}，退費 NT$ ${amountToRefund}`
-        );
+      // 取消預訂後將金額儲回使用者餘額（只有一般使用者才退款）
+      const amountToRefund = booking.cost;
+      if (amountToRefund && amountToRefund > 0 && !isAdmin) {
+        await this.updateBalance(userId, amountToRefund);
       }
 
       return true;

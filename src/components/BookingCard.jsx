@@ -43,11 +43,7 @@ function BookingCard({ booking, isGrouped = false }) {
 
       {/* 時段詳情 */}
       <div className="p-6">
-        <h4 className="text-lg font-semibold text-gray-900 mb-4">
-          {isGrouped
-            ? `預訂時段 (共 ${booking.timeSlots.length} 個)`
-            : '預訂時段'}
-        </h4>
+        <h4 className="text-lg font-semibold text-gray-900 mb-4">預訂時段</h4>
         <div className="mb-4">
           {isGrouped && booking.timeSlots ? (
             <div className="flex flex-wrap gap-2">
