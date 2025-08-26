@@ -18,13 +18,13 @@ function BookingModal({
   const { isAdmin } = useAuth();
   // 當 Modal 開啟且有使用者資訊時，自動填入預訂人姓名
   useEffect(() => {
-    if (isOpen && userInfo?.displayName && !bookingForm.booker) {
+    if (isOpen && userInfo?.displayName) {
       setBookingForm(prev => ({
         ...prev,
         booker: userInfo.displayName,
       }));
     }
-  }, [isOpen, userInfo, setBookingForm, bookingForm.booker]);
+  }, [isOpen, userInfo, setBookingForm]);
 
   if (!isOpen || selectedTimeSlots.length === 0) {
     return null;
