@@ -8,7 +8,6 @@ import UserBadge from './UserBadge';
 
 const UserProfileCard = ({
   size,
-  user,
   userProfile,
   isLoading = false,
   showBalance = true,
@@ -19,7 +18,6 @@ const UserProfileCard = ({
   setIsRenameModalOpen,
 }) => {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-
   const { toggleHintDialog } = useHintDialog();
 
   const handleDepositClick = () => {

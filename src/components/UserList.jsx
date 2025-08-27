@@ -3,6 +3,8 @@ import { userService } from '../services/firestore';
 import UserProfileCard from './UserProfileCard';
 
 const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
+  const displayUsers = users.filter(user => user.role !== 'admin');
+
   const handleDeposit = async (userId, amount) => {
     try {
       // 更新用戶的儲值餘額
@@ -76,7 +78,7 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
     );
   }
 
-  if (users.length === 0) {
+  if (displayUsers.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
@@ -101,32 +103,38 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-4">
-      {users.map(user => (
-        <UserProfileCard
-          size="small"
-          key={user.id}
-          user={null}
-          userProfile={{
-            id: user.id,
-            displayName:
-              user.displayName || user.email?.split('@')[0] || '未知用戶',
-            email: user.email || '無電子郵件',
-            photoURL: user.photoURL || null,
-            balance: user.balance || 0,
-            totalBookings: user.totalBookings || 0,
-            monthlyBookings: user.monthlyBookings || 0,
-            createdAt: user.createdAt || null,
-            role: user.role || 'user',
-          }}
-          showBalance={true}
-          showStats={true}
-          depositButton={true}
-          onDeposit={handleDeposit}
-          className=""
-        />
-      ))}
-    </div>
+    <>
+      <h3 className="font-medium text-gray-900 mb-2">
+        用戶列表({displayUsers.length}名用戶)
+      </h3>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-4">
+        {displayUsers.map(user => (
+          <UserProfileCard
+            size="small"
+            key={user.id}
+            user={null}
+            userProfile={{
+              id: user.id,
+              displayName:
+                user.displayName || user.email?.split('@')[0] || '未知用戶',
+              email: user.email || '無電子郵件',
+              photoURL: user.photoURL || null,
+              balance: user.balance || 0,
+              totalBookings: user.totalBookings || 0,
+              monthlyBookings: user.monthlyBookings || 0,
+              createdAt: user.createdAt || null,
+              role: user.role || 'user',
+            }}
+            showBalance={true}
+            showStats={true}
+            depositButton={true}
+            onDeposit={handleDeposit}
+            className=""
+          />
+        ))}
+      </div>
+    </>
   );
 };
 
