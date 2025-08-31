@@ -326,7 +326,6 @@ export const roomService = {
 
   // 獲取指定年份和月份的所有房間預訂記錄
   async getRoomBookingsForMonth(roomId, year, month) {
-    console.log('🚀 ~ roomId:', roomId);
     try {
       const roomRef = doc(db, 'rooms', roomId.toString());
 
@@ -387,8 +386,6 @@ export const roomService = {
           );
         }
       });
-
-      console.log('🚀 ~ allBookings:', allBookings);
 
       // 按日期和時間排序
       return allBookings.sort((a, b) => {

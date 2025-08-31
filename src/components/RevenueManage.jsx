@@ -15,7 +15,7 @@ function RevenueManage() {
   const [selectedRoom, setSelectedRoom] = useState('all');
   const [selectedMonthYear, setSelectedMonthYear] = useState(
     dayjs().format('YYYY-MM')
-  ); // 新增 YYYY-MM 格式狀態
+  );
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -28,9 +28,12 @@ function RevenueManage() {
     })),
   ];
 
+  const filteredBookings = bookings.filter(
+    booking => booking.booker !== '姿姿Linda'
+  );
+
   // 獲取預訂記錄
   const fetchBookings = async (year, month, roomId = 'all') => {
-    console.log('🚀 ~ year, month, roomId:', year, month, roomId);
     try {
       setLoading(true);
 
@@ -91,7 +94,10 @@ function RevenueManage() {
 
   // 計算總收入
   const calculateTotalRevenue = () => {
-    return bookings.reduce((sum, booking) => sum + (booking.cost || 0), 0);
+    return filteredBookings.reduce(
+      (sum, booking) => sum + (booking.cost || 0),
+      0
+    );
   };
 
   return (
@@ -151,7 +157,7 @@ function RevenueManage() {
           </div>
         )}
 
-        {!loading && bookings.length > 0 && (
+        {!loading && filteredBookings.length > 0 && (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -174,7 +180,7 @@ function RevenueManage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {bookings.map((booking, index) => (
+                {filteredBookings.map((booking, index) => (
                   <tr key={booking.id || index} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {formatDate(booking.date)}
@@ -199,21 +205,22 @@ function RevenueManage() {
         )}
 
         {/* 統計資訊 */}
-        {!loading && bookings.length > 0 && (
+        {!loading && filteredBookings.length > 0 && (
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-600">
                 共{' '}
                 <span className="font-medium text-gray-900">
-                  {bookings.length}
+                  {filteredBookings.length}
                 </span>{' '}
-                筆預訂記錄
+                筆預訂記錄 (扣除姿姿Linda)
               </div>
               <div className="text-sm text-gray-600">
                 總收入：
                 <span className="font-medium text-gray-900">
                   ${calculateTotalRevenue()}
-                </span>
+                </span>{' '}
+                (清潔費率 5% : NT$ {calculateTotalRevenue() * 0.05})
               </div>
             </div>
           </div>
