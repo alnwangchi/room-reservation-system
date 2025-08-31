@@ -17,7 +17,7 @@ function Booking() {
   const { roomId } = useParams();
   const { goToHome } = useAppNavigate();
   const { toggleHintDialog } = useHintDialog();
-  const { user, userProfile, updateUserProfile, isAdmin } = useAuth();
+  const { userProfile, updateUserProfile, isAdmin } = useAuth();
 
   const [currentDate, setCurrentDate] = useState(dayjs());
   const selectedRoom = roomId || 'general-piano-room';
@@ -26,7 +26,6 @@ function Booking() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const [bookingForm, setBookingForm] = useState({
-    booker: '',
     description: '',
   });
 
@@ -107,6 +106,7 @@ function Booking() {
       // 載入該日期的 Firestore 預訂資料
       loadBookingsForDate(date, selectedRoom);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedDate, selectedRoom, loadBookingsForDate]
   );
 
@@ -144,40 +144,7 @@ function Booking() {
     });
   };
 
-  const handleOpenBookingForm = () => {
-    // 檢查餘額是否足夠（admin 無需檢查餘額）
-    if (isAdmin) {
-      setShowBookingForm(true);
-      return;
-    } else {
-      const currentRoom = ROOMS.find(room => room.id === selectedRoom);
-      if (currentRoom) {
-        const totalCost = selectedTimeSlots.length * currentRoom.price;
-        if (userProfile.balance < totalCost) {
-          toggleHintDialog({
-            title: '餘額不足',
-            desc: `您的餘額為 NT$ ${userProfile.balance}，不足以支付 ${selectedTimeSlots.length} 個時段的費用 NT$ ${totalCost}。請先儲值後再進行預訂。`,
-            type: 'error',
-          });
-          return;
-        }
-      }
-
-      setShowBookingForm(true);
-    }
-  };
-
   const onSubmit = async () => {
-    // 檢查使用者餘額（admin 無需檢查餘額）
-    if (!isAdmin && (!userProfile || userProfile.balance === undefined)) {
-      toggleHintDialog({
-        title: '錯誤',
-        desc: '無法獲取使用者餘額資訊，請稍後再試',
-        type: 'error',
-      });
-      return;
-    }
-
     // 計算總預訂費用
     const currentRoom = ROOMS.find(room => room.id === selectedRoom);
     if (!currentRoom) {
@@ -281,7 +248,6 @@ function Booking() {
           setShowBookingForm(false);
           setSelectedTimeSlots([]);
           setBookingForm({
-            booker: '',
             description: '',
           });
 
@@ -477,7 +443,9 @@ function Booking() {
                 {selectedTimeSlots.length > 0 && (
                   <div className="mb-4">
                     <button
-                      onClick={handleOpenBookingForm}
+                      onClick={() => {
+                        setShowBookingForm(true);
+                      }}
                       disabled={isProcessing}
                       className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
@@ -512,7 +480,7 @@ function Booking() {
         bookingForm={bookingForm}
         setBookingForm={setBookingForm}
         roomInfo={ROOMS.find(room => room.id === selectedRoom)}
-        userInfo={userProfile}
+        userProfile={userProfile}
         isProcessing={isProcessing}
       />
     </div>

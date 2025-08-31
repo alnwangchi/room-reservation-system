@@ -324,6 +324,117 @@ export const roomService = {
     }
   },
 
+  // 獲取指定年份和月份的所有房間預訂記錄
+  async getRoomBookingsForMonth(roomId, year, month) {
+    console.log('🚀 ~ roomId:', roomId);
+    try {
+      const roomRef = doc(db, 'rooms', roomId.toString());
+
+      // 生成該月份的所有日期
+      const startDate = dayjs(
+        `${year}-${month.toString().padStart(2, '0')}-01`
+      );
+      const endDate = startDate.endOf('month');
+      const allBookings = [];
+
+      // 生成該月份所有日期的陣列
+      const dateStrings = [];
+      let currentDate = startDate;
+      while (
+        currentDate.isBefore(endDate) ||
+        currentDate.isSame(endDate, 'day')
+      ) {
+        dateStrings.push(currentDate.format('YYYY-MM-DD'));
+        currentDate = currentDate.add(1, 'day');
+      }
+
+      // 使用 Promise.allSettled 並行查詢所有日期
+      const bookingPromises = dateStrings.map(async dateStr => {
+        try {
+          const dateRef = doc(roomRef, dateStr, 'timeSlot');
+          const docSnap = await getDoc(dateRef);
+
+          if (docSnap.exists()) {
+            const timeSlots = docSnap.data();
+            return Object.keys(timeSlots).map(timeSlot => ({
+              id: `${dateStr}_${timeSlot}`,
+              date: dateStr,
+              timeSlot: timeSlot,
+              ...timeSlots[timeSlot],
+            }));
+          }
+          return [];
+        } catch (dateError) {
+          console.warn(
+            `Error getting bookings for date ${dateStr}:`,
+            dateError
+          );
+          return [];
+        }
+      });
+
+      // 等待所有查詢完成
+      const results = await Promise.allSettled(bookingPromises);
+
+      // 處理結果
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          allBookings.push(...result.value);
+        } else {
+          console.warn(
+            `Failed to get bookings for date ${dateStrings[index]}:`,
+            result.reason
+          );
+        }
+      });
+
+      console.log('🚀 ~ allBookings:', allBookings);
+
+      // 按日期和時間排序
+      return allBookings.sort((a, b) => {
+        const dateComparison = a.date.localeCompare(b.date);
+        if (dateComparison !== 0) return dateComparison;
+        return a.timeSlot.localeCompare(b.timeSlot);
+      });
+    } catch (error) {
+      console.error('Error getting room bookings for month:', error);
+      return [];
+    }
+  },
+
+  // 獲取所有房間在指定年份和月份的預訂記錄
+  async getAllRoomsBookingsForMonth(year, month) {
+    try {
+      const allBookings = [];
+      const rooms = ROOMS;
+
+      for (const room of rooms) {
+        const roomBookings = await this.getRoomBookingsForMonth(
+          room.id,
+          year,
+          month
+        );
+        roomBookings.forEach(booking => {
+          allBookings.push({
+            ...booking,
+            roomId: room.id,
+            roomName: room.name,
+          });
+        });
+      }
+
+      // 按日期和時間排序
+      return allBookings.sort((a, b) => {
+        const dateComparison = a.date.localeCompare(b.date);
+        if (dateComparison !== 0) return dateComparison;
+        return a.timeSlot.localeCompare(b.timeSlot);
+      });
+    } catch (error) {
+      console.error('Error getting all rooms bookings for month:', error);
+      return [];
+    }
+  },
+
   // 取消房間預訂
   async cancelRoomBooking(roomId, date, timeSlot) {
     try {

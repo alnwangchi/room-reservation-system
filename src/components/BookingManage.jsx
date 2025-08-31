@@ -1,10 +1,11 @@
 import { Listbox } from '@headlessui/react';
 import dayjs from 'dayjs';
-import { Calendar, ChevronDown, Users, X } from 'lucide-react';
+import { Calendar, ChevronDown, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { ROOMS } from '../constants';
 import { useHintDialog } from '../contexts/HintDialogContext';
 import { userService } from '../services/firestore';
+import MonthSelector from './MonthSelector';
 
 function BookingManage() {
   const { toggleHintDialog } = useHintDialog();
@@ -14,6 +15,7 @@ function BookingManage() {
   const [allUsers, setAllUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM')); // 新增月份選擇狀態
 
   // 載入所有使用者
   useEffect(() => {
@@ -44,7 +46,10 @@ function BookingManage() {
       try {
         setLoading(true);
         setError(null);
-        const userBookings = await userService.getUserBookings(selectedUser.id);
+        const userBookings = await userService.getUserBookings(
+          selectedUser.id,
+          selectedMonth
+        );
         setBookings(userBookings);
       } catch (err) {
         console.error('Error loading user bookings:', err);
@@ -55,7 +60,12 @@ function BookingManage() {
     };
 
     loadUserBookings();
-  }, [selectedUser]);
+  }, [selectedUser, selectedMonth]); // 添加 selectedMonth 依賴
+
+  // 處理月份變更
+  const handleMonthChange = monthValue => {
+    setSelectedMonth(monthValue);
+  };
 
   // 取消預訂
   const handleCancelBooking = async booking => {
@@ -70,7 +80,10 @@ function BookingManage() {
 
       // 重新載入預訂資料
       if (selectedUser) {
-        const userBookings = await userService.getUserBookings(selectedUser.id);
+        const userBookings = await userService.getUserBookings(
+          selectedUser.id,
+          selectedMonth
+        );
         setBookings(userBookings);
       }
     } catch (err) {
@@ -101,7 +114,6 @@ function BookingManage() {
       {/* 使用者選擇器 */}
       <div className="bg-gray-50 p-4 rounded-lg">
         <div className="flex items-center space-x-4">
-          <Users className="w-6 h-6 text-gray-600" />
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               選擇使用者
@@ -174,6 +186,18 @@ function BookingManage() {
                 </div>
               </Listbox>
             )}
+          </div>
+
+          {/* 月份選擇器 */}
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              選擇月份
+            </label>
+            <MonthSelector
+              selectedMonth={selectedMonth}
+              onMonthChange={handleMonthChange}
+              className="w-full"
+            />
           </div>
         </div>
       </div>

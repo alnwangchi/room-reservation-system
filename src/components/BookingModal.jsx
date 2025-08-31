@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { calculateEndTime } from '../utils/dateUtils';
 import BalanceCard from './BalanceCard';
@@ -12,19 +12,10 @@ function BookingModal({
   bookingForm,
   setBookingForm,
   roomInfo,
-  userInfo,
+  userProfile,
   isProcessing = false,
 }) {
   const { isAdmin } = useAuth();
-  // 當 Modal 開啟且有使用者資訊時，自動填入預訂人姓名
-  useEffect(() => {
-    if (isOpen && userInfo?.displayName) {
-      setBookingForm(prev => ({
-        ...prev,
-        booker: userInfo.displayName,
-      }));
-    }
-  }, [isOpen, userInfo, setBookingForm]);
 
   if (!isOpen || selectedTimeSlots.length === 0) {
     return null;
@@ -44,9 +35,8 @@ function BookingModal({
         </div>
 
         <div className="p-4 md:p-6 space-y-2">
-          {/* 餘額顯示 */}
-          {userInfo && !isAdmin && (
-            <BalanceCard balance={userInfo.balance || 0} />
+          {userProfile && !isAdmin && (
+            <BalanceCard balance={userProfile.balance || 0} />
           )}
 
           {/* 選中時段顯示 */}
@@ -89,21 +79,6 @@ function BookingModal({
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              預訂人*
-            </label>
-            <input
-              type="text"
-              value={bookingForm.booker}
-              onChange={e =>
-                setBookingForm({ ...bookingForm, booker: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="輸入預訂人姓名"
-            />
-          </div>
-
           {!isAdmin && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -113,12 +88,10 @@ function BookingModal({
                 value={bookingForm.description}
                 onChange={e =>
                   setBookingForm({
-                    ...bookingForm,
                     description: e.target.value,
                   })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder=""
               />
             </div>
           )}
@@ -132,20 +105,9 @@ function BookingModal({
             </button>
             <button
               onClick={onSubmit}
-              disabled={
-                isProcessing ||
-                !bookingForm.booker.trim() ||
-                (userInfo &&
-                  !isAdmin &&
-                  userInfo.balance < selectedTimeSlots.length * roomInfo?.price)
-              }
+              disabled={isProcessing}
               className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
-                !isProcessing &&
-                bookingForm.booker.trim() &&
-                (!userInfo ||
-                  !isAdmin ||
-                  userInfo.balance >=
-                    selectedTimeSlots.length * roomInfo?.price)
+                !isProcessing
                   ? 'bg-blue-600 hover:bg-blue-700 text-white'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}

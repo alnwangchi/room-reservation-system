@@ -1,4 +1,5 @@
 import BookingCard from '@components/BookingCard';
+import MonthSelector from '@components/MonthSelector';
 import PageHeader from '@components/PageHeader';
 import RenameModal from '@components/RenameModal';
 import UserProfileCard from '@components/UserProfileCard';
@@ -18,6 +19,29 @@ function MyBookings() {
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [error, setError] = useState(null);
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM')); // 新增月份選擇狀態
+
+  // 處理月份變更
+  const handleMonthChange = async monthValue => {
+    setSelectedMonth(monthValue);
+    if (!userProfile?.id) return;
+
+    try {
+      setLoadingBookings(true);
+      setError(null);
+
+      const userBookings = await userService.getUserBookings(
+        userProfile.id,
+        monthValue
+      );
+      setBookings(userBookings);
+    } catch (err) {
+      console.error('Error loading bookings for month:', err);
+      setError('載入該月份預訂資料時發生錯誤');
+    } finally {
+      setLoadingBookings(false);
+    }
+  };
 
   useEffect(() => {
     const loadBookings = async () => {
@@ -28,11 +52,13 @@ function MyBookings() {
         setError(null);
 
         const targetUserId = userProfile.id;
+        console.log('🚀 ~ targetUserId:', targetUserId);
 
         // 如果沒有有效的用戶ID，則不載入預訂
         if (!targetUserId) return;
 
         const userBookings = await userService.getUserBookings(targetUserId);
+        console.log('🚀 ~ userBookings:', userBookings);
         setBookings(userBookings);
       } catch (err) {
         console.error('Error loading bookings:', err);
@@ -284,6 +310,15 @@ function MyBookings() {
                     <h2 className="text-xl font-semibold text-gray-900">
                       預訂記錄
                     </h2>
+                    <div className="flex items-center space-x-4">
+                      {/* Headless UI 月份選擇器 */}
+                      <div className="w-48">
+                        <MonthSelector
+                          selectedMonth={selectedMonth}
+                          onMonthChange={handleMonthChange}
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   {loadingBookings ? (

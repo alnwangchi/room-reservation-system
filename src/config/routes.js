@@ -51,7 +51,7 @@ export const routes = [
   {
     path: '/revenue-analysis',
     element: RevenueAnalysis,
-    label: '收益分析',
+    label: '收益管理',
     showInNav: true,
     requireAuth: true,
     requireAdmin: true,
