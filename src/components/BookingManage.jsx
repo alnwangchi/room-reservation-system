@@ -106,7 +106,11 @@ function BookingManage() {
   const canCancelBooking = booking => {
     const bookingTime = dayjs(`${booking.date} ${booking.startTime}`);
     const now = dayjs();
-    return bookingTime.isAfter(now);
+    const today = now.startOf('day');
+    const bookingDate = bookingTime.startOf('day');
+
+    // 只有當天和未來的預訂才能取消，前一天和更早的預訂都不能取消
+    return bookingDate.isSame(today) || bookingDate.isAfter(today);
   };
 
   return (
