@@ -10,6 +10,7 @@ import { ROOMS, TIME_CATEGORIES, TIME_SLOT_CONFIG } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useHintDialog } from '../contexts/HintDialogContext';
 import { useAppNavigate, useBooking, useOpenSettings } from '../hooks';
+import { emailService } from '../services/email';
 import { roomService, userService } from '../services/firestore';
 import { isTimeInRange } from '../utils/dateUtils';
 
@@ -258,6 +259,27 @@ function Booking() {
               type: 'success',
             });
           }, 200);
+
+          // 發送預約通知 email
+          try {
+            const currentRoom = ROOMS.find(room => room.id === selectedRoom);
+            const timeSlots = selectedTimeSlots
+              .map(slot => slot.time)
+              .join(', ');
+
+            const bookingData = {
+              booker: userProfile.displayName,
+              roomName: currentRoom?.name,
+              date: selectedDate.format('YYYY-MM-DD'),
+              timeSlots: timeSlots,
+              cost: totalCost,
+              description: bookingForm.description || '',
+            };
+
+            await emailService.sendBookingConfirmationEmail(bookingData);
+          } catch (emailError) {
+            console.error('發送預約確認 email 時發生錯誤:', emailError);
+          }
 
           // 重新載入該日期的預訂資料
           await loadBookingsForDate(selectedDate, selectedRoom);
