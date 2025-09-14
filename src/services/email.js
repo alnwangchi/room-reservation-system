@@ -16,7 +16,6 @@ export const emailService = {
       // Firestore Email extension 會監聽這個集合並發送 email
       const docRef = await addDoc(collection(db, 'emails'), emailDoc);
 
-      console.log('Email 觸發成功，文檔 ID:', docRef.id);
       return {
         success: true,
         docId: docRef.id,

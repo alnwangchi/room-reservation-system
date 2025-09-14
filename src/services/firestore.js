@@ -467,7 +467,6 @@ export const roomService = {
       // 1. 從 rooms 集合中刪除預訂
       const roomRef = doc(db, 'rooms', roomId);
       const dateRef = doc(roomRef, date, 'timeSlot');
-      console.log('🚀 ~ 刪除 rooms 文檔:', `rooms/${roomId}/${date}/timeSlot`);
 
       // 使用事務來原子性地移除特定的 timeSlot
       await runTransaction(db, async transaction => {
@@ -485,34 +484,25 @@ export const roomService = {
           }
         }
       });
-      console.log('✅ rooms 文檔刪除成功');
 
       // 2. 從 users 集合中刪除預訂記錄
       // 確保 userId 是正確的格式（email_username）
       const userRef = doc(db, 'users', userId);
       const userBookingsRef = collection(userRef, 'bookings');
-      console.log('🚀 ~ 更新 users 文檔:', `users/${userId}/bookings`);
 
       // 從月份文檔中移除該預訂
       const yearMonth = dayjs(date).format('YYYY-MM');
       const monthDocRef = doc(userBookingsRef, yearMonth);
       const monthDocSnap = await getDoc(monthDocRef);
-      console.log(
-        '🚀 ~ 月份文檔:',
-        yearMonth,
-        monthDocSnap.exists() ? '存在' : '不存在'
-      );
 
       if (monthDocSnap.exists()) {
         const monthData = monthDocSnap.data();
         const roomBookings = monthData[roomId] || [];
-        console.log('🚀 ~ 房型預訂數量:', roomBookings.length);
 
         // 找到並移除對應的預訂記錄
         const updatedRoomBookings = roomBookings.filter(
           booking => !(booking.date === date && booking.startTime === timeSlot)
         );
-        console.log('🚀 ~ 過濾後預訂數量:', updatedRoomBookings.length);
 
         // 更新月份文檔
         const updatedMonthData = {
@@ -521,14 +511,12 @@ export const roomService = {
         };
 
         await setDoc(monthDocRef, updatedMonthData);
-        console.log('✅ users 文檔更新成功');
       } else {
         console.log('⚠️ 月份文檔不存在，跳過 users 更新');
       }
 
       // 3. 更新使用者的房型統計
       await this.updateUserRoomBookingsStatsAfterCancel(userId, roomId, 0.5); // 假設每次預訂是 0.5 小時
-      console.log('✅ 統計更新成功');
 
       return true;
     } catch (error) {
@@ -538,8 +526,7 @@ export const roomService = {
   },
 
   // 更新使用者的房型預訂統計（內部方法）
-  async updateUserRoomBookingsStats(userId, roomId, bookingInfo) {
-    console.log('🚀 ~ bookingInfo:', bookingInfo);
+  async updateUserRoomBookingsStats(userId, roomId) {
     try {
       const userRef = doc(db, 'users', userId);
       const userDoc = await getDoc(userRef);
@@ -802,8 +789,6 @@ export const userService = {
 
   // 取消預訂
   async cancelBooking(userId, booking) {
-    console.log('🚀 ~ userId:', userId);
-    console.log('🚀 ~ booking:', booking);
     try {
       // 調用 roomService 的取消預訂函數
       await roomService.cancelUserBooking(

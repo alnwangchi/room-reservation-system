@@ -10,7 +10,7 @@ import { useAppNavigate } from '@hooks/useNavigate';
 import { userService } from '@services/firestore';
 import dayjs from 'dayjs';
 import { Calendar } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function MyBookings() {
   const { userProfile, loading } = useAuth();
@@ -52,13 +52,11 @@ function MyBookings() {
         setError(null);
 
         const targetUserId = userProfile.id;
-        console.log('🚀 ~ targetUserId:', targetUserId);
 
         // 如果沒有有效的用戶ID，則不載入預訂
         if (!targetUserId) return;
 
         const userBookings = await userService.getUserBookings(targetUserId);
-        console.log('🚀 ~ userBookings:', userBookings);
         setBookings(userBookings);
       } catch (err) {
         console.error('Error loading bookings:', err);
@@ -144,22 +142,13 @@ function MyBookings() {
         if (!currentSlot) {
           currentSlot = { ...slot };
         } else {
-          // 檢查是否連接（當前時段的結束時間等於下一個時段的開始時間）
-          // 注意：這裡需要確保時段是連續的
           const currentEndTime = currentSlot.endTime;
           const nextStartTime = slot.startTime;
-
-          // 添加調試資訊
-          console.log(
-            `檢查連接: ${currentEndTime} === ${nextStartTime}`,
-            currentEndTime === nextStartTime
-          );
 
           if (currentEndTime === nextStartTime) {
             // 合併時段
             currentSlot.endTime = slot.endTime;
             currentSlot.id = `${currentSlot.id}_${slot.id}`;
-            console.log('合併時段:', currentSlot);
           } else {
             // 不連接，保存當前時段並開始新的時段
             mergedTimeSlots.push(currentSlot);
