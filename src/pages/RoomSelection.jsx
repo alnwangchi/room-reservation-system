@@ -13,7 +13,7 @@ function Home() {
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       {/* 頁面標題 */}
       <PageHeader
-        title="琴房預訂系統"
+        title="空間預訂"
         description="專業的琴房和錄音室預訂服務，為您提供舒適的音樂練習和錄製環境"
         icon={Calendar}
         iconBgColor="bg-blue-100"
@@ -22,14 +22,12 @@ function Home() {
 
       <div className="py-6 sm:py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* 房間列表 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
             {ROOMS.map(room => (
               <div
                 key={room.id}
                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
               >
-                {/* 房間圖片 */}
                 <div className="h-80 overflow-hidden">
                   <img
                     src={

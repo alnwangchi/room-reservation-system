@@ -1,51 +1,20 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Calendar, Clock, Shield, Users } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import BookingManage from '../components/BookingManage';
 import PageHeader from '../components/PageHeader';
 import RoomManage from '../components/RoomManage';
 import UserList from '../components/UserList';
-import { userService } from '../services/firestore';
+import useGetUsers from '../hooks/useGetUsers';
 
 function Admin() {
-  const [users, setUsers] = useState([]);
-  const [loadingUsers, setLoadingUsers] = useState(true);
-  const [errorUsers, setErrorUsers] = useState(null);
+  const {
+    allUsers: users,
+    loadingUsers,
+    error: errorUsers,
+    refetch: handleRefreshUsers,
+  } = useGetUsers();
   const [selectedRoomId, setSelectedRoomId] = useState('general-piano-room');
-
-  // 載入所有用戶資料
-  useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        setLoadingUsers(true);
-        setErrorUsers(null);
-        const allUsers = await userService.getAllUsers();
-        setUsers(allUsers);
-      } catch (err) {
-        console.error('Error loading users:', err);
-        setErrorUsers('載入用戶資料時發生錯誤');
-      } finally {
-        setLoadingUsers(false);
-      }
-    };
-
-    loadUsers();
-  }, []);
-
-  // 重新載入用戶資料的函數
-  const handleRefreshUsers = async () => {
-    try {
-      setLoadingUsers(true);
-      setErrorUsers(null);
-      const allUsers = await userService.getAllUsers();
-      setUsers(allUsers);
-    } catch (err) {
-      console.error('Error refreshing users:', err);
-      setErrorUsers('重新載入用戶資料時發生錯誤');
-    } finally {
-      setLoadingUsers(false);
-    }
-  };
 
   const tabs = [
     {

@@ -59,7 +59,7 @@ function Navigation() {
           <div className="flex-shrink-0">
             <NavItem to="/" isActive={isActive('/')}>
               <span className="text-white text-lg sm:text-xl md:text-2xl font-bold hover:text-primary-300 transition-colors duration-200">
-                房間預訂系統
+                知熹音樂教室預訂系統
               </span>
             </NavItem>
           </div>

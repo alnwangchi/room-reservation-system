@@ -4,39 +4,24 @@ import { Calendar, ChevronDown, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { ROOMS } from '../constants';
 import { useHintDialog } from '../contexts/HintDialogContext';
+import useGetUsers from '../hooks/useGetUsers';
 import { userService } from '../services/firestore';
 import MonthSelector from './MonthSelector';
 
 function BookingManage() {
   const { toggleHintDialog } = useHintDialog();
+  const { allUsers, loadingUsers, error: usersError } = useGetUsers();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [allUsers, setAllUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [loadingUsers, setLoadingUsers] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM')); // 新增月份選擇狀態
 
-  // 載入所有使用者
+  // 當使用者載入完成後，設定預設選中的使用者
   useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        setLoadingUsers(true);
-        const users = await userService.getAllUsers();
-        setAllUsers(users);
-        if (users.length > 0) {
-          setSelectedUser(users[3]);
-        }
-      } catch (err) {
-        console.error('Error loading users:', err);
-        setError('載入使用者資料時發生錯誤');
-      } finally {
-        setLoadingUsers(false);
-      }
-    };
-
-    loadUsers();
-  }, []);
+    if (allUsers.length > 0 && !selectedUser) {
+      setSelectedUser(allUsers[3]);
+    }
+  }, [allUsers, selectedUser]);
 
   // 載入選中使用者的預訂資料
   useEffect(() => {
@@ -45,7 +30,6 @@ function BookingManage() {
 
       try {
         setLoading(true);
-        setError(null);
         const userBookings = await userService.getUserBookings(
           selectedUser.id,
           selectedMonth
@@ -53,7 +37,6 @@ function BookingManage() {
         setBookings(userBookings);
       } catch (err) {
         console.error('Error loading user bookings:', err);
-        setError('載入預訂資料時發生錯誤');
       } finally {
         setLoading(false);
       }
@@ -227,13 +210,13 @@ function BookingManage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-2 text-gray-600">載入中...</p>
           </div>
-        ) : error ? (
+        ) : usersError ? (
           <div className="p-6 text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
               <X className="w-8 h-8 text-red-600" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">載入失敗</h3>
-            <p className="text-gray-500 mb-4">{error}</p>
+            <p className="text-gray-500 mb-4">{usersError}</p>
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
