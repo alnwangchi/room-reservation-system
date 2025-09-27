@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-tw';
-import { ChevronDown } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { ROOMS } from '../constants';
 import { roomService } from '../services/firestore';
 import MonthSelector from './MonthSelector';
@@ -18,6 +18,7 @@ function RevenueManage() {
   );
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [expandedBookers, setExpandedBookers] = useState(new Set());
 
   // 房間選項
   const roomOptions = [
@@ -92,6 +93,35 @@ function RevenueManage() {
     return date.format('M/D');
   };
 
+  // 按預訂人分組
+  const groupBookingsByBooker = () => {
+    const grouped = {};
+    filteredBookings.forEach(booking => {
+      const booker = booking.booker || '未知';
+      if (!grouped[booker]) {
+        grouped[booker] = {
+          booker,
+          bookings: [],
+          totalCost: 0,
+        };
+      }
+      grouped[booker].bookings.push(booking);
+      grouped[booker].totalCost += booking.cost || 0;
+    });
+    return Object.values(grouped);
+  };
+
+  // 切換預訂人展開/收合狀態
+  const toggleBookerExpansion = booker => {
+    const newExpanded = new Set(expandedBookers);
+    if (newExpanded.has(booker)) {
+      newExpanded.delete(booker);
+    } else {
+      newExpanded.add(booker);
+    }
+    setExpandedBookers(newExpanded);
+  };
+
   // 計算總收入
   const calculateTotalRevenue = () => {
     return filteredBookings.reduce(
@@ -158,49 +188,67 @@ function RevenueManage() {
         )}
 
         {!loading && filteredBookings.length > 0 && (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    日期
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    房間
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    時段
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    預訂人
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    費用
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredBookings.map((booking, index) => (
-                  <tr key={booking.id || index} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatDate(booking.date)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {booking.roomName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {booking.timeSlot}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {booking.booker || '未知'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${booking.cost || 0}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="p-6 space-y-4">
+            {groupBookingsByBooker().map((bookerGroup, index) => (
+              <div
+                key={bookerGroup.booker || index}
+                className="bg-gray-50 rounded-lg border border-gray-200 p-4"
+              >
+                {/* 預訂人標題 */}
+                <div
+                  className="flex justify-between items-center mb-3 cursor-pointer hover:bg-gray-100 rounded-md p-2 -m-2 transition-colors"
+                  onClick={() => toggleBookerExpansion(bookerGroup.booker)}
+                >
+                  <div className="flex items-center space-x-2">
+                    {expandedBookers.has(bookerGroup.booker) ? (
+                      <ChevronDown className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4 text-gray-500" />
+                    )}
+                    <h4 className="text-lg font-semibold text-gray-900">
+                      {bookerGroup.booker}
+                    </h4>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-600">
+                      共 {bookerGroup.bookings.length} 筆預訂
+                    </div>
+                    <div className="text-lg font-bold text-indigo-600">
+                      ${bookerGroup.totalCost}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 預訂詳情列表 */}
+                {expandedBookers.has(bookerGroup.booker) && (
+                  <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
+                    {bookerGroup.bookings.map((booking, bookingIndex) => (
+                      <div
+                        key={booking.id || bookingIndex}
+                        className="bg-white rounded-md p-3 border border-gray-100"
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center space-x-4">
+                            <span className="text-sm font-medium text-gray-900">
+                              {formatDate(booking.date)}
+                            </span>
+                            <span className="text-sm text-gray-600">
+                              {booking.roomName}
+                            </span>
+                            <span className="text-sm text-gray-600">
+                              {booking.timeSlot}
+                            </span>
+                          </div>
+                          <span className="text-sm font-medium text-gray-900">
+                            ${booking.cost || 0}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
 
@@ -210,6 +258,10 @@ function RevenueManage() {
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-600">
                 共{' '}
+                <span className="font-medium text-gray-900">
+                  {groupBookingsByBooker().length}
+                </span>{' '}
+                位預訂人，{' '}
                 <span className="font-medium text-gray-900">
                   {filteredBookings.length}
                 </span>{' '}
