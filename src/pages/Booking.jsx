@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import dayjs from 'dayjs';
@@ -115,9 +115,9 @@ function Booking() {
     if (isTimeSlotBooked(timeSlot, selectedDate, selectedRoom)) {
       return; // 已被預訂的時段不能點擊
     }
-
+    console.log('123');
     // 檢查餘額是否足夠支付新增的時段（admin 無需檢查餘額）
-    if (userProfile && !!userProfile.balance && !isAdmin) {
+    if (userProfile && userProfile.balance < 1 && !isAdmin) {
       const currentRoom = ROOMS.find(room => room.id === selectedRoom);
       if (currentRoom) {
         const newTotalCost = (selectedTimeSlots.length + 1) * currentRoom.price;
