@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
-import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { isEmpty } from '../utils';
 import { calculateEndTime } from '../utils/dateUtils';
 import BalanceCard from './BalanceCard';
 
@@ -17,7 +17,7 @@ function BookingModal({
 }) {
   const { isAdmin } = useAuth();
 
-  if (!isOpen || selectedTimeSlots.length === 0) {
+  if (!isOpen || isEmpty(selectedTimeSlots)) {
     return null;
   }
 

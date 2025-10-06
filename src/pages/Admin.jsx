@@ -1,7 +1,8 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { Calendar, Clock, Shield, Users } from 'lucide-react';
-import React, { useState } from 'react';
+import { BookMinus, Calendar, Clock, Shield, Users } from 'lucide-react';
+import { useState } from 'react';
 import BookingManage from '../components/BookingManage';
+import CancelBookingRecord from '../components/CancelBookingRecord';
 import PageHeader from '../components/PageHeader';
 import RoomManage from '../components/RoomManage';
 import UserList from '../components/UserList';
@@ -21,36 +22,33 @@ function Admin() {
       name: '使用者管理',
       icon: Users,
       content: (
-        <div className="p-6">
-          <UserList
-            users={users}
-            loading={loadingUsers}
-            error={errorUsers}
-            onRefresh={handleRefreshUsers}
-          />
-        </div>
+        <UserList
+          users={users}
+          loading={loadingUsers}
+          error={errorUsers}
+          onRefresh={handleRefreshUsers}
+        />
       ),
     },
     {
       name: '教室管理',
       icon: Calendar,
       content: (
-        <div className="p-6">
-          <RoomManage
-            selectedRoomId={selectedRoomId}
-            onRoomChange={setSelectedRoomId}
-          />
-        </div>
+        <RoomManage
+          selectedRoomId={selectedRoomId}
+          onRoomChange={setSelectedRoomId}
+        />
       ),
     },
     {
       name: '預約管理',
       icon: Clock,
-      content: (
-        <div className="p-6">
-          <BookingManage />
-        </div>
-      ),
+      content: <BookingManage />,
+    },
+    {
+      name: '取消記錄',
+      icon: BookMinus,
+      content: <CancelBookingRecord />,
     },
   ];
 
@@ -86,7 +84,7 @@ function Admin() {
             </TabList>
             <TabPanels className="min-h-[400px]">
               {tabs.map(tab => (
-                <TabPanel key={tab.name} className="focus:outline-none">
+                <TabPanel key={tab.name} className="focus:outline-none p-6">
                   {tab.content}
                 </TabPanel>
               ))}

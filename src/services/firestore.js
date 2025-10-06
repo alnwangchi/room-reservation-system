@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { ROOMS } from '../constants';
+import { isEmpty } from '../utils';
 import { calculateEndTime } from '../utils/dateUtils';
 
 // 通用 CRUD 操作
@@ -445,7 +446,7 @@ export const roomService = {
           if (timeSlots[timeSlot]) {
             delete timeSlots[timeSlot];
             // 如果沒有其他預訂了，刪除整個文檔
-            if (Object.keys(timeSlots).length === 0) {
+            if (isEmpty(timeSlots)) {
               transaction.delete(dateRef);
             } else {
               transaction.set(dateRef, timeSlots);
@@ -476,7 +477,7 @@ export const roomService = {
           if (timeSlots[timeSlot]) {
             delete timeSlots[timeSlot];
             // 如果沒有其他預訂了，刪除整個文檔
-            if (Object.keys(timeSlots).length === 0) {
+            if (isEmpty(timeSlots)) {
               transaction.delete(dateRef);
             } else {
               transaction.set(dateRef, timeSlots);
@@ -788,7 +789,8 @@ export const userService = {
   },
 
   // 取消預訂
-  async cancelBooking(userId, booking) {
+  // operator 參數用於記錄由誰執行了取消動作（可能是管理員）
+  async cancelBooking(userId, booking, operator = null) {
     try {
       // 調用 roomService 的取消預訂函數
       await roomService.cancelUserBooking(
@@ -809,6 +811,33 @@ export const userService = {
       const amountToRefund = booking.cost;
       if (amountToRefund && amountToRefund > 0 && !isAdmin) {
         await this.updateBalance(userId, amountToRefund);
+      }
+
+      // 紀錄取消預約記錄（包含操作者與被取消者資訊與詳細內容）
+      try {
+        const recordPayload = {
+          operatorId: operator?.id || operator?.uid || null,
+          operatorEmail: operator?.email || null,
+          operatorDisplayName: operator?.displayName || null,
+          targetUserId: userId,
+          canceledAt: dayjs().toDate(),
+          bookingDetail: {
+            id: booking.id,
+            roomId: booking.roomId,
+            roomName: booking.roomName || null,
+            booker: booking.booker || null,
+            date: booking.date,
+            startTime: booking.startTime,
+            endTime: booking.endTime || null,
+            cost: booking.cost || 0,
+            description: booking.description || '',
+            bookingTime: booking.bookingTime || null,
+          },
+        };
+        await recordService.addCancelBookingRecord(recordPayload);
+      } catch (logError) {
+        console.error('Error recording cancel booking record:', logError);
+        // 不阻擋主要流程
       }
 
       return true;
@@ -980,5 +1009,12 @@ export const bookingService = {
   // 刪除預訂
   async deleteBooking(id) {
     return await firestoreService.delete('bookings', id);
+  },
+};
+
+export const recordService = {
+  // 添加取消預約記錄
+  async addCancelBookingRecord(recordData) {
+    return await firestoreService.add('cancelBookingRecords', recordData);
   },
 };

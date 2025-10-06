@@ -1,7 +1,6 @@
 import { Listbox } from '@headlessui/react';
 import dayjs from 'dayjs';
 import { ChevronDown } from 'lucide-react';
-import React from 'react';
 import { MONTH_NAMES } from '../constants';
 
 function MonthSelector({
@@ -11,9 +10,9 @@ function MonthSelector({
   placeholder = '選擇月份',
   showYear = true,
 }) {
-  // 月份選項
-  const monthOptions = Array.from({ length: 4 }, (_, index) => {
-    const date = dayjs().add(index, 'month');
+  // 月份選項：從前一個月到未來三個月（共 5 個）
+  const monthOptions = Array.from({ length: 5 }, (_, idx) => {
+    const date = dayjs().add(idx - 1, 'month');
     return {
       value: date.format('YYYY-MM'),
       label: showYear

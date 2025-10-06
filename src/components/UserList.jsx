@@ -1,9 +1,15 @@
-import React from 'react';
 import { userService } from '../services/firestore';
 import UserProfileCard from './UserProfileCard';
 
 const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
-  const displayUsers = users.filter(user => user.role !== 'admin');
+  const displayUsers = users
+    .filter(user => user.role !== 'admin')
+    .sort((a, b) => {
+      return (
+        Object.values(b.totalBookings).reduce((acc, curr) => acc + curr, 0) -
+        Object.values(a.totalBookings).reduce((acc, curr) => acc + curr, 0)
+      );
+    });
 
   const handleDeposit = async (userId, amount) => {
     try {

@@ -1,15 +1,19 @@
 import { Listbox } from '@headlessui/react';
 import dayjs from 'dayjs';
 import { Calendar, ChevronDown, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ROOMS } from '../constants';
+import { useAuth } from '../contexts/AuthContext';
 import { useHintDialog } from '../contexts/HintDialogContext';
 import useGetUsers from '../hooks/useGetUsers';
 import { userService } from '../services/firestore';
+import { isEmpty } from '../utils';
 import MonthSelector from './MonthSelector';
+import UserBadge from './UserBadge';
 
 function BookingManage() {
   const { toggleHintDialog } = useHintDialog();
+  const { userProfile } = useAuth();
   const { allUsers, loadingUsers, error: usersError } = useGetUsers();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,33 +54,45 @@ function BookingManage() {
     setSelectedMonth(monthValue);
   };
 
-  // 取消預訂
   const handleCancelBooking = async booking => {
-    try {
-      await userService.cancelBooking(selectedUser.id, booking);
+    toggleHintDialog({
+      title: '確認取消預訂',
+      desc: `確定要取消 ${dayjs(booking.date).format('YYYY-MM-DD')} ${booking.startTime} 的預訂嗎？此操作將無法復原。`,
+      type: 'warning',
+      showCancel: true,
+      onCancel: () => {},
+      onOk: async () => {
+        try {
+          await userService.cancelBooking(
+            selectedUser.id,
+            booking,
+            userProfile
+          );
 
-      toggleHintDialog({
-        title: '取消成功',
-        desc: '預訂已成功取消',
-        type: 'success',
-      });
+          toggleHintDialog({
+            title: '取消成功',
+            desc: '預訂已成功取消',
+            type: 'success',
+          });
 
-      // 重新載入預訂資料
-      if (selectedUser) {
-        const userBookings = await userService.getUserBookings(
-          selectedUser.id,
-          selectedMonth
-        );
-        setBookings(userBookings);
-      }
-    } catch (err) {
-      console.error('Error canceling booking:', err);
-      toggleHintDialog({
-        title: '取消失敗',
-        desc: '取消預訂時發生錯誤',
-        type: 'error',
-      });
-    }
+          // 重新載入預訂資料
+          if (selectedUser) {
+            const userBookings = await userService.getUserBookings(
+              selectedUser.id,
+              selectedMonth
+            );
+            setBookings(userBookings);
+          }
+        } catch (err) {
+          console.error('Error canceling booking:', err);
+          toggleHintDialog({
+            title: '取消失敗',
+            desc: '取消預訂時發生錯誤',
+            type: 'error',
+          });
+        }
+      },
+    });
   };
 
   // 獲取房間名稱
@@ -139,11 +155,12 @@ function BookingManage() {
                         {({ selected, active }) => (
                           <>
                             <span
-                              className={`block truncate ${
+                              className={`truncate flex gap-2 ${
                                 selected ? 'font-medium' : 'font-normal'
                               }`}
                             >
                               {user.displayName || user.email || user.id}
+                              <UserBadge role={user.role} />
                             </span>
                             {selected ? (
                               <span
@@ -224,7 +241,7 @@ function BookingManage() {
               重新載入
             </button>
           </div>
-        ) : bookings.length === 0 ? (
+        ) : isEmpty(bookings.length) ? (
           <div className="p-6 text-center">
             <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">

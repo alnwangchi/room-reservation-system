@@ -115,7 +115,6 @@ function Booking() {
     if (isTimeSlotBooked(timeSlot, selectedDate, selectedRoom)) {
       return; // 已被預訂的時段不能點擊
     }
-    console.log('123');
     // 檢查餘額是否足夠支付新增的時段（admin 無需檢查餘額）
     if (userProfile && userProfile.balance < 1 && !isAdmin) {
       const currentRoom = ROOMS.find(room => room.id === selectedRoom);
