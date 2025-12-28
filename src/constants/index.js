@@ -17,8 +17,10 @@ export const MONTH_NAMES = [
 // 星期名稱
 export const WEEK_DAYS = ['日', '一', '二', '三', '四', '五', '六'];
 
+import { isDev } from '../utils';
+
 // 房型資料
-export const ROOMS = [
+const baseRooms = [
   {
     id: 'general-piano-room',
     name: '一般琴房',
@@ -37,6 +39,11 @@ export const ROOMS = [
   },
 ];
 
+export const ROOMS = baseRooms.map(room => ({
+  ...room,
+  id: isDev() ? `${room.id}-dev` : room.id,
+}));
+
 // 時段配置
 export const TIME_SLOT_CONFIG = {
   START_HOUR: 9,
@@ -50,4 +57,43 @@ export const TIME_CATEGORIES = {
   MORNING: { name: '上午時段', startHour: 9, endHour: 12 },
   AFTERNOON: { name: '下午時段', startHour: 12, endHour: 18 },
   EVENING: { name: '晚上時段', startHour: 18, endHour: 21 },
+};
+
+// 開發者帳號常數（僅在開發環境使用）
+export const DEV_ACCOUNT = {
+  // Firebase Auth User 物件模擬
+  user: {
+    uid: 'dev-user-uid',
+    email: 'dev@example.com',
+    displayName: '開發者',
+    photoURL: null,
+    emailVerified: true,
+    providerData: [
+      {
+        providerId: 'google.com',
+        uid: 'dev-user-uid',
+        email: 'dev@example.com',
+        displayName: '開發者',
+        photoURL: null,
+      },
+    ],
+  },
+  // Firestore User Profile 資料
+  profile: {
+    id: 'dev',
+    uid: 'dev-user-uid',
+    email: 'dev@example.com',
+    displayName: '開發者',
+    role: 'admin',
+    isActive: true,
+    balance: 0,
+    totalBookings: {
+      'general-piano-room': 0,
+      'standard-recording-studio': 0,
+    },
+    photoURL: null,
+    provider: 'google',
+    createdAt: new Date(),
+    lastLoginAt: new Date(),
+  },
 };

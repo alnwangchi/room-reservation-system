@@ -1,9 +1,18 @@
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { isDev } from '../utils';
 
 // Email 服務
 export const emailService = {
   async triggerEmail(emailData) {
+    if (isDev()) {
+      return {
+        success: true,
+        docId: 'dev-mode-skipped',
+        message: 'dev mode skipped',
+      };
+    }
+
     try {
       const emailDoc = {
         to: emailData.to || 'alnwangchi@gmail.com',

@@ -1,5 +1,5 @@
-import React from 'react';
 import { useLineWebViewDetector } from '../hooks/useLineWebViewDetector';
+import { isDev } from '../utils';
 
 export function LineWebViewRedirect() {
   const { isLineWebView, isLoading, openExternal, openInSafari, openInChrome } =
@@ -103,7 +103,7 @@ export function LineWebViewRedirect() {
         </div>
 
         {/* 除錯資訊（僅在開發模式顯示） */}
-        {import.meta.env.DEV && (
+        {isDev() && (
           <details className="mt-4">
             <summary className="text-xs text-gray-400 cursor-pointer">
               除錯資訊

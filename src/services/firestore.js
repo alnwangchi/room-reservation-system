@@ -210,12 +210,14 @@ export const roomService = {
         let monthBookings = {};
         if (customId) {
           monthDocSnap = await transaction.get(monthDocRef);
+          // 使用 ROOMS 常數動態初始化所有房型的陣列
+          const initialBookings = {};
+          ROOMS.forEach(room => {
+            initialBookings[room.id] = [];
+          });
           monthBookings = monthDocSnap.exists()
             ? monthDocSnap.data()
-            : {
-                'general-piano-room': [],
-                'standard-recording-studio': [],
-              };
+            : initialBookings;
         }
 
         // Calculate end time, duration, and cost
@@ -265,6 +267,10 @@ export const roomService = {
           };
 
           // 將新預訂添加到對應房型的陣列中
+          // 確保該房型的陣列存在，如果不存在則初始化為空陣列
+          if (!monthBookings[roomId]) {
+            monthBookings[roomId] = [];
+          }
           monthBookings[roomId].push(newBooking);
 
           // 在事務中更新月份文檔

@@ -15,3 +15,7 @@ export const isEmpty = value => {
 
   return false;
 };
+
+export const isDev = () => {
+  return import.meta.env.DEV;
+};
