@@ -24,6 +24,11 @@ export const useAppNavigate = () => {
     navigate('/');
   };
 
+  // 導航到選擇房間頁面
+  const goToRoomSelection = () => {
+    navigate('/room-selection');
+  };
+
   // 預訂成功後導航到我的預訂頁面
   const goToMyBookings = () => {
     navigate('/my-bookings');
@@ -82,6 +87,7 @@ export const useAppNavigate = () => {
   return {
     // 基本導航
     goToHome,
+    goToRoomSelection,
     goToBooking,
     goToMyBookings,
     goToRevenueAnalysis,

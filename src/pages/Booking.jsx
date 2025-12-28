@@ -16,7 +16,7 @@ import { isTimeInRange } from '../utils/dateUtils';
 
 function Booking() {
   const { roomId } = useParams();
-  const { goToHome } = useAppNavigate();
+  const { goToRoomSelection } = useAppNavigate();
   const { toggleHintDialog } = useHintDialog();
   const { userProfile, updateUserProfile, isAdmin } = useAuth();
 
@@ -419,7 +419,7 @@ function Booking() {
       {/* 標題列 */}
       <PageHeader
         title={roomId ? `${currentRoom?.name}預訂日曆` : '我要預訂'}
-        onBack={roomId ? goToHome : undefined}
+        onBack={roomId ? goToRoomSelection : undefined}
         description={roomId ? '無法預訂今天以前的日期' : '選擇琴房並預訂時段'}
       />
 
