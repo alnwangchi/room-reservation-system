@@ -37,6 +37,7 @@ export const authService = {
           totalBookings: {
             'general-piano-room': 0,
             'standard-recording-studio': 0,
+            'multifunctional-meeting-space': 0,
           },
           lastLoginAt: dayjs().toDate(),
         });

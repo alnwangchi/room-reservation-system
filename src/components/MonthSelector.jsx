@@ -10,16 +10,25 @@ function MonthSelector({
   placeholder = '選擇月份',
   showYear = true,
 }) {
-  // 月份選項：從前一個月到未來三個月（共 5 個）
-  const monthOptions = Array.from({ length: 5 }, (_, idx) => {
-    const date = dayjs().add(idx - 1, 'month');
-    return {
+  // 月份選項：從 2025 年 8 月開始到目前當月
+  const startDate = dayjs('2025-08');
+  const currentDate = dayjs().startOf('month');
+  const monthOptions = [];
+
+  let date = startDate;
+  // 使用 isBefore 和 isSame 的組合來替代 isSameOrBefore
+  while (
+    date.isBefore(currentDate, 'month') ||
+    date.isSame(currentDate, 'month')
+  ) {
+    monthOptions.push({
       value: date.format('YYYY-MM'),
       label: showYear
         ? `${date.year()} 年 ${MONTH_NAMES[date.month()]}`
         : MONTH_NAMES[date.month()],
-    };
-  });
+    });
+    date = date.add(1, 'month');
+  }
 
   return (
     <div className={className}>

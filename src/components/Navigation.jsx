@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import logo from '../assets/logo.jpg';
 import { getNavRoutes } from '../config/routes';
 import { useAuth } from '../contexts/AuthContext';
 import { useHintDialog } from '../contexts/HintDialogContext';
@@ -58,9 +59,16 @@ function Navigation() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <NavItem to="/" isActive={isActive('/')}>
-              <span className="text-white text-lg sm:text-xl md:text-2xl font-bold hover:text-primary-300 transition-colors duration-200">
-                知熹音樂教室預訂系統
-              </span>
+              <div className="flex items-center space-x-3">
+                <img
+                  src={logo}
+                  alt="Logo"
+                  className="h-8 w-8 sm:h-10 sm:w-10 object-contain"
+                />
+                <span className="text-white text-lg sm:text-xl md:text-2xl font-bold hover:text-primary-300 transition-colors duration-200">
+                  知熹音樂教室預訂系統
+                </span>
+              </div>
             </NavItem>
           </div>
 

@@ -37,6 +37,14 @@ const baseRooms = [
     price: 350,
     description: '專業錄音設備和隔音環境，適合音樂錄製和製作',
   },
+  {
+    id: 'multifunctional-meeting-space',
+    name: '多功能會議空間',
+    capacity: 8,
+    color: '#8b5cf6',
+    price: 200,
+    description: '即將開放預定功能',
+  },
 ];
 
 export const ROOMS = baseRooms.map(room => ({
@@ -90,6 +98,7 @@ export const DEV_ACCOUNT = {
     totalBookings: {
       'general-piano-room': 0,
       'standard-recording-studio': 0,
+      'multifunctional-meeting-space': 0,
     },
     photoURL: null,
     provider: 'google',
