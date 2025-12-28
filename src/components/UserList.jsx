@@ -1,9 +1,13 @@
+import { Switch } from '@headlessui/react';
+import { useState } from 'react';
 import { userService } from '../services/firestore';
 import UserProfileCard from './UserProfileCard';
 
 const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
+  const [switchEnabled, setSwitchEnabled] = useState(false);
+
   const displayUsers = users
-    .filter(user => user.role !== 'admin')
+    .filter(user => switchEnabled || user.role !== 'admin')
     .sort((a, b) => {
       return (
         Object.values(b.totalBookings).reduce((acc, curr) => acc + curr, 0) -
@@ -86,9 +90,27 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
 
   return (
     <>
-      <h3 className="font-medium text-gray-900 mb-2">
-        用戶列表({displayUsers.length}名用戶)
-      </h3>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-medium text-gray-900">
+          用戶列表({displayUsers.length}名用戶)
+        </h3>
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={switchEnabled}
+            onChange={setSwitchEnabled}
+            className={`${
+              switchEnabled ? 'bg-blue-600' : 'bg-gray-200'
+            } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+          >
+            <span
+              className={`${
+                switchEnabled ? 'translate-x-6' : 'translate-x-1'
+              } inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform`}
+            />
+          </Switch>
+          <span className="text-sm text-gray-700">顯示管理員</span>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-4">
         {displayUsers.map(user => (
