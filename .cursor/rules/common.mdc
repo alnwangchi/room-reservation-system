@@ -1,0 +1,52 @@
+## 環境判斷規則
+
+### 開發環境判斷
+
+- **必須使用 `isDev()` 工具函數**：判斷是否為開發環境時，必須使用 `src/utils/index.js` 中的 `isDev()` 函數
+- **禁止直接使用 `import.meta.env.DEV`**：不應在程式碼中直接使用 `import.meta.env.DEV`，應統一使用 `isDev()` 工具函數
+- **導入方式**：從 `../utils` 或 `@utils` 導入 `isDev` 函數
+
+### 範例
+
+```javascript
+// ✅ 正確
+import { isDev } from '../utils';
+if (isDev()) {
+  // 開發環境邏輯
+}
+
+// ❌ 錯誤
+if (import.meta.env.DEV) {
+  // 不應直接使用
+}
+```
+
+## 頁面導航規則
+
+### 新增頁面時的導航函數要求
+
+- **必須在 `useNavigate` 中新增對應函數**：當新增任何一個頁面時，必須在 `src/hooks/useNavigate.js` 中新增對應的導航函數和頁面檢查函數
+- **導航函數命名**：使用 `goTo` 前綴，例如 `goToNewPage`
+- **頁面檢查函數命名**：使用 `isIn` 前綴，例如 `isInNewPagePage`
+- **導出要求**：新增的函數必須在 `useAppNavigate` hook 的返回值中導出
+
+### 範例
+
+```javascript
+// ✅ 正確：新增頁面時同時更新 useNavigate.js
+// 在 useNavigate.js 中新增：
+const goToNewPage = () => {
+  navigate('/new-page');
+};
+
+const isInNewPagePage = () => {
+  return location.pathname === '/new-page';
+};
+
+// 並在 return 中導出：
+return {
+  // ... 其他函數
+  goToNewPage,
+  isInNewPagePage,
+};
+```
