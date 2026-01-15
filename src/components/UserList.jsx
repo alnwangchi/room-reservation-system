@@ -1,14 +1,37 @@
 import { Switch } from '@headlessui/react';
+import dayjs from 'dayjs';
 import { useState } from 'react';
 import { userService } from '../services/firestore';
 import UserProfileCard from './UserProfileCard';
 
 const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
   const [switchEnabled, setSwitchEnabled] = useState(false);
+  const [sortByJoinTime, setSortByJoinTime] = useState(false);
+
+  const getCreatedAtValue = value => {
+    if (!value) {
+      return 0;
+    }
+    if (typeof value === 'object') {
+      if (typeof value.toDate === 'function') {
+        const dateValue = dayjs(value.toDate());
+        return dateValue.isValid() ? dateValue.valueOf() : 0;
+      }
+      if ('seconds' in value) {
+        const dateValue = dayjs(value.seconds * 1000);
+        return dateValue.isValid() ? dateValue.valueOf() : 0;
+      }
+    }
+    const dateValue = dayjs(value);
+    return dateValue.isValid() ? dateValue.valueOf() : 0;
+  };
 
   const displayUsers = users
     .filter(user => switchEnabled || user.role !== 'admin')
     .sort((a, b) => {
+      if (sortByJoinTime) {
+        return getCreatedAtValue(b.createdAt) - getCreatedAtValue(a.createdAt);
+      }
       return (
         Object.values(b.totalBookings).reduce((acc, curr) => acc + curr, 0) -
         Object.values(a.totalBookings).reduce((acc, curr) => acc + curr, 0)
@@ -94,21 +117,39 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
         <h3 className="font-medium text-gray-900">
           用戶列表({displayUsers.length}名用戶)
         </h3>
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={switchEnabled}
-            onChange={setSwitchEnabled}
-            className={`${
-              switchEnabled ? 'bg-blue-600' : 'bg-gray-200'
-            } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-          >
-            <span
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={switchEnabled}
+              onChange={setSwitchEnabled}
               className={`${
-                switchEnabled ? 'translate-x-6' : 'translate-x-1'
-              } inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform`}
-            />
-          </Switch>
-          <span className="text-sm text-gray-700">顯示管理員</span>
+                switchEnabled ? 'bg-blue-600' : 'bg-gray-200'
+              } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+            >
+              <span
+                className={`${
+                  switchEnabled ? 'translate-x-6' : 'translate-x-1'
+                } inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform`}
+              />
+            </Switch>
+            <span className="text-sm text-gray-700">顯示管理員</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={sortByJoinTime}
+              onChange={setSortByJoinTime}
+              className={`${
+                sortByJoinTime ? 'bg-blue-600' : 'bg-gray-200'
+              } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+            >
+              <span
+                className={`${
+                  sortByJoinTime ? 'translate-x-6' : 'translate-x-1'
+                } inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform`}
+              />
+            </Switch>
+            <span className="text-sm text-gray-700">加入時間</span>
+          </div>
         </div>
       </div>
 
