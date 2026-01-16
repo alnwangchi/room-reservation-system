@@ -1,6 +1,5 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { BarChart3, TrendingUp } from 'lucide-react';
-import React from 'react';
 import PageHeader from '../components/PageHeader';
 import RevenueAnalysis from '../components/RevenueAnalysis';
 import RevenueManage from '../components/RevenueManage';
@@ -33,7 +32,7 @@ function RevenueManagement() {
       {/* 主要內容區域 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <TabGroup>
+          <TabGroup defaultIndex={1}>
             <TabList className="flex border-b border-gray-200">
               {tabs.map(tab => (
                 <Tab

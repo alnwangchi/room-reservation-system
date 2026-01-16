@@ -113,18 +113,18 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-medium text-gray-900">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+        <h3 className="font-medium text-gray-900 text-base sm:text-lg">
           用戶列表({displayUsers.length}名用戶)
         </h3>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2">
             <Switch
               checked={switchEnabled}
               onChange={setSwitchEnabled}
               className={`${
                 switchEnabled ? 'bg-blue-600' : 'bg-gray-200'
-              } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+              } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex-shrink-0`}
             >
               <span
                 className={`${
@@ -132,7 +132,9 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
                 } inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform`}
               />
             </Switch>
-            <span className="text-sm text-gray-700">顯示管理員</span>
+            <span className="text-sm text-gray-700 whitespace-nowrap">
+              顯示管理員
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Switch
@@ -140,7 +142,7 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
               onChange={setSortByJoinTime}
               className={`${
                 sortByJoinTime ? 'bg-blue-600' : 'bg-gray-200'
-              } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+              } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex-shrink-0`}
             >
               <span
                 className={`${
@@ -148,7 +150,9 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
                 } inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform`}
               />
             </Switch>
-            <span className="text-sm text-gray-700">加入時間</span>
+            <span className="text-sm text-gray-700 whitespace-nowrap">
+              加入時間
+            </span>
           </div>
         </div>
       </div>
