@@ -68,68 +68,136 @@ function CancelBookingRecord() {
           目前沒有任何取消紀錄
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  編號
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  取消時間
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  操作者
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  預訂日期
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  時段
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  教室
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  預訂者
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {records.map((record, index) => {
-                const bd = record.bookingDetail || {};
-                return (
-                  <tr key={record.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {index + 1}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatTs(record.canceledAt || record.createdAt)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="flex flex-col">
-                        <span>{record.operatorDisplayName}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {bd.date || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {bd.startTime || '-'}
-                      {bd.endTime ? ` - ${bd.endTime}` : ''}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {bd.roomName || bd.roomId || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {bd.booker || '-'}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* 手機版：卡片式設計 */}
+          <div className="md:hidden divide-y divide-gray-200">
+            {records.map((record, index) => {
+              const bd = record.bookingDetail || {};
+              return (
+                <div
+                  key={record.id}
+                  className="p-4 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        #{index + 1}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {formatTs(record.canceledAt || record.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-start">
+                      <span className="text-xs text-gray-500 w-20 flex-shrink-0">
+                        操作者：
+                      </span>
+                      <span className="text-sm text-gray-900 flex-1">
+                        {record.operatorDisplayName || '-'}
+                      </span>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="text-xs text-gray-500 w-20 flex-shrink-0">
+                        預訂日期：
+                      </span>
+                      <span className="text-sm text-gray-900 flex-1">
+                        {bd.date || '-'}
+                      </span>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="text-xs text-gray-500 w-20 flex-shrink-0">
+                        時段：
+                      </span>
+                      <span className="text-sm text-gray-900 flex-1">
+                        {bd.startTime || '-'}
+                        {bd.endTime ? ` - ${bd.endTime}` : ''}
+                      </span>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="text-xs text-gray-500 w-20 flex-shrink-0">
+                        教室：
+                      </span>
+                      <span className="text-sm text-gray-900 flex-1">
+                        {bd.roomName || bd.roomId || '-'}
+                      </span>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="text-xs text-gray-500 w-20 flex-shrink-0">
+                        預訂者：
+                      </span>
+                      <span className="text-sm text-gray-900 flex-1">
+                        {bd.booker || '-'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 桌面版：表格設計 */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    編號
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    取消時間
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    操作者
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    預訂日期
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    時段
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    教室
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    預訂者
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {records.map((record, index) => {
+                  const bd = record.bookingDetail || {};
+                  return (
+                    <tr key={record.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {index + 1}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatTs(record.canceledAt || record.createdAt)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {record.operatorDisplayName || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {bd.date || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {bd.startTime || '-'}
+                        {bd.endTime ? ` - ${bd.endTime}` : ''}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {bd.roomName || bd.roomId || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {bd.booker || '-'}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );
