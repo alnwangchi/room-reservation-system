@@ -216,7 +216,7 @@ function BookingManage() {
       {/* 預訂列表 */}
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <h3 className="text-lg font-medium text-gray-900">
               {selectedUser
                 ? `${selectedUser.displayName || selectedUser.email || selectedUser.id} 的預訂`
@@ -257,51 +257,101 @@ function BookingManage() {
             <p className="text-gray-500">該使用者目前沒有任何預訂</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    日期
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    教室
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    時段
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    操作
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {bookings.map((booking, index) => (
-                  <tr key={`${booking.id}-${index}`}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {dayjs(booking.date).format('YYYY-MM-DD')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {getRoomName(booking.roomId)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {booking.startTime}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
-                      {canCancelBooking(booking) && (
-                        <button
-                          onClick={() => handleCancelBooking(booking)}
-                          className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-sm font-medium transition-colors"
-                        >
-                          取消預訂
-                        </button>
-                      )}
-                    </td>
+          <>
+            {/* 手機版：卡片式設計 */}
+            <div className="md:hidden divide-y divide-gray-200">
+              {bookings.map((booking, index) => (
+                <div
+                  key={`${booking.id}-${index}`}
+                  className="p-4 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        #{index + 1}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {dayjs(booking.date).format('YYYY-MM-DD')}
+                      </span>
+                    </div>
+                    {canCancelBooking(booking) && (
+                      <button
+                        onClick={() => handleCancelBooking(booking)}
+                        className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-sm font-medium transition-colors"
+                      >
+                        取消預訂
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center">
+                      <span className="text-xs text-gray-500 w-16 flex-shrink-0">
+                        教室：
+                      </span>
+                      <span className="text-sm text-gray-900 flex-1">
+                        {getRoomName(booking.roomId)}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-xs text-gray-500 w-16 flex-shrink-0">
+                        時段：
+                      </span>
+                      <span className="text-sm text-gray-900 flex-1">
+                        {booking.startTime}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 桌面版：表格設計 */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      日期
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      教室
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      時段
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      操作
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {bookings.map((booking, index) => (
+                    <tr key={`${booking.id}-${index}`}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {dayjs(booking.date).format('YYYY-MM-DD')}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {getRoomName(booking.roomId)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {booking.startTime}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
+                        {canCancelBooking(booking) && (
+                          <button
+                            onClick={() => handleCancelBooking(booking)}
+                            className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-sm font-medium transition-colors"
+                          >
+                            取消預訂
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>
