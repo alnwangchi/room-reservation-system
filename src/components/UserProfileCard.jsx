@@ -1,6 +1,6 @@
 import { useHintDialog } from '@contexts/HintDialogContext';
 import { Calendar, Pen, User } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { formatDate } from '../utils/dateUtils';
 import BalanceCard from './BalanceCard';
 import DepositModal from './DepositModal';
@@ -96,7 +96,7 @@ const UserProfileCard = ({
       {/* 用戶基本信息 */}
       <div
         className={`flex items-center mb-3 relative ${
-          size === 'small' ? 'flex-col' : ''
+          size === 'small' ? 'flex-col text-center' : ''
         }`}
       >
         {showRenameButton && (
@@ -106,11 +106,15 @@ const UserProfileCard = ({
           />
         )}
         {size === 'small' && (
-          <div className="absolute right-0 top-0">
+          <div className="absolute right-0 top-0 hidden sm:block">
             <UserBadge role={userProfile.role} />
           </div>
         )}
-        <div className="flex flex-col justify-center items-center mr-4">
+        <div
+          className={`flex flex-col justify-center items-center ${
+            size === 'small' ? 'mb-2' : 'mr-4'
+          }`}
+        >
           <div className="w-16 h-16 rounded-full overflow-hidden mb-1">
             {photoURL ? (
               <img
@@ -130,13 +134,17 @@ const UserProfileCard = ({
             </h3>
           )}
         </div>
-        <div className="flex-1">
+        <div className={`flex-1 ${size === 'small' ? 'w-full' : ''}`}>
           <div className="flex items-center gap-2">
             {size !== 'small' && <h3>{displayName || email.split('@')[0]}</h3>}
-            {size !== 'small' && <UserBadge role={userProfile.role} />}
+            {size !== 'small' && (
+              <div className="hidden sm:block">
+                <UserBadge role={userProfile.role} />
+              </div>
+            )}
           </div>
-          <p className="text-gray-600 text-sm mb-1">{email}</p>
-          <div className="flex space-x-2">
+          <p className="text-gray-600 text-sm mb-1 hidden sm:block">{email}</p>
+          <div className="hidden sm:flex justify-center space-x-2">
             <span className="text-xs text-gray-500">
               會員自 {formatDate(createdAt)}
             </span>

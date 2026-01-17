@@ -114,10 +114,7 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-        <h3 className="font-medium text-gray-900 text-base sm:text-lg">
-          用戶列表({displayUsers.length}名用戶)
-        </h3>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+        <div className="flex flex-row items-center gap-3 sm:gap-4 flex-nowrap">
           <div className="flex items-center gap-2">
             <Switch
               checked={switchEnabled}
@@ -157,7 +154,7 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-4">
         {displayUsers.map(user => (
           <UserProfileCard
             size="small"

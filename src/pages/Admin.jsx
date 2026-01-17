@@ -21,6 +21,7 @@ function Admin() {
     {
       name: '使用者管理',
       icon: Users,
+      count: users?.length ?? 0,
       content: (
         <UserList
           users={users}
@@ -77,6 +78,11 @@ function Admin() {
                     <>
                       <tab.icon className="w-5 h-5" />
                       <span className="hidden sm:inline">{tab.name}</span>
+                      {typeof tab.count === 'number' && (
+                        <span className="text-xs text-gray-500">
+                          ({tab.count})
+                        </span>
+                      )}
                     </>
                   )}
                 </Tab>
