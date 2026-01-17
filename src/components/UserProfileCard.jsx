@@ -92,7 +92,7 @@ const UserProfileCard = ({
   } = userProfile;
 
   return (
-    <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
+    <div className={`bg-white rounded-lg shadow-md  p-2 md:p-6 ${className}`}>
       {/* 用戶基本信息 */}
       <div
         className={`flex items-center mb-3 relative ${
@@ -115,7 +115,9 @@ const UserProfileCard = ({
             size === 'small' ? 'mb-2' : 'mr-4'
           }`}
         >
-          <div className="w-16 h-16 rounded-full overflow-hidden mb-1">
+          <div
+            className={`${size === 'small' ? 'w-12 h-12 sm:w-16 sm:h-16' : 'w-16 h-16'} rounded-full overflow-hidden mb-1`}
+          >
             {photoURL ? (
               <img
                 src={photoURL}
@@ -124,12 +126,14 @@ const UserProfileCard = ({
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <User className="w-8 h-8 text-white" />
+                <User
+                  className={`${size === 'small' ? 'w-6 h-6 sm:w-8 sm:h-8' : 'w-8 h-8'} text-white`}
+                />
               </div>
             )}
           </div>
           {size === 'small' && (
-            <h3 className="text-center">
+            <h3 className="text-center text-sm sm:text-base">
               {displayName || email.split('@')[0]}
             </h3>
           )}
@@ -158,7 +162,7 @@ const UserProfileCard = ({
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center">
             <Calendar className="w-4 h-4 text-blue-600 mr-2" />
-            <span className="text-xs font-medium text-gray-700">
+            <span className="text-xs font-medium text-gray-700 hidden sm:inline">
               預訂時段總數
             </span>
           </div>

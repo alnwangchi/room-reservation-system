@@ -1,14 +1,13 @@
 import { CreditCard } from 'lucide-react';
-import React from 'react';
 
 function BalanceCard({ balance }) {
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg px-4 py-2 text-white">
+    <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg px-4 py-2 text-white flex gap-2 justify-between md:block">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">儲值餘額</span>
+        <span className="hidden sm:block text-sm font-medium">儲值餘額</span>
         <CreditCard className="w-5 h-5" />
       </div>
-      <div className="text-2xl font-bold">NT$ {balance.toLocaleString()}</div>
+      <div className="text-2xl font-bold">{balance.toLocaleString()}</div>
     </div>
   );
 }

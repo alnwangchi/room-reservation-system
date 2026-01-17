@@ -1,14 +1,12 @@
 import { Listbox } from '@headlessui/react';
 import dayjs from 'dayjs';
 import { ChevronDown } from 'lucide-react';
-import { MONTH_NAMES } from '../constants';
 
 function MonthSelector({
   selectedMonth,
   onMonthChange,
   className = 'w-48',
   placeholder = '選擇月份',
-  showYear = true,
 }) {
   // 月份選項：從 2025 年 8 月開始到目前當月
   const startDate = dayjs('2025-08');
@@ -23,9 +21,7 @@ function MonthSelector({
   ) {
     monthOptions.push({
       value: date.format('YYYY-MM'),
-      label: showYear
-        ? `${date.year()} 年 ${MONTH_NAMES[date.month()]}`
-        : MONTH_NAMES[date.month()],
+      label: date.format('YYYYMM'),
     });
     date = date.add(1, 'month');
   }
