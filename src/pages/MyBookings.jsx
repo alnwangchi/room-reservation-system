@@ -289,6 +289,7 @@ function MyBookings() {
                   className="sticky top-6"
                   showRenameButton
                   setIsRenameModalOpen={setIsRenameModalOpen}
+                  showFullContentOnMobile={true}
                 />
               </div>
 

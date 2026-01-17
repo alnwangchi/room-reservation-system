@@ -123,7 +123,7 @@ function BookingManage() {
     <div className="space-y-6">
       {/* 使用者選擇器 */}
       <div className="bg-gray-50 p-4 rounded-lg">
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               選擇使用者

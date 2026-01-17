@@ -16,6 +16,7 @@ const UserProfileCard = ({
   onDeposit,
   showRenameButton,
   setIsRenameModalOpen,
+  showFullContentOnMobile = false,
 }) => {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const { toggleHintDialog } = useHintDialog();
@@ -147,8 +148,14 @@ const UserProfileCard = ({
               </div>
             )}
           </div>
-          <p className="text-gray-600 text-sm mb-1 hidden sm:block">{email}</p>
-          <div className="hidden sm:flex justify-center space-x-2">
+          <p
+            className={`text-gray-600 text-sm mb-1 ${showFullContentOnMobile ? '' : 'hidden sm:block'}`}
+          >
+            {email}
+          </p>
+          <div
+            className={`${showFullContentOnMobile ? 'flex' : 'hidden sm:flex'} justify-start space-x-2`}
+          >
             <span className="text-xs text-gray-500">
               會員自 {formatDate(createdAt)}
             </span>
@@ -156,13 +163,20 @@ const UserProfileCard = ({
         </div>
       </div>
       {/* 儲值餘額 */}
-      {showBalance && <BalanceCard balance={balance} />}
+      {showBalance && (
+        <BalanceCard
+          balance={balance}
+          showFullContentOnMobile={showFullContentOnMobile}
+        />
+      )}
       {/* 統計信息 */}
       <div className="grid grid-cols-1 gap-3 mt-2">
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center">
             <Calendar className="w-4 h-4 text-blue-600 mr-2" />
-            <span className="text-xs font-medium text-gray-700 hidden sm:inline">
+            <span
+              className={`text-xs font-medium text-gray-700 ${showFullContentOnMobile ? '' : 'hidden sm:inline'}`}
+            >
               預訂時段總數
             </span>
           </div>
