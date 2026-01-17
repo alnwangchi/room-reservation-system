@@ -1,3 +1,4 @@
+import { Listbox } from '@headlessui/react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-tw';
 import { ChevronDown, ChevronRight } from 'lucide-react';
@@ -144,20 +145,67 @@ function RevenueManage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               選擇房間
             </label>
-            <div className="relative">
-              <select
-                value={selectedRoom}
-                onChange={e => handleRoomChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white"
-              >
-                {roomOptions.map(room => (
-                  <option key={room.value} value={room.value}>
-                    {room.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-            </div>
+            <Listbox value={selectedRoom} onChange={handleRoomChange}>
+              <div className="relative">
+                <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-2 pl-3 pr-10 text-left border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <span className="block truncate">
+                    {roomOptions.find(room => room.value === selectedRoom)?.label ||
+                      '選擇房間'}
+                  </span>
+                  <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <ChevronDown
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </Listbox.Button>
+                <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                  {roomOptions.map(room => (
+                    <Listbox.Option
+                      key={room.value}
+                      className={({ active }) =>
+                        `relative cursor-default select-none py-2 pl-3 pr-9 ${
+                          active ? 'bg-blue-600 text-white' : 'text-gray-900'
+                        }`
+                      }
+                      value={room.value}
+                    >
+                      {({ selected, active }) => (
+                        <>
+                          <span
+                            className={`block truncate ${
+                              selected ? 'font-medium' : 'font-normal'
+                            }`}
+                          >
+                            {room.label}
+                          </span>
+                          {selected ? (
+                            <span
+                              className={`absolute inset-y-0 right-0 flex items-center pr-4 ${
+                                active ? 'text-white' : 'text-blue-600'
+                              }`}
+                            >
+                              <svg
+                                className="h-5 w-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </span>
+                          ) : null}
+                        </>
+                      )}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </div>
+            </Listbox>
           </div>
 
           {/* 月份選擇器 */}
