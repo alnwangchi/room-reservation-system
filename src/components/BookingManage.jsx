@@ -1,7 +1,8 @@
 import { Listbox } from '@headlessui/react';
+import { sortUsersByTotalBookings } from '@utils/user';
 import dayjs from 'dayjs';
 import { Calendar, ChevronDown, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ROOMS } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useHintDialog } from '../contexts/HintDialogContext';
@@ -20,12 +21,18 @@ function BookingManage() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM')); // 新增月份選擇狀態
 
-  // 當使用者載入完成後，設定預設選中的使用者
+  // 按照預訂數量排序使用者（多到少）
+  const sortedUsers = useMemo(() => {
+    if (!allUsers || allUsers.length === 0) return [];
+    return [...allUsers].sort(sortUsersByTotalBookings);
+  }, [allUsers]);
+
+  // 當使用者載入完成後，設定預設選中的使用者為預訂數量最多的用戶
   useEffect(() => {
-    if (allUsers.length > 0 && !selectedUser) {
-      setSelectedUser(allUsers[3]);
+    if (sortedUsers.length > 0 && !selectedUser) {
+      setSelectedUser(sortedUsers[0]);
     }
-  }, [allUsers, selectedUser]);
+  }, [sortedUsers, selectedUser]);
 
   // 載入選中使用者的預訂資料
   useEffect(() => {
@@ -142,7 +149,7 @@ function BookingManage() {
                     </span>
                   </Listbox.Button>
                   <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    {allUsers.map(user => (
+                    {sortedUsers.map(user => (
                       <Listbox.Option
                         key={user.id}
                         className={({ active }) =>

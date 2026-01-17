@@ -1,5 +1,9 @@
 import { Switch } from '@headlessui/react';
-import dayjs from 'dayjs';
+import {
+  filterUsersByRole,
+  sortUsersByJoinTime,
+  sortUsersByTotalBookings,
+} from '@utils/user';
 import { useState } from 'react';
 import { userService } from '../services/firestore';
 import UserProfileCard from './UserProfileCard';
@@ -8,35 +12,9 @@ const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
   const [switchEnabled, setSwitchEnabled] = useState(false);
   const [sortByJoinTime, setSortByJoinTime] = useState(false);
 
-  const getCreatedAtValue = value => {
-    if (!value) {
-      return 0;
-    }
-    if (typeof value === 'object') {
-      if (typeof value.toDate === 'function') {
-        const dateValue = dayjs(value.toDate());
-        return dateValue.isValid() ? dateValue.valueOf() : 0;
-      }
-      if ('seconds' in value) {
-        const dateValue = dayjs(value.seconds * 1000);
-        return dateValue.isValid() ? dateValue.valueOf() : 0;
-      }
-    }
-    const dateValue = dayjs(value);
-    return dateValue.isValid() ? dateValue.valueOf() : 0;
-  };
-
-  const displayUsers = users
-    .filter(user => switchEnabled || user.role !== 'admin')
-    .sort((a, b) => {
-      if (sortByJoinTime) {
-        return getCreatedAtValue(b.createdAt) - getCreatedAtValue(a.createdAt);
-      }
-      return (
-        Object.values(b.totalBookings).reduce((acc, curr) => acc + curr, 0) -
-        Object.values(a.totalBookings).reduce((acc, curr) => acc + curr, 0)
-      );
-    });
+  const displayUsers = filterUsersByRole(users, switchEnabled).sort(
+    sortByJoinTime ? sortUsersByJoinTime : sortUsersByTotalBookings
+  );
 
   const handleDeposit = async (userId, amount) => {
     try {
