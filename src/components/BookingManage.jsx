@@ -1,7 +1,6 @@
-import { Listbox } from '@headlessui/react';
 import { sortUsersByTotalBookings } from '@utils/user';
 import dayjs from 'dayjs';
-import { Calendar, ChevronDown, X } from 'lucide-react';
+import { Calendar, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { ROOMS } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +9,7 @@ import useGetUsers from '../hooks/useGetUsers';
 import { userService } from '../services/firestore';
 import { isEmpty } from '../utils';
 import MonthSelector from './MonthSelector';
+import DropSelector from './shared/DropSelector';
 import UserBadge from './UserBadge';
 
 function BookingManage() {
@@ -131,71 +131,49 @@ function BookingManage() {
             {loadingUsers ? (
               <div className="animate-pulse bg-gray-200 h-10 rounded-md"></div>
             ) : (
-              <Listbox value={selectedUser} onChange={setSelectedUser}>
-                <div className="relative">
-                  <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-2 pl-3 pr-10 text-left border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <span className="block truncate">
-                      {selectedUser
-                        ? selectedUser.displayName ||
-                          selectedUser.email ||
-                          selectedUser.id
-                        : '選擇使用者'}
+              <DropSelector
+                value={selectedUser}
+                onChange={setSelectedUser}
+                options={sortedUsers}
+                placeholder="選擇使用者"
+                getDisplayValue={user =>
+                  user
+                    ? user.displayName || user.email || user.id
+                    : '選擇使用者'
+                }
+                renderOption={(user, { selected, active }) => (
+                  <>
+                    <span
+                      className={`truncate flex gap-2 ${
+                        selected ? 'font-medium' : 'font-normal'
+                      }`}
+                    >
+                      {user.displayName || user.email || user.id}
+                      <UserBadge role={user.role} />
                     </span>
-                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                      <ChevronDown
-                        className="h-5 w-5 text-gray-400"
-                        aria-hidden="true"
-                      />
-                    </span>
-                  </Listbox.Button>
-                  <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    {sortedUsers.map(user => (
-                      <Listbox.Option
-                        key={user.id}
-                        className={({ active }) =>
-                          `relative cursor-default select-none py-2 pl-3 pr-9 ${
-                            active ? 'bg-blue-600 text-white' : 'text-gray-900'
-                          }`
-                        }
-                        value={user}
+                    {selected && (
+                      <span
+                        className={`absolute inset-y-0 right-0 flex items-center pr-4 ${
+                          active ? 'text-white' : 'text-blue-600'
+                        }`}
                       >
-                        {({ selected, active }) => (
-                          <>
-                            <span
-                              className={`truncate flex gap-2 ${
-                                selected ? 'font-medium' : 'font-normal'
-                              }`}
-                            >
-                              {user.displayName || user.email || user.id}
-                              <UserBadge role={user.role} />
-                            </span>
-                            {selected ? (
-                              <span
-                                className={`absolute inset-y-0 right-0 flex items-center pr-4 ${
-                                  active ? 'text-white' : 'text-blue-600'
-                                }`}
-                              >
-                                <svg
-                                  className="h-5 w-5"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                  aria-hidden="true"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              </span>
-                            ) : null}
-                          </>
-                        )}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </div>
-              </Listbox>
+                        <svg
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </span>
+                    )}
+                  </>
+                )}
+              />
             )}
           </div>
 

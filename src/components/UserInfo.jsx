@@ -1,5 +1,4 @@
 import { User } from 'lucide-react';
-import React from 'react';
 
 function UserInfo({ userProfile, onLogout, isMobile = false }) {
   const buttonClasses = isMobile
