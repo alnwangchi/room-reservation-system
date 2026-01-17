@@ -125,17 +125,20 @@ function BookingManage() {
       <div className="bg-gray-50 p-4 rounded-lg">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              選擇使用者
-            </label>
             {loadingUsers ? (
-              <div className="animate-pulse bg-gray-200 h-10 rounded-md"></div>
+              <>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  選擇使用者
+                </label>
+                <div className="animate-pulse bg-gray-200 h-10 rounded-md"></div>
+              </>
             ) : (
               <DropSelector
                 value={selectedUser}
                 onChange={setSelectedUser}
                 options={sortedUsers}
                 placeholder="選擇使用者"
+                label="選擇使用者"
                 getDisplayValue={user =>
                   user
                     ? user.displayName || user.email || user.id
@@ -179,13 +182,11 @@ function BookingManage() {
 
           {/* 月份選擇器 */}
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              選擇月份
-            </label>
             <MonthSelector
               selectedMonth={selectedMonth}
               onMonthChange={handleMonthChange}
               className="w-full"
+              label="選擇月份"
             />
           </div>
         </div>

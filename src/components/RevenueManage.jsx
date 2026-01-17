@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-tw';
-import { ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ROOMS } from '../constants';
 import { roomService } from '../services/firestore';
@@ -142,26 +142,22 @@ function RevenueManage() {
         <div className="flex flex-col sm:flex-row gap-4">
           {/* 房間選擇器 */}
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              選擇房間
-            </label>
             <DropSelector
               value={selectedRoom}
               onChange={handleRoomChange}
               options={roomOptions}
               placeholder="選擇房間"
+              label="選擇房間"
             />
           </div>
 
           {/* 月份選擇器 */}
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              選擇月份
-            </label>
             <MonthSelector
               selectedMonth={selectedMonthYear}
               onMonthChange={handleMonthYearChange}
               className="w-full"
+              label="選擇月份"
             />
           </div>
         </div>

@@ -6,6 +6,7 @@ function MonthSelector({
   onMonthChange,
   className = 'w-48',
   placeholder = '選擇月份',
+  label,
 }) {
   // 月份選項：從 2025 年 8 月開始到目前當月
   const startDate = dayjs('2025-08');
@@ -32,6 +33,7 @@ function MonthSelector({
       options={monthOptions}
       placeholder={placeholder}
       className={className}
+      label={label}
       checkmarkPosition="left"
       buttonClassName="rounded-lg shadow-md focus-visible:border-indigo-500 focus-visible:ring-indigo-500"
       optionsClassName="z-10"

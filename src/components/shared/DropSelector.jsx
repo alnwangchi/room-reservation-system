@@ -8,6 +8,7 @@ import { ChevronDown } from 'lucide-react';
  * @param {Array} options - 選項陣列，格式為 { value, label } 或任意物件
  * @param {string} placeholder - 預設顯示文字
  * @param {string} className - 外層容器樣式
+ * @param {string} label - 標題文字（可選）
  * @param {Function} getDisplayValue - 自訂顯示值的函數，接收選中值，返回顯示文字
  * @param {Function} renderOption - 自訂選項渲染函數，接收 (option, { selected, active })，返回 React 元素
  * @param {'left' | 'right'} checkmarkPosition - 選中標記位置，預設 'right'
@@ -20,6 +21,7 @@ function DropSelector({
   options = [],
   placeholder = '請選擇',
   className = '',
+  label,
   getDisplayValue,
   renderOption,
   checkmarkPosition = 'right',
@@ -98,6 +100,11 @@ function DropSelector({
 
   return (
     <div className={className}>
+      {label && (
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {label}
+        </label>
+      )}
       <Listbox value={value} onChange={onChange}>
         <div className="relative">
           <Listbox.Button
