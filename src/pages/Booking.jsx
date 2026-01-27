@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import dayjs from 'dayjs';
+import { Sun } from 'lucide-react';
 import BookingModal from '../components/BookingModal';
 import Calendar from '../components/Calendar';
 import PageHeader from '../components/PageHeader';
@@ -451,8 +452,14 @@ function Booking() {
             <div className="bg-white rounded-xl shadow-sm">
               <div className="p-4 md:p-6">
                 <div className="flex items-center justify-between mb-4 md:mb-6">
-                  <h3 className="text-xl font-semibold">
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
                     {selectedDate.format('M月D日')}
+                    {isHoliday && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-orange-600">
+                        <Sun className="w-3 h-3" />
+                        (假日)
+                      </span>
+                    )}
                   </h3>
                   <p className="text-sm" style={{ color: currentRoom?.color }}>
                     {currentRoom?.name} - NT${' '}
