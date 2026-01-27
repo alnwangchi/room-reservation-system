@@ -1,0 +1,18 @@
+---
+description: constants 資料夾不得定義函式
+globs: src/constants/**/*.{js,jsx,ts,tsx}
+alwaysApply: false
+---
+
+# constants 資料夾規範
+
+- `src/constants/` 內禁止新增任何 `function`（含箭頭函式）
+- 共用函式請移至 `src/utils/` 或 `src/helpers/`（若有該資料夾）
+
+```javascript
+// ❌ 錯誤（constants 內含函式）
+export const buildLabel = value => `${value}分鐘`;
+
+// ✅ 正確（constants 內只放常數）
+export const INTERVAL_MINUTES = 30;
+```
