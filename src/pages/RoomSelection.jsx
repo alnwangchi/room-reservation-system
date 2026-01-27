@@ -70,11 +70,22 @@ function Home() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-blue-600">
-                          NT$ {room.price}
-                        </div>
+                        {room.holidayPrice ? (
+                          <>
+                            <div className="text-md font-bold text-blue-600">
+                              平日 NT$ {room.price}
+                            </div>
+                            <div className="text-md font-bold text-blue-600">
+                              假日 NT$ {room.holidayPrice}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-md font-bold text-blue-600">
+                            NT$ {room.price}
+                          </div>
+                        )}
                         <p className="text-sm font-bold text-blue-600">
-                        {intervalLabel}
+                          {intervalLabel}
                         </p>
                       </div>
                     </div>
