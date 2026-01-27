@@ -1,4 +1,4 @@
-import { calculateEndTime } from '../utils/dateUtils';
+import { calculateEndTime } from '@utils/date';
 
 function TimeSlotButton({
   slot,

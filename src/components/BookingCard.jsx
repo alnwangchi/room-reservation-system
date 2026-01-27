@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import React from 'react';
-import { formatTimeRange } from '../utils/dateUtils';
+import { formatTimeRange } from '@utils/date';
 
 function BookingCard({ booking, isGrouped = false }) {
   return (

@@ -12,7 +12,7 @@ import { useHintDialog } from '../contexts/HintDialogContext';
 import { useAppNavigate, useBooking, useOpenSettings } from '../hooks';
 import { emailService } from '../services/email';
 import { roomService, userService } from '../services/firestore';
-import { isTimeInRange } from '../utils/dateUtils';
+import { isTimeInRange, isWeekend } from '@utils/date';
 import { getIntervalLabel, getTimeSlotConfig } from '../utils/timeSlot';
 
 function Booking() {
@@ -46,6 +46,10 @@ function Booking() {
 
   const timeSlotConfig = getTimeSlotConfig(selectedRoom);
   const intervalLabel = getIntervalLabel(timeSlotConfig.INTERVAL_MINUTES);
+  const isHoliday =
+    selectedDate && selectedRoom.includes('multifunctional-meeting-space')
+      ? isWeekend(selectedDate)
+      : false;
 
   const generateTimeSlots = () => {
     const config = timeSlotConfig;
@@ -116,7 +120,11 @@ function Booking() {
     if (userProfile && userProfile.balance < 1 && !isAdmin) {
       const currentRoom = ROOMS.find(room => room.id === selectedRoom);
       if (currentRoom) {
-        const newTotalCost = (selectedTimeSlots.length + 1) * currentRoom.price;
+        const slotPrice =
+          isHoliday && currentRoom.holidayPrice
+            ? currentRoom.holidayPrice
+            : currentRoom.price;
+        const newTotalCost = (selectedTimeSlots.length + 1) * slotPrice;
         if (userProfile.balance < newTotalCost) {
           toggleHintDialog({
             title: '餘額不足',
@@ -153,7 +161,11 @@ function Booking() {
       return;
     }
 
-    const totalCost = selectedTimeSlots.length * currentRoom.price; // 每個時段的價格
+    const slotPrice =
+      isHoliday && currentRoom.holidayPrice
+        ? currentRoom.holidayPrice
+        : currentRoom.price;
+    const totalCost = selectedTimeSlots.length * slotPrice; // 每個時段的價格
 
     // 🔒 預訂前的最終衝突檢查
     try {
@@ -443,7 +455,10 @@ function Booking() {
                     {selectedDate.format('M月D日')}
                   </h3>
                   <p className="text-sm" style={{ color: currentRoom?.color }}>
-                    {currentRoom?.name} - NT$ {currentRoom?.price}
+                    {currentRoom?.name} - NT${' '}
+                    {isHoliday && currentRoom?.holidayPrice
+                      ? currentRoom.holidayPrice
+                      : currentRoom?.price}
                     {intervalLabel}
                   </p>
                 </div>

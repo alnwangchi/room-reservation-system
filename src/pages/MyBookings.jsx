@@ -12,7 +12,7 @@ import { getTimeSlotConfig } from '@utils/timeSlot';
 import dayjs from 'dayjs';
 import { Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { calculateEndTime } from '../utils/dateUtils';
+import { calculateEndTime, isWeekend } from '@utils/date';
 
 function MyBookings() {
   const { userProfile, loading } = useAuth();
@@ -180,9 +180,14 @@ function MyBookings() {
         const slotDuration = endTime.diff(startTime, 'hour', true);
 
         const room = ROOMS.find(r => r.id === group.roomId);
+        const useHolidayPrice =
+          group.roomId.includes('multifunctional-meeting-space') &&
+          isWeekend(group.date) &&
+          room?.holidayPrice;
         const intervalMinutes = getTimeSlotConfig(group.roomId).INTERVAL_MINUTES;
         const slotsPerHour = 60 / intervalMinutes;
-        const slotCost = room ? slotDuration * slotsPerHour * room.price : 0;
+        const roomPrice = room ? (useHolidayPrice ? room.holidayPrice : room.price) : 0;
+        const slotCost = slotDuration * slotsPerHour * roomPrice;
         return sum + slotCost;
       }, 0);
 

@@ -1,10 +1,6 @@
 import dayjs from 'dayjs';
 
-/**
- * 將 Firestore Timestamp 轉換為 JavaScript Date 物件
- * @param {Object|Date|string} timestamp - Firestore Timestamp 或 Date 物件或日期字串
- * @returns {Date|null} 轉換後的 Date 物件，如果轉換失敗則返回 null
- */
+// 轉換 Firestore timestamp 為 Date
 export const convertFirestoreTimestamp = timestamp => {
   if (!timestamp) return null;
 
@@ -27,22 +23,13 @@ export const convertFirestoreTimestamp = timestamp => {
   return null;
 };
 
-/**
- * 格式化日期為可讀字串
- * @param {Object|Date|string} timestamp - Firestore Timestamp 或 Date 物件或日期字串
- * @param {string} format - dayjs 格式字串，預設為 'YYYY/MM/DD'
- * @returns {string} 格式化後的日期字串，如果轉換失敗則返回 '未知'
- */
+// 格式化日期字串
 export const formatDate = (timestamp, format = 'YYYY/MM/DD') => {
   const date = convertFirestoreTimestamp(timestamp);
   return date ? dayjs(date).format(format) : '未知';
 };
 
-/**
- * 格式化日期為相對時間（例如：3天前）
- * @param {Object|Date|string} timestamp - Firestore Timestamp 或 Date 物件或日期字串
- * @returns {string} 相對時間字串
- */
+// 格式化相對時間
 export const formatRelativeTime = timestamp => {
   const date = convertFirestoreTimestamp(timestamp);
   if (!date) return '未知';
@@ -58,11 +45,7 @@ export const formatRelativeTime = timestamp => {
   return `${Math.floor(diffDays / 365)}年前`;
 };
 
-/**
- * 檢查日期是否為今天
- * @param {Object|Date|string} timestamp - Firestore Timestamp 或 Date 物件或日期字串
- * @returns {boolean} 是否為今天
- */
+// 判斷是否為今天
 export const isToday = timestamp => {
   const date = convertFirestoreTimestamp(timestamp);
   if (!date) return false;
@@ -70,11 +53,7 @@ export const isToday = timestamp => {
   return dayjs(date).isSame(dayjs(), 'day'); // 使用 dayjs 比較
 };
 
-/**
- * 檢查日期是否為昨天
- * @param {Object|Date|string} timestamp - Firestore Timestamp 或 Date 物件或日期字串
- * @returns {boolean} 是否為昨天
- */
+// 判斷是否為昨天
 export const isYesterday = timestamp => {
   const date = convertFirestoreTimestamp(timestamp);
   if (!date) return false;
@@ -83,12 +62,15 @@ export const isYesterday = timestamp => {
   return dayjs(date).isSame(yesterday, 'day'); // 使用 dayjs 比較
 };
 
-/**
- * 獲取兩個日期之間的天數差
- * @param {Object|Date|string} startTimestamp - 開始時間
- * @param {Object|Date|string} endTimestamp - 結束時間
- * @returns {number} 天數差
- */
+// 判斷是否為週末
+export const isWeekend = dateInput => {
+  const date = dayjs(dateInput);
+  if (!date.isValid()) return false;
+  const day = date.day();
+  return day === 0 || day === 6;
+};
+
+// 計算日期差（天）
 export const getDaysDifference = (startTimestamp, endTimestamp) => {
   const startDate = convertFirestoreTimestamp(startTimestamp);
   const endDate = convertFirestoreTimestamp(endTimestamp);
@@ -98,12 +80,7 @@ export const getDaysDifference = (startTimestamp, endTimestamp) => {
   return dayjs(endDate).diff(dayjs(startDate), 'day'); // 使用 dayjs 計算天數差
 };
 
-/**
- * 格式化時段範圍為 "HH:MM - HH:MM" 格式
- * @param {string} startTime - 開始時間，格式為 "HH:MM"
- * @param {string} endTime - 結束時間，格式為 "HH:MM"
- * @returns {string} 格式化後的時段範圍字串
- */
+// 格式化時段範圍
 export const formatTimeRange = (startTime, endTime) => {
   if (!startTime || !endTime) return '';
 
@@ -123,12 +100,7 @@ export const formatTimeRange = (startTime, endTime) => {
   return `${formattedStart} - ${formattedEnd}`;
 };
 
-/**
- * 計算結束時間（基於開始時間和時長）
- * @param {string} startTime - 開始時間，格式為 "HH:MM"
- * @param {number} durationMinutes - 時長（分鐘）
- * @returns {string} 結束時間，格式為 "HH:MM"
- */
+// 計算結束時間
 export const calculateEndTime = (startTime, durationMinutes) => {
   if (!startTime || typeof startTime !== 'string') return '';
   if (typeof durationMinutes !== 'number' || durationMinutes <= 0) return '';
@@ -147,13 +119,7 @@ export const calculateEndTime = (startTime, durationMinutes) => {
   return `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
 };
 
-/**
- * 檢查時間是否在指定範圍內
- * @param {string} time - 要檢查的時間，格式為 "HH:MM"
- * @param {string} startTime - 範圍開始時間，格式為 "HH:MM"
- * @param {string} endTime - 範圍結束時間，格式為 "HH:MM"
- * @returns {boolean} 時間是否在範圍內
- */
+// 檢查時間是否在範圍內
 export const isTimeInRange = (time, startTime, endTime) => {
   if (!time || !startTime || !endTime) return false;
 

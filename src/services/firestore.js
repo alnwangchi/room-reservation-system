@@ -18,7 +18,7 @@ import {
 import { db } from '../config/firebase';
 import { ROOMS } from '../constants';
 import { isEmpty } from '../utils';
-import { calculateEndTime } from '../utils/dateUtils';
+import { calculateEndTime, isWeekend } from '@utils/date';
 import { getTimeSlotConfig } from '../utils/timeSlot';
 
 // 通用 CRUD 操作
@@ -229,8 +229,12 @@ export const roomService = {
         const durationHours = endTimeDate.diff(startTime, 'hour', true);
 
         const room = ROOMS.find(r => r.id === roomId);
+        const useHolidayPrice =
+          roomId.includes('multifunctional-meeting-space') &&
+          isWeekend(dateStr) &&
+          room?.holidayPrice;
         // room.price 已經是每個時段的價格
-        const bookingCost = room ? room.price : 0;
+        const bookingCost = room ? (useHolidayPrice ? room.holidayPrice : room.price) : 0;
 
         // 🔒 然後進行所有寫入操作
         // 1. 建立預訂記錄到 rooms 集合
@@ -264,7 +268,7 @@ export const roomService = {
             description: userInfo.description || '',
             booker: userInfo.displayName || userInfo.booker,
             bookedAt: dayjs().toDate(),
-            roomPrice: ROOMS.find(r => r.id === roomId)?.price || 0,
+            roomPrice: bookingCost,
             bookingTime: dayjs().valueOf(),
           };
 
