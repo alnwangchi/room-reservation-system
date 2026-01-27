@@ -28,7 +28,7 @@ function RoomCard({ room }) {
 
         <div className="space-y-2 mb-4 sm:mb-6">
           <p className="text-sm sm:text-base text-secondary-600">
-            費用: {room.price}/小時
+            費用: {room.price} 點/小時
           </p>
           <p className="text-sm sm:text-base text-secondary-600">
             容量: {room.capacity}人

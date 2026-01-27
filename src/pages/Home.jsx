@@ -97,11 +97,11 @@ function Home() {
                   </div>
                   <div className="space-y-2 text-sm text-gray-700">
                     <p>
-                      <span className="font-medium">最低金額：</span>NT$ 200
+                      <span className="font-medium">最低金額：</span>200 點
                     </p>
                     <p>
                       <span className="font-medium">儲值優惠：</span>
-                      儲值 2000 即贈 200元
+                      儲值 2000 即贈 200 點
                     </p>
                   </div>
                 </div>

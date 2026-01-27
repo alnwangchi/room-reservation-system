@@ -35,7 +35,7 @@ function BookingCard({ booking, isGrouped = false }) {
           <div className="flex flex-col">
             <p className="text-sm text-gray-500">費用</p>
             <p className="font-medium text-gray-900">
-              NT$ {isGrouped ? booking.totalCost : booking.cost}
+              {isGrouped ? booking.totalCost : booking.cost} 點
             </p>
           </div>
         </div>

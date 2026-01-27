@@ -40,7 +40,7 @@ const UserProfileCard = ({
         toggleHintDialog({
           type: 'success',
           title: '儲值成功',
-          message: `已成功為 ${userProfile?.displayName || userProfile?.email?.split('@')[0]} 儲值 NT$ ${amount.toLocaleString()}`,
+          message: `已成功為 ${userProfile?.displayName || userProfile?.email?.split('@')[0]} 儲值 ${amount.toLocaleString()} 點`,
         });
       } catch (error) {
         // 儲值失敗時顯示錯誤訊息

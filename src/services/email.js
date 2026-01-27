@@ -57,7 +57,7 @@ export const emailService = {
               <p><strong>房間：</strong>${bookingData.roomName}</p>
               <p><strong>日期：</strong>${bookingData.date}</p>
               <p><strong>時段：</strong>${bookingData.timeSlots}</p>
-              <p><strong>費用：</strong>NT$ ${bookingData.cost}</p>
+              <p><strong>費用：</strong>${bookingData.cost} 點</p>
               ${bookingData.description ? `<p><strong>備註：</strong>${bookingData.description}</p>` : ''}
             </div>
             

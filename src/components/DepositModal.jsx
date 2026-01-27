@@ -79,7 +79,7 @@ const DepositModal = ({
           <div className="bg-gray-50 rounded-lg p-3">
             <p className="text-sm text-gray-600">目前餘額</p>
             <p className="text-lg font-bold text-gray-900">
-              NT$ {currentBalance?.toLocaleString() || 0}
+              {currentBalance?.toLocaleString() || 0} 點
             </p>
           </div>
         </div>
@@ -95,7 +95,7 @@ const DepositModal = ({
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                NT$
+                點
               </span>
               <input
                 type="number"

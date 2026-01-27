@@ -228,21 +228,21 @@ function RevenueCalculator() {
               <div>
                 <p className="text-sm text-gray-500">每日基本收入</p>
                 <p className="font-medium text-gray-900">
-                  NT$ {room.dailyBaseRevenue.toLocaleString()}
+                  {room.dailyBaseRevenue.toLocaleString()} 點
                 </p>
               </div>
 
               <div>
                 <p className="text-sm text-gray-500">每日清潔費支出</p>
                 <p className="font-medium text-gray-900">
-                  NT$ {room.dailyCleaningFee.toLocaleString()}
+                  {room.dailyCleaningFee.toLocaleString()} 點
                 </p>
               </div>
 
               <div>
                 <p className="text-sm text-gray-500">每日淨收入</p>
                 <p className="font-medium text-gray-900">
-                  NT$ {room.dailyNetRevenue.toLocaleString()}
+                  {room.dailyNetRevenue.toLocaleString()} 點
                 </p>
               </div>
             </div>
@@ -253,7 +253,7 @@ function RevenueCalculator() {
                   一個月淨收入：
                 </span>
                 <span className="text-xl font-bold text-green-600">
-                  NT$ {room.monthlyNetRevenue.toLocaleString()}
+                  {room.monthlyNetRevenue.toLocaleString()} 點
                 </span>
               </div>
             </div>
@@ -270,10 +270,10 @@ function RevenueCalculator() {
           </div>
           <div className="text-right">
             <p className="text-3xl font-bold">
-              NT$ {totalMonthlyRevenue.toLocaleString()}
+              {totalMonthlyRevenue.toLocaleString()} 點
             </p>
             <p className="text-sm text-green-100">
-              平均每日 NT$ {(totalMonthlyRevenue / 30).toLocaleString()}
+              平均每日 {(totalMonthlyRevenue / 30).toLocaleString()} 點
             </p>
           </div>
         </div>
@@ -289,16 +289,17 @@ function RevenueCalculator() {
             </div>
             <div className="text-right">
               <p className="text-xl font-bold text-green-100">
-                NT${' '}
                 {revenueData
                   .reduce((sum, room) => sum + room.dailyCleaningFee * 30, 0)
-                  .toLocaleString()}
+                  .toLocaleString()}{' '}
+                點
               </p>
               <p className="text-sm text-green-200">
-                平均每日 NT${' '}
+                平均每日{' '}
                 {revenueData
                   .reduce((sum, room) => sum + room.dailyCleaningFee, 0)
-                  .toLocaleString()}
+                  .toLocaleString()}{' '}
+                點
               </p>
             </div>
           </div>
@@ -317,16 +318,17 @@ function RevenueCalculator() {
             </div>
             <div className="text-right">
               <p className="text-xl font-bold text-green-100">
-                NT${' '}
                 {revenueData
                   .reduce((sum, room) => sum + room.dailyBaseRevenue * 30, 0)
-                  .toLocaleString()}
+                  .toLocaleString()}{' '}
+                點
               </p>
               <p className="text-sm text-green-200">
-                平均每日 NT${' '}
+                平均每日{' '}
                 {revenueData
                   .reduce((sum, room) => sum + room.dailyBaseRevenue, 0)
-                  .toLocaleString()}
+                  .toLocaleString()}{' '}
+                點
               </p>
             </div>
           </div>

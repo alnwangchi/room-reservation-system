@@ -73,15 +73,15 @@ function Home() {
                         {room.holidayPrice ? (
                           <>
                             <div className="text-md font-bold text-blue-600">
-                              平日 NT$ {room.price}
+                              平日 {room.price} 點
                             </div>
                             <div className="text-md font-bold text-blue-600">
-                              假日 NT$ {room.holidayPrice}
+                              假日 {room.holidayPrice} 點
                             </div>
                           </>
                         ) : (
                           <div className="text-md font-bold text-blue-600">
-                            NT$ {room.price}
+                            {room.price} 點
                           </div>
                         )}
                         <p className="text-sm font-bold text-blue-600">

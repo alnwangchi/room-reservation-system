@@ -129,7 +129,7 @@ function Booking() {
         if (userProfile.balance < newTotalCost) {
           toggleHintDialog({
             title: '餘額不足',
-            desc: `您的餘額為 NT$ ${userProfile.balance}，不足以支付 ${selectedTimeSlots.length + 1} 個時段的費用 NT$ ${newTotalCost}。請先儲值後再進行預訂。`,
+            desc: `您的餘額為 ${userProfile.balance} 點，不足以支付 ${selectedTimeSlots.length + 1} 個時段的費用 ${newTotalCost} 點。請先儲值後再進行預訂。`,
             type: 'warning',
           });
           return;
@@ -462,11 +462,11 @@ function Booking() {
                     )}
                   </h3>
                   <p className="text-sm" style={{ color: currentRoom?.color }}>
-                    {currentRoom?.name} - NT${' '}
+                    {currentRoom?.name} -{' '}
                     {isHoliday && currentRoom?.holidayPrice
                       ? currentRoom.holidayPrice
-                      : currentRoom?.price}
-                    {intervalLabel}
+                      : currentRoom?.price}{' '}
+                    點{intervalLabel}
                   </p>
                 </div>
 

@@ -259,9 +259,9 @@ function RevenueManage() {
               <div className="text-sm text-gray-600">
                 總收入：
                 <span className="font-medium text-gray-900">
-                  ${calculateTotalRevenue()}
+                  {calculateTotalRevenue()} 點
                 </span>{' '}
-                (清潔費率 5% : NT$ {calculateTotalRevenue() * 0.05})
+                (清潔費率 5% : {calculateTotalRevenue() * 0.05} 點)
               </div>
             </div>
           </div>

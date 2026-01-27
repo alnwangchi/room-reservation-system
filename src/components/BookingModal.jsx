@@ -65,7 +65,7 @@ function BookingModal({
                   費用計算：
                 </span>
                 <span className="text-sm text-green-600">
-                  {selectedTimeSlots.length} × ${roomInfo?.price}/時段
+                  {selectedTimeSlots.length} × {roomInfo?.price} 點/時段
                 </span>
               </div>
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-green-200">
@@ -73,7 +73,7 @@ function BookingModal({
                   總費用：
                 </span>
                 <span className="text-lg font-bold text-green-800">
-                  ${selectedTimeSlots.length * roomInfo?.price}
+                  {selectedTimeSlots.length * roomInfo?.price} 點
                 </span>
               </div>
             </div>
