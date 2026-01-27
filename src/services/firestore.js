@@ -19,6 +19,7 @@ import { db } from '../config/firebase';
 import { ROOMS } from '../constants';
 import { isEmpty } from '../utils';
 import { calculateEndTime } from '../utils/dateUtils';
+import { getTimeSlotConfig } from '../utils/timeSlot';
 
 // 通用 CRUD 操作
 export const firestoreService = {
@@ -191,6 +192,7 @@ export const roomService = {
       const monthDocRef = doc(userBookingsRef, yearMonth);
 
       // 使用 Firestore 事務進行原子性操作
+      const intervalMinutes = getTimeSlotConfig(roomId).INTERVAL_MINUTES;
       const result = await runTransaction(db, async transaction => {
         // 🔒 先進行所有讀取操作
         // 1. 檢查時段是否已被預訂
@@ -221,13 +223,13 @@ export const roomService = {
         }
 
         // Calculate end time, duration, and cost
-        const endTime = calculateEndTime(timeSlot, 30);
+        const endTime = calculateEndTime(timeSlot, intervalMinutes);
         const startTime = dayjs(`2000-01-01T${timeSlot}:00`);
         const endTimeDate = dayjs(`2000-01-01T${endTime}:00`);
         const durationHours = endTimeDate.diff(startTime, 'hour', true);
 
         const room = ROOMS.find(r => r.id === roomId);
-        // room.price 已經是半小時（一個時段）的價格
+        // room.price 已經是每個時段的價格
         const bookingCost = room ? room.price : 0;
 
         // 🔒 然後進行所有寫入操作
@@ -286,7 +288,7 @@ export const roomService = {
           await this.updateUserRoomBookingsStats(customId, roomId.toString(), {
             date: dateStr,
             startTime: timeSlot,
-            endTime: calculateEndTime(timeSlot, 30),
+            endTime: calculateEndTime(timeSlot, intervalMinutes),
             duration: result.duration,
             cost: result.cost,
             description: userInfo.description || '',

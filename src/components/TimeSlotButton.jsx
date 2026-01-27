@@ -1,16 +1,15 @@
-import React from 'react';
 import { calculateEndTime } from '../utils/dateUtils';
 
 function TimeSlotButton({
   slot,
   isBooked,
-  booking,
+  _booking,
   isSelected,
   onClick,
   disabled,
 }) {
   // 計算完整的時段範圍顯示
-  const timeRangeDisplay = `${slot.time} - ${calculateEndTime(slot.time, 30)}`;
+  const timeRangeDisplay = `${slot.time} - ${calculateEndTime(slot.time, slot.interval)}`;
 
   return (
     <button

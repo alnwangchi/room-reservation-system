@@ -6,13 +6,14 @@ import BookingModal from '../components/BookingModal';
 import Calendar from '../components/Calendar';
 import PageHeader from '../components/PageHeader';
 import TimeSlotButton from '../components/TimeSlotButton';
-import { ROOMS, TIME_CATEGORIES, TIME_SLOT_CONFIG } from '../constants';
+import { ROOMS, TIME_CATEGORIES } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useHintDialog } from '../contexts/HintDialogContext';
 import { useAppNavigate, useBooking, useOpenSettings } from '../hooks';
 import { emailService } from '../services/email';
 import { roomService, userService } from '../services/firestore';
 import { isTimeInRange } from '../utils/dateUtils';
+import { getIntervalLabel, getTimeSlotConfig } from '../utils/timeSlot';
 
 function Booking() {
   const { roomId } = useParams();
@@ -43,23 +44,19 @@ function Booking() {
   // 使用 useOpenSettings hook 獲取開放設定
   const { timeSlots } = useOpenSettings(selectedRoom, selectedDate);
 
+  const timeSlotConfig = getTimeSlotConfig(selectedRoom);
+  const intervalLabel = getIntervalLabel(timeSlotConfig.INTERVAL_MINUTES);
+
   const generateTimeSlots = () => {
+    const config = timeSlotConfig;
     const slots = [];
-    for (
-      let hour = TIME_SLOT_CONFIG.START_HOUR;
-      hour <= TIME_SLOT_CONFIG.END_HOUR;
-      hour++
-    ) {
-      for (
-        let minute = 0;
-        minute < 60;
-        minute += TIME_SLOT_CONFIG.INTERVAL_MINUTES
-      ) {
-        // 排除 21:30 時段
+    for (let hour = config.START_HOUR; hour <= config.END_HOUR; hour++) {
+      for (let minute = 0; minute < 60; minute += config.INTERVAL_MINUTES) {
+        // 排除最後一個半小時時段（若設定啟用）
         if (
-          TIME_SLOT_CONFIG.EXCLUDE_LAST_HALF_HOUR &&
-          hour === TIME_SLOT_CONFIG.END_HOUR &&
-          minute === 30
+          config.EXCLUDE_LAST_HALF_HOUR &&
+          hour === config.END_HOUR &&
+          minute === config.INTERVAL_MINUTES
         ) {
           continue;
         }
@@ -70,13 +67,13 @@ function Booking() {
           hour,
           minute,
           display: time,
+          interval: config.INTERVAL_MINUTES,
         });
       }
     }
 
     return slots;
   };
-
   // 檢查時間槽是否被預訂
   const isTimeSlotBooked = (timeSlot, date, roomId) => {
     const roomBookings = getBookingsForDateAndRoom(date, roomId);
@@ -431,6 +428,7 @@ function Booking() {
             selectedDate={selectedDate}
             onDateSelect={handleDateSelect}
             onMonthChange={setCurrentDate}
+            maxDate={dayjs().add(2, 'month').endOf('month')}
             disabledDateRange={{
               end: dayjs(), // 禁用今天及以前的日期
             }}
@@ -446,7 +444,7 @@ function Booking() {
                   </h3>
                   <p className="text-sm" style={{ color: currentRoom?.color }}>
                     {currentRoom?.name} - NT$ {currentRoom?.price}
-                    /半小時
+                    {intervalLabel}
                   </p>
                 </div>
 

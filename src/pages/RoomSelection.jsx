@@ -4,6 +4,7 @@ import multifunctionalMeetingSpace from '../assets/multifunctional-meeting-space
 import standardRecordingStudio01 from '../assets/standard-recording-studio01.jpg';
 import PageHeader from '../components/PageHeader';
 import { ROOMS } from '../constants';
+import { getIntervalLabel, getTimeSlotConfig } from '../utils/timeSlot';
 import { useAppNavigate } from '../hooks';
 
 // 房型圖片映射
@@ -34,9 +35,9 @@ function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
             {ROOMS.map(room => {
-              const isDisabled =
-                room.id === 'multifunctional-meeting-space' ||
-                room.id === 'multifunctional-meeting-space-dev';
+              const intervalLabel = getIntervalLabel(
+                getTimeSlotConfig(room.id).INTERVAL_MINUTES
+              );
 
               return (
                 <div
@@ -49,7 +50,7 @@ function Home() {
                       alt={room.name}
                       className="w-full h-full object-cover"
                     />
-                    {isDisabled && (
+                    {room.isDisabled && (
                       <div className="absolute inset-0 bg-gray-900 bg-opacity-50"></div>
                     )}
                   </div>
@@ -73,7 +74,7 @@ function Home() {
                           NT$ {room.price}
                         </div>
                         <p className="text-sm font-bold text-blue-600">
-                          /半小時
+                        {intervalLabel}
                         </p>
                       </div>
                     </div>
@@ -90,14 +91,14 @@ function Home() {
 
                       <button
                         onClick={() => goToBooking(room.id)}
-                        disabled={isDisabled}
+                        disabled={room.isDisabled}
                         className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                          isDisabled
+                          room.isDisabled
                             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             : 'bg-blue-600 text-white hover:bg-blue-700'
                         }`}
                       >
-                        立即預訂
+                        {room.isDisabled ? '暫不開放' : '立即預訂'}
                       </button>
                     </div>
                   </div>

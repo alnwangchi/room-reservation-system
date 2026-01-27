@@ -49,7 +49,7 @@ function BookingModal({
                 .map(slot => {
                   // 使用共用的計算結束時間函數
                   const startTime = slot.time;
-                  const endTime = calculateEndTime(startTime, 30);
+                  const endTime = calculateEndTime(startTime, slot.interval);
 
                   return `${startTime} - ${endTime}`;
                 })

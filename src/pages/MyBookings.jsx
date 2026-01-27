@@ -8,9 +8,11 @@ import { useAuth } from '@contexts/AuthContext';
 import { ROOMS } from '@constants';
 import { useAppNavigate } from '@hooks/useNavigate';
 import { userService } from '@services/firestore';
+import { getTimeSlotConfig } from '@utils/timeSlot';
 import dayjs from 'dayjs';
 import { Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { calculateEndTime } from '../utils/dateUtils';
 
 function MyBookings() {
   const { userProfile, loading } = useAuth();
@@ -94,36 +96,41 @@ function MyBookings() {
 
     // 先按房型和日期分組
     bookings.forEach(booking => {
+      const intervalMinutes = getTimeSlotConfig(booking.roomId).INTERVAL_MINUTES;
+      const normalizedBooking = {
+        ...booking,
+        endTime: calculateEndTime(booking.startTime, intervalMinutes),
+      };
       const groupKey = `${booking.roomId}-${booking.date}`;
 
       if (groupedBookings.has(groupKey)) {
         // 如果已有相同房型和日期的預訂，合併時段
         const existingGroup = groupedBookings.get(groupKey);
         existingGroup.timeSlots.push({
-          startTime: booking.startTime,
-          endTime: booking.endTime,
-          id: booking.id,
+          startTime: normalizedBooking.startTime,
+          endTime: normalizedBooking.endTime,
+          id: normalizedBooking.id,
         });
         // 累加費用和時長
         existingGroup.totalCost =
-          (existingGroup.totalCost || 0) + (booking.cost || 0);
+          (existingGroup.totalCost || 0) + (normalizedBooking.cost || 0);
         existingGroup.totalDuration =
-          (existingGroup.totalDuration || 0) + (booking.duration || 0);
+          (existingGroup.totalDuration || 0) + (normalizedBooking.duration || 0);
         // 更新合併ID以包含所有時段
-        existingGroup.id = `${existingGroup.id}_${booking.id}`;
+        existingGroup.id = `${existingGroup.id}_${normalizedBooking.id}`;
       } else {
         // 創建新的分組
         groupedBookings.set(groupKey, {
-          ...booking,
+          ...normalizedBooking,
           timeSlots: [
             {
-              startTime: booking.startTime,
-              endTime: booking.endTime,
-              id: booking.id,
+              startTime: normalizedBooking.startTime,
+              endTime: normalizedBooking.endTime,
+              id: normalizedBooking.id,
             },
           ],
-          totalCost: booking.cost || 0,
-          totalDuration: booking.duration || 0,
+          totalCost: normalizedBooking.cost || 0,
+          totalDuration: normalizedBooking.duration || 0,
           isGrouped: true,
         });
       }
@@ -173,8 +180,9 @@ function MyBookings() {
         const slotDuration = endTime.diff(startTime, 'hour', true);
 
         const room = ROOMS.find(r => r.id === group.roomId);
-        // 每個時段是 30 分鐘，價格是每 30 分鐘的價格
-        const slotCost = room ? slotDuration * 2 * room.price : 0;
+        const intervalMinutes = getTimeSlotConfig(group.roomId).INTERVAL_MINUTES;
+        const slotsPerHour = 60 / intervalMinutes;
+        const slotCost = room ? slotDuration * slotsPerHour * room.price : 0;
         return sum + slotCost;
       }, 0);
 

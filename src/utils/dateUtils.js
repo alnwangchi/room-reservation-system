@@ -126,11 +126,12 @@ export const formatTimeRange = (startTime, endTime) => {
 /**
  * 計算結束時間（基於開始時間和時長）
  * @param {string} startTime - 開始時間，格式為 "HH:MM"
- * @param {number} durationMinutes - 時長（分鐘），預設為 30
+ * @param {number} durationMinutes - 時長（分鐘）
  * @returns {string} 結束時間，格式為 "HH:MM"
  */
-export const calculateEndTime = (startTime, durationMinutes = 30) => {
+export const calculateEndTime = (startTime, durationMinutes) => {
   if (!startTime || typeof startTime !== 'string') return '';
+  if (typeof durationMinutes !== 'number' || durationMinutes <= 0) return '';
 
   const [hour, minute] = startTime.split(':').map(Number);
   if (isNaN(hour) || isNaN(minute)) return '';

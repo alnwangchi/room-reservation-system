@@ -8,9 +8,9 @@ function MonthSelector({
   placeholder = '選擇月份',
   label,
 }) {
-  // 月份選項：從 2025 年 8 月開始到目前當月
+  // 月份選項：從 2025 年 8 月開始到目前月份 +2
   const startDate = dayjs('2025-08');
-  const currentDate = dayjs().startOf('month');
+  const currentDate = dayjs().startOf('month').add(2, 'month');
   const monthOptions = [];
 
   let date = startDate;

@@ -8,6 +8,7 @@ function Calendar({
   selectedDate,
   onDateSelect,
   onMonthChange,
+  maxDate = null, // 允許顯示/選擇的最晚日期 (包含)
   disabledDateRange = {
     start: null, // 禁用開始日期 (包含)
     end: null, // 禁用結束日期 (包含)
@@ -55,6 +56,13 @@ function Calendar({
 
   const handleNextMonth = () => {
     if (onMonthChange) {
+      if (
+        maxDate &&
+        (currentDate.isSame(dayjs(maxDate), 'month') ||
+          currentDate.isAfter(dayjs(maxDate), 'month'))
+      ) {
+        return;
+      }
       onMonthChange(currentDate.add(1, 'month'));
     }
   };
@@ -89,6 +97,10 @@ function Calendar({
       (date.isSame(dayjs(disabledDateRange.end), 'day') ||
         date.isBefore(dayjs(disabledDateRange.end), 'day'))
     ) {
+      return true;
+    }
+
+    if (maxDate && date.isAfter(dayjs(maxDate), 'day')) {
       return true;
     }
 

@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import { roomService } from '../services/firestore';
 import { calculateEndTime } from '../utils/dateUtils';
+import { getTimeSlotConfig } from '../utils/timeSlot';
 
 export const useBooking = selectedRoom => {
   const [selectedDate, setSelectedDate] = useState();
@@ -16,12 +17,13 @@ export const useBooking = selectedRoom => {
         roomId,
         date
       );
+      const intervalMinutes = getTimeSlotConfig(roomId).INTERVAL_MINUTES;
 
       // 轉換 Firestore 資料格式為本地格式
       const localBookings = firestoreBookings.map(booking => ({
         ...booking,
         startTime: booking.timeSlot,
-        endTime: calculateEndTime(booking.timeSlot, 30),
+        endTime: calculateEndTime(booking.timeSlot, intervalMinutes),
       }));
 
       // 更新本地預訂狀態

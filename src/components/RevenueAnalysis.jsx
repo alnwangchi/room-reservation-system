@@ -15,7 +15,7 @@ function RevenueAnalysis() {
             <h4 className="font-medium text-gray-800 mb-2">基本假設</h4>
             <ul className="text-sm text-gray-600 space-y-1">
               <li>• 營業時間：每日 09:00 - 21:00</li>
-              <li>• 時段間隔：每 30 分鐘一個時段</li>
+              <li>• 時段間隔：依房間類型設定</li>
               <li>• 租用率：30%（可根據實際情況調整）</li>
               <li>• 清潔費：每次出租收取 5%</li>
               <li>• 計算週期：一個月（30天）</li>

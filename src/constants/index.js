@@ -38,12 +38,15 @@ const baseRooms = [
     description: '專業錄音設備和隔音環境，適合音樂錄製和製作',
   },
   {
+    isDisabled: false,
     id: 'multifunctional-meeting-space',
     name: '多功能會議空間',
-    capacity: 8,
+    capacity: 30,
     color: '#8b5cf6',
-    price: 200,
-    description: '即將開放預定功能',
+    price: 350,
+    holidayPrice: 600,
+    description:
+      '多功能空間租借設備附有投影機、簡報筆、麥克風、白板可容納30-40人',
   },
 ];
 
@@ -59,6 +62,14 @@ export const TIME_SLOT_CONFIG = {
   INTERVAL_MINUTES: 30,
   EXCLUDE_LAST_HALF_HOUR: false, // 包含 20:30
 };
+
+export const MTS_TIME_SLOT_CONFIG = {
+  START_HOUR: 9,
+  END_HOUR: 21,
+  INTERVAL_MINUTES: 60,
+  EXCLUDE_LAST_HALF_HOUR: false, // 包含 20:30
+};
+
 
 // 時段分類
 export const TIME_CATEGORIES = {

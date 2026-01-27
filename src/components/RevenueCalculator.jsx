@@ -1,13 +1,13 @@
 import { Calculator, Calendar, DollarSign, TrendingUp } from 'lucide-react';
 import React, { useState } from 'react';
 import { ROOMS, TIME_SLOT_CONFIG } from '../constants';
+import { getTimeSlotConfig } from '../utils/timeSlot';
 
 function RevenueCalculator() {
   // 可編輯的參數狀態
   const [settings, setSettings] = useState({
     startHour: TIME_SLOT_CONFIG.START_HOUR,
     endHour: TIME_SLOT_CONFIG.END_HOUR,
-    intervalMinutes: TIME_SLOT_CONFIG.INTERVAL_MINUTES,
     occupancyRate: 0.2, // 租用率
     cleaningFeeRate: 0.05, // 清潔費
   });
@@ -21,49 +21,51 @@ function RevenueCalculator() {
   };
 
   // 計算每日可用時段數量
-  const calculateDailyTimeSlots = () => {
+  const calculateDailyTimeSlots = intervalMinutes => {
     const startHour = settings.startHour;
     const endHour = settings.endHour;
-    const intervalMinutes = settings.intervalMinutes;
 
     // 計算總小時數
     const totalHours = endHour - startHour;
 
-    // 每小時2個時段（00分和30分）
-    let slots = totalHours * 2;
+    // 每小時的時段數 = 60 / intervalMinutes
+    const slotsPerHour = 60 / intervalMinutes;
+    let slots = totalHours * slotsPerHour;
 
     // 如果開始時間不是整點，需要減去第一個不完整的時段
     if (startHour % 1 !== 0) {
-      slots -= 1;
+      slots -= (startHour % 1) * slotsPerHour;
     }
 
     // 如果結束時間不是整點，需要減去最後一個不完整的時段
     if (endHour % 1 !== 0) {
-      slots -= 1;
+      slots -= (1 - (endHour % 1)) * slotsPerHour;
     }
 
-    return slots;
+    return Math.max(0, Math.floor(slots));
   };
 
   // 計算每日出租時段數量（共用函數）
-  const calculateDailyOccupiedSlots = occupancyRate => {
-    const dailySlots = calculateDailyTimeSlots();
+  const calculateDailyOccupiedSlots = (occupancyRate, dailySlots) => {
     return Math.floor(dailySlots * occupancyRate);
   };
 
   // 計算一個月的收益
   const calculateMonthlyRevenue = () => {
-    const dailySlots = calculateDailyTimeSlots();
     const monthlyDays = 30; // 假設一個月30天
     const occupancyRate = settings.occupancyRate;
     const cleaningFeeRate = settings.cleaningFeeRate;
 
     const results = ROOMS.map(room => {
+      const intervalMinutes = getTimeSlotConfig(room.id).INTERVAL_MINUTES;
       // 每日可用時段
-      const dailyAvailableSlots = dailySlots;
+      const dailyAvailableSlots = calculateDailyTimeSlots(intervalMinutes);
 
       // 每日實際出租時段（考慮租用率）
-      const dailyOccupiedSlots = calculateDailyOccupiedSlots(occupancyRate);
+      const dailyOccupiedSlots = calculateDailyOccupiedSlots(
+        occupancyRate,
+        dailyAvailableSlots
+      );
 
       // 每日基本收入
       const dailyBaseRevenue = dailyOccupiedSlots * room.price; // 每個時段的價格
@@ -93,6 +95,19 @@ function RevenueCalculator() {
   };
 
   const revenueData = calculateMonthlyRevenue();
+  const dailySlotsRange = revenueData.map(room => room.dailyAvailableSlots);
+  const minDailySlots = Math.min(...dailySlotsRange);
+  const maxDailySlots = Math.max(...dailySlotsRange);
+  const dailySlotsDisplay =
+    minDailySlots === maxDailySlots
+      ? `${minDailySlots}`
+      : `${minDailySlots} - ${maxDailySlots}`;
+  const minOccupiedSlots = Math.floor(minDailySlots * settings.occupancyRate);
+  const maxOccupiedSlots = Math.floor(maxDailySlots * settings.occupancyRate);
+  const occupiedSlotsDisplay =
+    minOccupiedSlots === maxOccupiedSlots
+      ? `${minOccupiedSlots}`
+      : `${minOccupiedSlots} - ${maxOccupiedSlots}`;
   const totalMonthlyRevenue = revenueData.reduce(
     (sum, room) => sum + room.monthlyNetRevenue,
     0
@@ -122,12 +137,11 @@ function RevenueCalculator() {
             </span>
           </div>
           <p className="text-2xl font-bold text-blue-800">
-            {calculateDailyTimeSlots()}
+            {dailySlotsDisplay}
           </p>
           <p className="text-xs text-blue-600">
             {settings.startHour.toString().padStart(2, '0')}:00 -{' '}
-            {settings.endHour.toString().padStart(2, '0')}:00，每
-            {settings.intervalMinutes}分鐘
+            {settings.endHour.toString().padStart(2, '0')}:00，依房型間隔
           </p>
         </div>
 
@@ -154,7 +168,7 @@ function RevenueCalculator() {
               />
               <span className="text-sm text-yellow-600">%</span>
               <span className="text-sm text-yellow-500">
-                ({calculateDailyOccupiedSlots(settings.occupancyRate)} 時段)
+                ({occupiedSlotsDisplay} 時段)
               </span>
             </div>
             <p className="text-2xl font-bold text-yellow-800">
