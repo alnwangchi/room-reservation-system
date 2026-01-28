@@ -40,118 +40,130 @@ function Header() {
     }
   };
 
+  const closeMobileMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  const handleMobileLogout = () => {
+    handleLogout();
+    closeMobileMenu();
+  };
+
+  const navItems = getNavRoutes(isAuthenticated, isAdmin);
+
   return (
-    <header className="bg-white shadow-lg">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+    <header className="bg-secondary-800 shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <img src={logo} alt="Logo" className="h-12 w-auto" />
-            </div>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-6">
-            <nav className="flex space-x-2">
-              {getNavRoutes().map(route => (
-                <NavItem
-                  key={route.path}
-                  to={route.path}
-                  isActive={isActive(route.path)}
-                  show={route.showNav && (!route.adminOnly || isAdmin)}
-                >
-                  {route.label}
-                </NavItem>
-              ))}
-            </nav>
-
-            {/* User Info and Logout */}
-            {isAuthenticated && (
-              <div className="flex items-center space-x-4">
-                <UserInfo userProfile={userProfile} />
-                <button
-                  onClick={handleLogout}
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  登出
-                </button>
+          <div className="flex-shrink-0">
+            <NavItem to="/" isActive={isActive('/')}>
+              <div className="flex items-center space-x-3">
+                <img
+                  src={logo}
+                  alt="Logo"
+                  className="h-8 w-8 sm:h-10 sm:w-10 object-contain"
+                />
+                <span className="text-white text-lg sm:text-xl md:text-2xl font-bold hover:text-primary-300 transition-colors duration-200">
+                  知熹音樂教室預訂系統
+                </span>
               </div>
-            )}
+            </NavItem>
           </div>
+
+          {/* Desktop Menu */}
+          <ul className="hidden md:flex space-x-4 lg:space-x-8">
+            {navItems.map(item => (
+              <NavItem
+                key={item.path}
+                to={item.path}
+                isActive={isActive(item.path)}
+                show
+              >
+                {item.label}
+              </NavItem>
+            ))}
+
+            {isAuthenticated ? (
+              <li className="flex items-center space-x-3">
+                <UserInfo userProfile={userProfile} onLogout={handleLogout} />
+              </li>
+            ) : (
+              <NavItem to="/login" isActive={isActive('/login')}>
+                登入
+              </NavItem>
+            )}
+          </ul>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+              className="text-white hover:text-primary-300 focus:outline-none focus:text-primary-300 transition-colors duration-200"
             >
-              <span className="sr-only">Open main menu</span>
-              {isMenuOpen ? (
-                <svg
-                  className="h-6 w-6"
-                  stroke="currentColor"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                {isMenuOpen ? (
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
                     d="M6 18L18 6M6 6l12 12"
                   />
-                </svg>
-              ) : (
-                <svg
-                  className="h-6 w-6"
-                  stroke="currentColor"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
+                ) : (
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
                     d="M4 6h16M4 12h16M4 18h16"
                   />
-                </svg>
-              )}
+                )}
+              </svg>
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden border-t border-gray-100">
-          <div className="px-4 py-3 space-y-1">
-            {getNavRoutes().map(route => (
-              <NavItem
-                key={route.path}
-                to={route.path}
-                isActive={isActive(route.path)}
-                isMobile
-                onClick={() => setIsMenuOpen(false)}
-                show={route.showNav && (!route.adminOnly || isAdmin)}
-              >
-                {route.label}
-              </NavItem>
-            ))}
-          </div>
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden pb-6 sm:pb-8">
+            <div className="px-2 pt-2 pb-3 space-y-2 sm:px-3 bg-secondary-700 rounded-lg mt-2">
+              {navItems.map(item => (
+                <NavItem
+                  key={item.path}
+                  to={item.path}
+                  isActive={isActive(item.path)}
+                  isMobile
+                  show
+                  onClick={closeMobileMenu}
+                >
+                  {item.label}
+                </NavItem>
+              ))}
 
-          {isAuthenticated && (
-            <div className="px-4 py-3 border-t border-gray-100">
-              <UserInfo userProfile={userProfile} isMobile />
-              <button
-                onClick={handleLogout}
-                className="mt-3 w-full text-left text-sm text-gray-600 hover:text-gray-900"
-              >
-                登出
-              </button>
+              {isAuthenticated ? (
+                <UserInfo
+                  userProfile={userProfile}
+                  onLogout={handleMobileLogout}
+                  isMobile
+                />
+              ) : (
+                <NavItem
+                  to="/login"
+                  isActive={isActive('/login')}
+                  isMobile
+                  onClick={closeMobileMenu}
+                >
+                  登入
+                </NavItem>
+              )}
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </header>
   );
 }
