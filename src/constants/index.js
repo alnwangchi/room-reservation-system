@@ -1,3 +1,23 @@
+import m1 from '@/assets/carousel/m1.JPEG';
+import m2 from '@/assets/carousel/m2.JPEG';
+import m3 from '@/assets/carousel/m3.JPEG';
+import m4 from '@/assets/carousel/m4.JPEG';
+import m5 from '@/assets/carousel/m5.JPEG';
+import m6 from '@/assets/carousel/m6.JPEG';
+import m7 from '@/assets/carousel/m7.JPEG';
+import p1 from '@/assets/carousel/p1.JPEG';
+import p2 from '@/assets/carousel/p2.JPEG';
+import p3 from '@/assets/carousel/p3.JPEG';
+import p4 from '@/assets/carousel/p4.JPEG';
+import p5 from '@/assets/carousel/p5.JPEG';
+import p6 from '@/assets/carousel/p6.JPEG';
+import p7 from '@/assets/carousel/p7.JPEG';
+import r1 from '@/assets/carousel/r1.JPEG';
+import r2 from '@/assets/carousel/r2.JPEG';
+import r3 from '@/assets/carousel/r3.JPEG';
+import r4 from '@/assets/carousel/r4.JPEG';
+import { isDev } from '@utils';
+
 // 月份名稱
 export const MONTH_NAMES = [
   '一月',
@@ -17,8 +37,6 @@ export const MONTH_NAMES = [
 // 星期名稱
 export const WEEK_DAYS = ['日', '一', '二', '三', '四', '五', '六'];
 
-import { isDev } from '@utils';
-
 // 房型資料
 const baseRooms = [
   {
@@ -28,14 +46,7 @@ const baseRooms = [
     color: '#3b82f6',
     price: 100,
     description: '琴房配備鋼琴和舒適環境，適合個人練習和教學',
-  },
-  {
-    id: 'standard-recording-studio',
-    name: '標準錄音室',
-    capacity: 4,
-    color: '#10b981',
-    price: 350,
-    description: '專業錄音設備和隔音環境，適合音樂錄製和製作',
+    images: [p1, p2, p3, p4, p5, p6, p7],
   },
   {
     isDisabled: false,
@@ -47,6 +58,16 @@ const baseRooms = [
     holidayPrice: 600,
     description:
       '多功能空間租借設備附有投影機、簡報筆、麥克風、白板可容納 30-40 人，若後續時段無人預訂，則可以半小時為臨時單位延長',
+    images: [m1, m2, m3, m4, m5, m6, m7],
+  },
+  {
+    id: 'standard-recording-studio',
+    name: '標準錄音室',
+    capacity: 4,
+    color: '#10b981',
+    price: 350,
+    description: '專業錄音設備和隔音環境，適合音樂錄製和製作',
+    images: [r1, r2, r3, r4],
   },
 ];
 

@@ -5,6 +5,20 @@ import { defineConfig } from 'vite';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  assetsInclude: [
+    '**/*.jpg',
+    '**/*.jpeg',
+    '**/*.png',
+    '**/*.gif',
+    '**/*.webp',
+    '**/*.svg',
+    '**/*.JPG',
+    '**/*.JPEG',
+    '**/*.PNG',
+    '**/*.GIF',
+    '**/*.WEBP',
+    '**/*.SVG',
+  ],
   server: {
     port: 5678,
     open: true,

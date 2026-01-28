@@ -1,25 +1,10 @@
-import generalPianoRoom01 from '@/assets/general-piano-room01.jpg';
-import multifunctionalMeetingSpace from '@/assets/multifunctional-meeting-space.jpg';
-import standardRecordingStudio01 from '@/assets/standard-recording-studio01.jpg';
 import PageBar from '@components/PageBar';
+import RoomCard from '@components/RoomCard';
 import { ROOMS } from '@constants';
-import { useAppNavigate } from '@hooks';
 import { getIntervalLabel, getTimeSlotConfig } from '@utils/timeSlot';
-import { Calendar, Clock, MapPin } from 'lucide-react';
-
-// 房型圖片映射
-const roomImages = {
-  'general-piano-room': generalPianoRoom01,
-  'general-piano-room-dev': generalPianoRoom01,
-  'standard-recording-studio': standardRecordingStudio01,
-  'standard-recording-studio-dev': standardRecordingStudio01,
-  'multifunctional-meeting-space': multifunctionalMeetingSpace,
-  'multifunctional-meeting-space-dev': multifunctionalMeetingSpace,
-};
+import { Calendar } from 'lucide-react';
 
 function Home() {
-  const { goToBooking } = useAppNavigate();
-
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       {/* 頁面標題 */}
@@ -33,87 +18,18 @@ function Home() {
 
       <div className="py-6 sm:py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          <div className="flex flex-col gap-6 mb-12">
             {ROOMS.map(room => {
               const intervalLabel = getIntervalLabel(
                 getTimeSlotConfig(room.id).INTERVAL_MINUTES
               );
 
               return (
-                <div
+                <RoomCard
                   key={room.id}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-                >
-                  <div className="h-80 overflow-hidden relative">
-                    <img
-                      src={roomImages[room.id] || generalPianoRoom01}
-                      alt={room.name}
-                      className="w-full h-full object-cover"
-                    />
-                    {room.isDisabled && (
-                      <div className="absolute inset-0 bg-gray-900 bg-opacity-50"></div>
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                          <MapPin className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900">
-                            {room.name}
-                          </h3>
-                          <p className="text-sm text-gray-500">
-                            容量：{room.capacity} 人
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        {room.holidayPrice ? (
-                          <>
-                            <div className="text-md font-bold text-blue-600">
-                              平日 {room.price} 點
-                            </div>
-                            <div className="text-md font-bold text-blue-600">
-                              假日 {room.holidayPrice} 點
-                            </div>
-                          </>
-                        ) : (
-                          <div className="text-md font-bold text-blue-600">
-                            {room.price} 點
-                          </div>
-                        )}
-                        <p className="text-sm font-bold text-blue-600">
-                          {intervalLabel}
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="text-gray-600 mb-4">{room.description}</p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-col items-start space-x-4 text-sm text-gray-500">
-                        <div className="flex items-center space-x-1">
-                          <Clock className="w-4 h-4" />
-                          <span>09:00-21:00</span>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => goToBooking(room.id)}
-                        disabled={room.isDisabled}
-                        className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                          room.isDisabled
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
-                      >
-                        {room.isDisabled ? '暫不開放' : '立即預訂'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  room={room}
+                  intervalLabel={intervalLabel}
+                />
               );
             })}
           </div>
