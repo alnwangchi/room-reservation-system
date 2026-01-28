@@ -18,7 +18,12 @@ function NavLink({ to, children, isActive, isMobile = false, onClick }) {
   }`;
 
   return (
-    <Link to={to} className={className} onClick={onClick}>
+    <Link
+      to={to}
+      className={className}
+      onClick={onClick}
+      style={{ textWrap: 'balance' }}
+    >
       {children}
     </Link>
   );

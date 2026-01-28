@@ -1,4 +1,4 @@
-import RevenueCalculator from '@components/RevenueCalculator';
+import RevenueCalculator from '@components/revenue/RevenueCalculator';
 
 function RevenueAnalysis() {
   return (

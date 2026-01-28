@@ -1,6 +1,6 @@
 import PageBar from '@components/PageBar';
-import RevenueAnalysis from '@components/RevenueAnalysis';
-import RevenueManage from '@components/RevenueManage';
+import RevenueAnalysis from '@components/revenue/RevenueAnalysis';
+import RevenueManage from '@components/revenue/RevenueManage';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { BarChart3, TrendingUp } from 'lucide-react';
 
