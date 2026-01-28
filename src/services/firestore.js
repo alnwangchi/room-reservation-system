@@ -146,37 +146,6 @@ export const firestoreService = {
 
 // 特定集合的服務
 export const roomService = {
-  // 獲取所有教室
-  async getAllRooms() {
-    return await firestoreService.getAll('rooms');
-  },
-
-  // 根據 ID 獲取教室
-  async getRoomById(id) {
-    return await firestoreService.getById('rooms', id);
-  },
-
-  // 添加新教室
-  async addRoom(roomData) {
-    return await firestoreService.add('rooms', roomData);
-  },
-
-  // 更新教室資訊
-  async updateRoom(id, roomData) {
-    try {
-      roomData.updatedAt = dayjs().toDate(); // 使用 dayjs 創建 Date 物件
-      return await firestoreService.update('rooms', id, roomData);
-    } catch (error) {
-      console.error('Error updating room:', error);
-      throw error;
-    }
-  },
-
-  // 刪除教室
-  async deleteRoom(id) {
-    return await firestoreService.delete('rooms', id);
-  },
-
   // 預訂房間時段
   async bookRoomTimeSlot(roomId, date, timeSlot, userInfo) {
     try {
@@ -449,35 +418,6 @@ export const roomService = {
     }
   },
 
-  // 取消房間預訂
-  async cancelRoomBooking(roomId, date, timeSlot) {
-    try {
-      const roomRef = doc(db, 'rooms', roomId.toString());
-      const dateRef = doc(roomRef, date, 'timeSlot');
-
-      await runTransaction(db, async transaction => {
-        const docSnap = await transaction.get(dateRef);
-        if (docSnap.exists()) {
-          const timeSlots = docSnap.data();
-          if (timeSlots[timeSlot]) {
-            delete timeSlots[timeSlot];
-            // 如果沒有其他預訂了，刪除整個文檔
-            if (isEmpty(timeSlots)) {
-              transaction.delete(dateRef);
-            } else {
-              transaction.set(dateRef, timeSlots);
-            }
-          }
-        }
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Error canceling room booking:', error);
-      throw error;
-    }
-  },
-
   // 取消使用者預訂記錄
   async cancelUserBooking(userId, bookingId, roomId, date, timeSlot) {
     try {
@@ -679,11 +619,6 @@ export const userService = {
     return await firestoreService.getAll('users');
   },
 
-  // 根據 ID 獲取使用者
-  async getUserById(id) {
-    return await firestoreService.getById('users', id);
-  },
-
   // 根據 email 獲取使用者
   async getUserByEmail(email) {
     try {
@@ -749,28 +684,6 @@ export const userService = {
     } catch (error) {
       console.error('Error updating last login time:', error);
       return false;
-    }
-  },
-
-  // 更新使用者預訂統計
-  async updateBookingStats(userId, increment = 1) {
-    const user = await this.getUserById(userId);
-    if (user) {
-      const currentMonth = new Date().getMonth();
-      const lastMonth = user.lastBookingMonth || -1;
-
-      let monthlyBookings = user.monthlyBookings || 0;
-      if (currentMonth !== lastMonth) {
-        monthlyBookings = increment;
-      } else {
-        monthlyBookings += increment;
-      }
-
-      await this.updateUser(userId, {
-        totalBookings: (user.totalBookings || 0) + increment,
-        monthlyBookings,
-        lastBookingMonth: currentMonth,
-      });
     }
   },
 
@@ -863,11 +776,6 @@ export const userService = {
     }
   },
 
-  // 刪除使用者
-  async deleteUser(id) {
-    return await firestoreService.delete('users', id);
-  },
-
   // 獲取使用者的預訂記錄
   async getUserBookings(userId, targetMonth = null) {
     try {
@@ -911,120 +819,6 @@ export const userService = {
       console.error(`Error getting user bookings for ${userId}:`, error);
       return [];
     }
-  },
-
-  // 獲取使用者的所有預訂記錄（跨月份）
-  async getAllUserBookings(userId) {
-    try {
-      const userRef = doc(db, 'users', userId);
-      const userBookingsRef = collection(userRef, 'bookings');
-
-      const querySnapshot = await getDocs(userBookingsRef);
-      const bookings = [];
-
-      querySnapshot.forEach(doc => {
-        const monthData = doc.data();
-
-        // 遍歷每個房型的預訂陣列
-        Object.keys(monthData).forEach(roomId => {
-          if (Array.isArray(monthData[roomId])) {
-            monthData[roomId].forEach(booking => {
-              // 為每個預訂添加月份資訊和唯一ID
-              bookings.push({
-                id: `${doc.id}_${roomId}_${booking.bookingTime}`,
-                month: doc.id, // 月份 (YYYY-MM)
-                ...booking,
-              });
-            });
-          }
-        });
-      });
-
-      // 按日期和時間排序（最新的在前）
-      return bookings.sort((a, b) => {
-        const dateComparison = b.date.localeCompare(a.date);
-        if (dateComparison !== 0) return dateComparison;
-        return a.startTime.localeCompare(b.startTime);
-      });
-    } catch (error) {
-      console.error(`Error getting all user bookings for ${userId}:`, error);
-      return [];
-    }
-  },
-
-  // 獲取使用者本月預訂次數
-  async getMonthlyBookings(userId) {
-    try {
-      const currentMonth = dayjs().month(); // 使用 dayjs 獲取當前月份
-      const currentYear = dayjs().year(); // 使用 dayjs 獲取當前年份
-
-      const userBookings = await this.getUserBookings(userId);
-
-      // 篩選本月預訂
-      const monthlyBookings = userBookings.filter(booking => {
-        const bookingDate = dayjs(booking.date);
-        return (
-          bookingDate.month() === currentMonth &&
-          bookingDate.year() === currentYear
-        );
-      });
-
-      return monthlyBookings.length;
-    } catch (error) {
-      console.error('Error getting monthly bookings:', error);
-      return 0;
-    }
-  },
-};
-
-export const bookingService = {
-  // 獲取所有預訂
-  async getAllBookings() {
-    return await firestoreService.getAll('bookings');
-  },
-
-  // 根據 ID 獲取預訂
-  async getBookingById(id) {
-    return await firestoreService.getById('bookings', id);
-  },
-
-  // 根據使用者 ID 獲取預訂
-  async getBookingsByUserId(userId) {
-    return await firestoreService.query(
-      'bookings',
-      [{ field: 'userId', operator: '==', value: userId }],
-      { field: 'date', direction: 'desc' }
-    );
-  },
-
-  // 根據教室 ID 獲取預訂
-  async getBookingsByRoomId(roomId) {
-    return await firestoreService.query(
-      'bookings',
-      [{ field: 'roomId', operator: '==', value: roomId }],
-      { field: 'date', direction: 'asc' }
-    );
-  },
-
-  // 添加新預訂
-  async addBooking(bookingData) {
-    return await firestoreService.add('bookings', bookingData);
-  },
-
-  // 更新預訂記錄
-  async updateBooking(id, bookingData) {
-    try {
-      bookingData.updatedAt = dayjs().toDate(); // 使用 dayjs 創建 Date 物件
-      return await firestoreService.update('bookings', id, bookingData);
-    } catch (error) {
-      console.error('Error updating booking:', error);
-      throw error;
-    }
-  },
-
-  // 刪除預訂
-  async deleteBooking(id) {
-    return await firestoreService.delete('bookings', id);
   },
 };
 

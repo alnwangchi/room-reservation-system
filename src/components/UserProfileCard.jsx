@@ -163,12 +163,7 @@ const UserProfileCard = ({
         </div>
       </div>
       {/* 儲值餘額 */}
-      {showBalance && (
-        <BalanceCard
-          balance={balance}
-          showFullContentOnMobile={showFullContentOnMobile}
-        />
-      )}
+      {showBalance && <BalanceCard balance={balance} />}
       {/* 統計信息 */}
       <div className="grid grid-cols-1 gap-3 mt-2">
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
