@@ -7,14 +7,14 @@ import RevenueManage from '../components/RevenueManage';
 function RevenueManagement() {
   const tabs = [
     {
-      name: '收益分析',
-      icon: BarChart3,
-      content: <RevenueAnalysis />,
-    },
-    {
       name: '實際營收',
       icon: TrendingUp,
       content: <RevenueManage />,
+    },
+    {
+      name: '收益分析',
+      icon: BarChart3,
+      content: <RevenueAnalysis />,
     },
   ];
 
@@ -32,7 +32,7 @@ function RevenueManagement() {
       {/* 主要內容區域 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <TabGroup defaultIndex={1}>
+          <TabGroup defaultIndex={0}>
             <TabList className="flex border-b border-gray-200">
               {tabs.map(tab => (
                 <Tab

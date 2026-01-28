@@ -185,7 +185,9 @@ function RevenueManage() {
               >
                 {/* 預訂人標題 */}
                 <div
-                  className="flex justify-between items-center mb-3 cursor-pointer hover:bg-gray-100 rounded-md p-2 -m-2 transition-colors"
+                  className={`flex justify-between items-center cursor-pointer hover:bg-gray-100 rounded-md p-2 -m-2 transition-colors ${
+                    expandedBookers.has(bookerGroup.booker) ? 'mb-3' : ''
+                  }`}
                   onClick={() => toggleBookerExpansion(bookerGroup.booker)}
                 >
                   <div className="flex items-center space-x-2">
