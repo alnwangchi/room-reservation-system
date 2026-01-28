@@ -46,7 +46,7 @@ const baseRooms = [
     price: 350,
     holidayPrice: 600,
     description:
-      '多功能空間租借設備附有投影機、簡報筆、麥克風、白板可容納30-40人',
+      '多功能空間租借設備附有投影機、簡報筆、麥克風、白板可容納 30-40 人，若後續時段無人預訂，則可以半小時為臨時單位延長',
   },
 ];
 
@@ -67,7 +67,7 @@ export const MTS_TIME_SLOT_CONFIG = {
   START_HOUR: 9,
   END_HOUR: 21,
   INTERVAL_MINUTES: 60,
-  EXCLUDE_LAST_HALF_HOUR: false, // 包含 20:30
+  EXCLUDE_LAST_HOUR: false,
 };
 
 // 時段分類

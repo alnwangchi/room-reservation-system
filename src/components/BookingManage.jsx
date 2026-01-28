@@ -1,12 +1,12 @@
 import MonthSelector from '@components/MonthSelector';
 import DropSelector from '@components/shared/DropSelector';
 import UserBadge from '@components/UserBadge';
-import { ROOMS } from '@constants';
+import { DEV_ACCOUNT, ROOMS } from '@constants';
 import { useAuth } from '@contexts/AuthContext';
 import { useHintDialog } from '@contexts/HintDialogContext';
 import useGetUsers from '@hooks/useGetUsers';
 import { userService } from '@services/firestore';
-import { isEmpty } from '@utils';
+import { isDev, isEmpty } from '@utils';
 import { sortUsersByTotalBookings } from '@utils/user';
 import dayjs from 'dayjs';
 import { Calendar, X } from 'lucide-react';
@@ -23,8 +23,17 @@ function BookingManage() {
 
   // 按照預訂數量排序使用者（多到少）
   const sortedUsers = useMemo(() => {
-    if (!allUsers || allUsers.length === 0) return [];
-    return [...allUsers].sort(sortUsersByTotalBookings);
+    const baseUsers = allUsers || [];
+    const devUsers = isDev()
+      ? [DEV_ACCOUNT.profile].filter(
+          devUser => !baseUsers.some(user => user.id === devUser.id)
+        )
+      : [];
+
+    const mergedUsers = [...devUsers, ...baseUsers];
+    if (mergedUsers.length === 0) return [];
+
+    return [...mergedUsers].sort(sortUsersByTotalBookings);
   }, [allUsers]);
 
   // 當使用者載入完成後，設定預設選中的使用者為預訂數量最多的用戶
