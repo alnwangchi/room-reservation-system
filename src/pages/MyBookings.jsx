@@ -1,6 +1,6 @@
 import BookingCard from '@components/BookingCard';
 import MonthSelector from '@components/MonthSelector';
-import PageHeader from '@components/PageHeader';
+import PageBar from '@components/PageBar';
 import RenameModal from '@components/RenameModal';
 import UserProfileCard from '@components/UserProfileCard';
 import { useAuth } from '@contexts/AuthContext';
@@ -8,11 +8,11 @@ import { useAuth } from '@contexts/AuthContext';
 import { ROOMS } from '@constants';
 import { useAppNavigate } from '@hooks/useNavigate';
 import { userService } from '@services/firestore';
+import { calculateEndTime, isWeekend } from '@utils/date';
 import { getTimeSlotConfig } from '@utils/timeSlot';
 import dayjs from 'dayjs';
 import { Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { calculateEndTime, isWeekend } from '@utils/date';
 
 function MyBookings() {
   const { userProfile, loading } = useAuth();
@@ -96,7 +96,9 @@ function MyBookings() {
 
     // 先按房型和日期分組
     bookings.forEach(booking => {
-      const intervalMinutes = getTimeSlotConfig(booking.roomId).INTERVAL_MINUTES;
+      const intervalMinutes = getTimeSlotConfig(
+        booking.roomId
+      ).INTERVAL_MINUTES;
       const normalizedBooking = {
         ...booking,
         endTime: calculateEndTime(booking.startTime, intervalMinutes),
@@ -115,7 +117,8 @@ function MyBookings() {
         existingGroup.totalCost =
           (existingGroup.totalCost || 0) + (normalizedBooking.cost || 0);
         existingGroup.totalDuration =
-          (existingGroup.totalDuration || 0) + (normalizedBooking.duration || 0);
+          (existingGroup.totalDuration || 0) +
+          (normalizedBooking.duration || 0);
         // 更新合併ID以包含所有時段
         existingGroup.id = `${existingGroup.id}_${normalizedBooking.id}`;
       } else {
@@ -184,9 +187,15 @@ function MyBookings() {
           group.roomId.includes('multifunctional-meeting-space') &&
           isWeekend(group.date) &&
           room?.holidayPrice;
-        const intervalMinutes = getTimeSlotConfig(group.roomId).INTERVAL_MINUTES;
+        const intervalMinutes = getTimeSlotConfig(
+          group.roomId
+        ).INTERVAL_MINUTES;
         const slotsPerHour = 60 / intervalMinutes;
-        const roomPrice = room ? (useHolidayPrice ? room.holidayPrice : room.price) : 0;
+        const roomPrice = room
+          ? useHolidayPrice
+            ? room.holidayPrice
+            : room.price
+          : 0;
         const slotCost = slotDuration * slotsPerHour * roomPrice;
         return sum + slotCost;
       }, 0);
@@ -282,7 +291,7 @@ function MyBookings() {
       />
       <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
         {/* 頁面標題 */}
-        <PageHeader
+        <PageBar
           title="我的預訂"
           description="查看和管理你的房間預訂"
           icon={Calendar}

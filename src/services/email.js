@@ -1,6 +1,6 @@
+import { db } from '@config/firebase';
+import { isDev } from '@utils';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { db } from '../config/firebase';
-import { isDev } from '../utils';
 
 // Email 服務
 export const emailService = {

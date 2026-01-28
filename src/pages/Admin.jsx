@@ -1,12 +1,12 @@
+import BookingManage from '@components/BookingManage';
+import CancelBookingRecord from '@components/CancelBookingRecord';
+import PageBar from '@components/PageBar';
+import RoomManage from '@components/RoomManage';
+import UserList from '@components/UserList';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import useGetUsers from '@hooks/useGetUsers';
 import { BookMinus, Calendar, Clock, Shield, Users } from 'lucide-react';
 import { useState } from 'react';
-import BookingManage from '../components/BookingManage';
-import CancelBookingRecord from '../components/CancelBookingRecord';
-import PageHeader from '../components/PageHeader';
-import RoomManage from '../components/RoomManage';
-import UserList from '../components/UserList';
-import useGetUsers from '../hooks/useGetUsers';
 
 function Admin() {
   const {
@@ -56,7 +56,7 @@ function Admin() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       {/* 頁面標題 */}
-      <PageHeader title="管理後台" description="系統管理與配置" icon={Shield} />
+      <PageBar title="管理後台" description="系統管理與配置" icon={Shield} />
 
       {/* 主要內容區域 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

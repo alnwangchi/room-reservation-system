@@ -1,6 +1,5 @@
-import React from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useAppNavigate } from '../hooks/useNavigate';
+import { useAuth } from '@contexts/AuthContext';
+import { useAppNavigate } from '@hooks/useNavigate';
 
 function ProtectedRoute({
   children,

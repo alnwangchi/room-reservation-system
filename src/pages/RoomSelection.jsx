@@ -1,11 +1,11 @@
+import generalPianoRoom01 from '@/assets/general-piano-room01.jpg';
+import multifunctionalMeetingSpace from '@/assets/multifunctional-meeting-space.jpg';
+import standardRecordingStudio01 from '@/assets/standard-recording-studio01.jpg';
+import PageBar from '@components/PageBar';
+import { ROOMS } from '@constants';
+import { useAppNavigate } from '@hooks';
+import { getIntervalLabel, getTimeSlotConfig } from '@utils/timeSlot';
 import { Calendar, Clock, MapPin } from 'lucide-react';
-import generalPianoRoom01 from '../assets/general-piano-room01.jpg';
-import multifunctionalMeetingSpace from '../assets/multifunctional-meeting-space.jpg';
-import standardRecordingStudio01 from '../assets/standard-recording-studio01.jpg';
-import PageHeader from '../components/PageHeader';
-import { ROOMS } from '../constants';
-import { getIntervalLabel, getTimeSlotConfig } from '../utils/timeSlot';
-import { useAppNavigate } from '../hooks';
 
 // 房型圖片映射
 const roomImages = {
@@ -23,7 +23,7 @@ function Home() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       {/* 頁面標題 */}
-      <PageHeader
+      <PageBar
         title="空間預訂"
         description="專業的琴房和錄音室預訂服務，為您提供舒適的音樂練習和錄製環境"
         icon={Calendar}

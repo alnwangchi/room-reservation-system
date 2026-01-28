@@ -1,10 +1,10 @@
+import BalanceCard from '@components/BalanceCard';
+import DepositModal from '@components/DepositModal';
+import UserBadge from '@components/UserBadge';
 import { useHintDialog } from '@contexts/HintDialogContext';
+import { formatDate } from '@utils/date';
 import { Calendar, Pen, User } from 'lucide-react';
 import { useState } from 'react';
-import { formatDate } from '@utils/date';
-import BalanceCard from './BalanceCard';
-import DepositModal from './DepositModal';
-import UserBadge from './UserBadge';
 
 const UserProfileCard = ({
   size,

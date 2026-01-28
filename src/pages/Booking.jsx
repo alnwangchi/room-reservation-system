@@ -1,20 +1,20 @@
 import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import BookingModal from '@components/BookingModal';
+import Calendar from '@components/Calendar';
+import PageBar from '@components/PageBar';
+import TimeSlotButton from '@components/TimeSlotButton';
+import { ROOMS, TIME_CATEGORIES } from '@constants';
+import { useAuth } from '@contexts/AuthContext';
+import { useHintDialog } from '@contexts/HintDialogContext';
+import { useAppNavigate, useBooking, useOpenSettings } from '@hooks';
+import { emailService } from '@services/email';
+import { roomService, userService } from '@services/firestore';
+import { isTimeInRange, isWeekend } from '@utils/date';
+import { getIntervalLabel, getTimeSlotConfig } from '@utils/timeSlot';
 import dayjs from 'dayjs';
 import { Sun } from 'lucide-react';
-import BookingModal from '../components/BookingModal';
-import Calendar from '../components/Calendar';
-import PageHeader from '../components/PageHeader';
-import TimeSlotButton from '../components/TimeSlotButton';
-import { ROOMS, TIME_CATEGORIES } from '../constants';
-import { useAuth } from '../contexts/AuthContext';
-import { useHintDialog } from '../contexts/HintDialogContext';
-import { useAppNavigate, useBooking, useOpenSettings } from '../hooks';
-import { emailService } from '../services/email';
-import { roomService, userService } from '../services/firestore';
-import { isTimeInRange, isWeekend } from '@utils/date';
-import { getIntervalLabel, getTimeSlotConfig } from '../utils/timeSlot';
 
 function Booking() {
   const { roomId } = useParams();
@@ -427,7 +427,7 @@ function Booking() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       {/* 標題列 */}
-      <PageHeader
+      <PageBar
         title={roomId ? `${currentRoom?.name}預訂日曆` : '我要預訂'}
         onBack={roomId ? goToRoomSelection : undefined}
         description={roomId ? '無法預訂今天以前的日期' : '選擇琴房並預訂時段'}

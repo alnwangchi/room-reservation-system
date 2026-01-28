@@ -1,3 +1,5 @@
+import { auth, googleProvider } from '@config/firebase';
+import { userService } from '@services/firestore';
 import dayjs from 'dayjs';
 import {
   onAuthStateChanged,
@@ -6,8 +8,6 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { useEffect, useState } from 'react';
-import { auth, googleProvider } from '../config/firebase';
-import { userService } from './firestore';
 
 // 認證服務
 export const authService = {

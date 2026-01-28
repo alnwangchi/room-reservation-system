@@ -1,7 +1,6 @@
+import { MONTH_NAMES, WEEK_DAYS } from '@constants';
 import dayjs from 'dayjs';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React from 'react';
-import { MONTH_NAMES, WEEK_DAYS } from '../constants';
 
 function Calendar({
   currentDate,

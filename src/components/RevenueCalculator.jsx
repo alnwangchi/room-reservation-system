@@ -1,7 +1,7 @@
+import { ROOMS, TIME_SLOT_CONFIG } from '@constants';
+import { getTimeSlotConfig } from '@utils/timeSlot';
 import { Calculator, Calendar, DollarSign, TrendingUp } from 'lucide-react';
-import React, { useState } from 'react';
-import { ROOMS, TIME_SLOT_CONFIG } from '../constants';
-import { getTimeSlotConfig } from '../utils/timeSlot';
+import { useState } from 'react';
 
 function RevenueCalculator() {
   // 可編輯的參數狀態

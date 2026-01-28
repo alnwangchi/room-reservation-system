@@ -1,7 +1,6 @@
 import { ChevronLeft } from 'lucide-react';
-import React from 'react';
 
-function PageHeader({
+function PageBar({
   title,
   description,
   icon: Icon,
@@ -45,4 +44,4 @@ function PageHeader({
   );
 }
 
-export default PageHeader;
+export default PageBar;

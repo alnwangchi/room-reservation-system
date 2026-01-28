@@ -1,8 +1,8 @@
+import { roomService } from '@services/firestore';
+import { calculateEndTime } from '@utils/date';
+import { getTimeSlotConfig } from '@utils/timeSlot';
 import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
-import { roomService } from '../services/firestore';
-import { calculateEndTime } from '@utils/date';
-import { getTimeSlotConfig } from '../utils/timeSlot';
 
 export const useBooking = selectedRoom => {
   const [selectedDate, setSelectedDate] = useState();

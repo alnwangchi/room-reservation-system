@@ -17,7 +17,7 @@ export const MONTH_NAMES = [
 // 星期名稱
 export const WEEK_DAYS = ['日', '一', '二', '三', '四', '五', '六'];
 
-import { isDev } from '../utils';
+import { isDev } from '@utils';
 
 // 房型資料
 const baseRooms = [
@@ -69,7 +69,6 @@ export const MTS_TIME_SLOT_CONFIG = {
   INTERVAL_MINUTES: 60,
   EXCLUDE_LAST_HALF_HOUR: false, // 包含 20:30
 };
-
 
 // 時段分類
 export const TIME_CATEGORIES = {

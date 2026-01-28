@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import GoogleLoginButton from '../components/GoogleLoginButton';
-import { useAuth } from '../contexts/AuthContext';
-import { useHintDialog } from '../contexts/HintDialogContext';
-import { useAppNavigate } from '../hooks';
-import { useLineWebViewDetector } from '../hooks/useLineWebViewDetector';
-import { authService } from '../services/auth';
+import GoogleLoginButton from '@components/GoogleLoginButton';
+import { useAuth } from '@contexts/AuthContext';
+import { useHintDialog } from '@contexts/HintDialogContext';
+import { useAppNavigate } from '@hooks';
+import { useLineWebViewDetector } from '@hooks/useLineWebViewDetector';
+import { authService } from '@services/auth';
+import { useEffect, useState } from 'react';
 
 // Google 登入錯誤訊息映射
 const GOOGLE_LOGIN_ERROR_MESSAGES = {

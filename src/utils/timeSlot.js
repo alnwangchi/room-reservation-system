@@ -1,4 +1,4 @@
-import { MTS_TIME_SLOT_CONFIG, TIME_SLOT_CONFIG } from '../constants';
+import { MTS_TIME_SLOT_CONFIG, TIME_SLOT_CONFIG } from '@constants';
 
 export const getTimeSlotConfig = roomId => {
   if (!roomId) return TIME_SLOT_CONFIG;

@@ -1,5 +1,4 @@
-import React from 'react';
-import { useAppNavigate } from '../hooks';
+import { useAppNavigate } from '@hooks';
 
 function RoomCard({ room }) {
   const { goToBooking } = useAppNavigate();

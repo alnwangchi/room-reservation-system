@@ -1,8 +1,8 @@
-import { X } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { isEmpty } from '../utils';
+import BalanceCard from '@components/BalanceCard';
+import { useAuth } from '@contexts/AuthContext';
+import { isEmpty } from '@utils';
 import { calculateEndTime } from '@utils/date';
-import BalanceCard from './BalanceCard';
+import { X } from 'lucide-react';
 
 function BookingModal({
   isOpen,

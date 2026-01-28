@@ -1,5 +1,5 @@
+import { roomService } from '@services/firestore';
 import { useCallback, useEffect, useState } from 'react';
-import { roomService } from '../services/firestore';
 
 export const useOpenSettings = (selectedRoomId, selectedDate) => {
   const [timeSlots, setTimeSlots] = useState({

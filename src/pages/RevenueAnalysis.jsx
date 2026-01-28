@@ -1,8 +1,8 @@
+import PageBar from '@components/PageBar';
+import RevenueAnalysis from '@components/RevenueAnalysis';
+import RevenueManage from '@components/RevenueManage';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { BarChart3, TrendingUp } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
-import RevenueAnalysis from '../components/RevenueAnalysis';
-import RevenueManage from '../components/RevenueManage';
 
 function RevenueManagement() {
   const tabs = [
@@ -21,7 +21,7 @@ function RevenueManagement() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       {/* 頁面標題 */}
-      <PageHeader
+      <PageBar
         title="收益管理"
         description="收益分析與實際營收管理"
         icon={BarChart3}

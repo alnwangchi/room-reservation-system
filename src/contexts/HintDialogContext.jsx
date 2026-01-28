@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-import HintDialog from '../components/HintDialog';
+import HintDialog from '@components/HintDialog';
+import { createContext, useContext, useState } from 'react';
 
 const HintDialogContext = createContext();
 

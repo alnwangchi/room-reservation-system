@@ -1,5 +1,5 @@
+import { userService } from '@services/firestore';
 import { useEffect, useState } from 'react';
-import { userService } from '../services/firestore';
 
 function useGetUsers() {
   const [allUsers, setAllUsers] = useState([]);

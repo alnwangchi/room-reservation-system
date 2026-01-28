@@ -1,5 +1,4 @@
-import React from 'react';
-import RevenueCalculator from './RevenueCalculator';
+import RevenueCalculator from '@components/RevenueCalculator';
 
 function RevenueAnalysis() {
   return (

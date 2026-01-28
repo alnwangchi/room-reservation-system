@@ -1,5 +1,5 @@
-import { useLineWebViewDetector } from '../hooks/useLineWebViewDetector';
-import { isDev } from '../utils';
+import { useLineWebViewDetector } from '@hooks/useLineWebViewDetector';
+import { isDev } from '@utils';
 
 export function LineWebViewRedirect() {
   const { isLineWebView, isLoading, openExternal, openInSafari, openInChrome } =

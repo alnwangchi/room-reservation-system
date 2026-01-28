@@ -1,7 +1,7 @@
+import { firestoreService } from '@services/firestore';
+import { isEmpty } from '@utils';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { firestoreService } from '../services/firestore';
-import { isEmpty } from '../utils';
 
 function CancelBookingRecord() {
   const [records, setRecords] = useState([]);

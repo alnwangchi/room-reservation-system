@@ -50,3 +50,22 @@ return {
   isInNewPagePage,
 };
 ```
+
+## 匯入路徑規則
+
+- **必須使用 `@` alias**：`src` 內部模組與資產一律用 `@` 別名匯入（如 `@components/...`、`@utils/...`、`@/assets/...`）
+- **禁止使用相對路徑**：避免 `../` 或 `./` 指向 `src` 內部檔案
+
+### 範例
+
+```javascript
+// ✅ 正確
+import PageBar from '@components/PageBar';
+import { isDev } from '@utils';
+import logo from '@/assets/logo.jpg';
+
+// ❌ 錯誤
+import PageBar from '../components/PageBar';
+import { isDev } from '../utils';
+import logo from '../assets/logo.jpg';
+```

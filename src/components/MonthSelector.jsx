@@ -1,5 +1,5 @@
+import DropSelector from '@components/shared/DropSelector';
 import dayjs from 'dayjs';
-import DropSelector from './shared/DropSelector';
 
 function MonthSelector({
   selectedMonth,

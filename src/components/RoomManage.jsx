@@ -1,10 +1,10 @@
+import Calendar from '@components/Calendar';
+import { ROOMS, TIME_CATEGORIES } from '@constants';
 import { Switch } from '@headlessui/react';
+import { useBooking, useOpenSettings } from '@hooks';
 import dayjs from 'dayjs';
 import { Clock } from 'lucide-react';
 import { useState } from 'react';
-import { ROOMS, TIME_CATEGORIES } from '../constants';
-import { useBooking, useOpenSettings } from '../hooks';
-import Calendar from './Calendar';
 
 function RoomManage({ selectedRoomId = 'general-piano-room', onRoomChange }) {
   const [currentDate, setCurrentDate] = useState(dayjs());

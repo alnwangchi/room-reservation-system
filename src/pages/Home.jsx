@@ -1,3 +1,4 @@
+import { useAppNavigate } from '@hooks';
 import {
   AlertTriangle,
   ArrowRight,
@@ -7,7 +8,6 @@ import {
   CreditCard,
   Gift,
 } from 'lucide-react';
-import { useAppNavigate } from '../hooks';
 
 function Home() {
   const { navigate } = useAppNavigate();

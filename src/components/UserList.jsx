@@ -1,12 +1,12 @@
+import UserProfileCard from '@components/UserProfileCard';
 import { Switch } from '@headlessui/react';
+import { userService } from '@services/firestore';
 import {
   filterUsersByRole,
   sortUsersByJoinTime,
   sortUsersByTotalBookings,
 } from '@utils/user';
 import { useState } from 'react';
-import { userService } from '../services/firestore';
-import UserProfileCard from './UserProfileCard';
 
 const UserList = ({ users = [], loading = false, error = null, onRefresh }) => {
   const [switchEnabled, setSwitchEnabled] = useState(false);

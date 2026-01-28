@@ -1,12 +1,12 @@
+import logo from '@/assets/logo.jpg';
+import NavItem from '@components/NavItem';
+import UserInfo from '@components/UserInfo';
+import { getNavRoutes } from '@config/routes';
+import { useAuth } from '@contexts/AuthContext';
+import { useHintDialog } from '@contexts/HintDialogContext';
+import { authService } from '@services/auth';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import logo from '../assets/logo.jpg';
-import { getNavRoutes } from '../config/routes';
-import { useAuth } from '../contexts/AuthContext';
-import { useHintDialog } from '../contexts/HintDialogContext';
-import { authService } from '../services/auth';
-import NavItem from './NavItem';
-import UserInfo from './UserInfo';
 
 function Navigation() {
   const location = useLocation();

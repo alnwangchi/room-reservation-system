@@ -1,3 +1,8 @@
+import { db } from '@config/firebase';
+import { ROOMS } from '@constants';
+import { isEmpty } from '@utils';
+import { calculateEndTime, isWeekend } from '@utils/date';
+import { getTimeSlotConfig } from '@utils/timeSlot';
 import dayjs from 'dayjs';
 import {
   addDoc,
@@ -15,11 +20,6 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { db } from '../config/firebase';
-import { ROOMS } from '../constants';
-import { isEmpty } from '../utils';
-import { calculateEndTime, isWeekend } from '@utils/date';
-import { getTimeSlotConfig } from '../utils/timeSlot';
 
 // 通用 CRUD 操作
 export const firestoreService = {
@@ -234,7 +234,11 @@ export const roomService = {
           isWeekend(dateStr) &&
           room?.holidayPrice;
         // room.price 已經是每個時段的價格
-        const bookingCost = room ? (useHolidayPrice ? room.holidayPrice : room.price) : 0;
+        const bookingCost = room
+          ? useHolidayPrice
+            ? room.holidayPrice
+            : room.price
+          : 0;
 
         // 🔒 然後進行所有寫入操作
         // 1. 建立預訂記錄到 rooms 集合
