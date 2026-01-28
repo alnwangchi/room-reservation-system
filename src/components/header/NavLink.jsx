@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 function NavLink({ to, children, isActive, isMobile = false, onClick }) {
