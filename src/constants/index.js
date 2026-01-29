@@ -44,8 +44,8 @@ const baseRooms = [
     name: '多功能會議空間',
     capacity: 30,
     color: '#8b5cf6',
-    price: 700,
-    holidayPrice: 1200,
+    price: 650,
+    holidayPrice: 1000,
     description:
       '多功能空間租借設備附有投影機、簡報筆、麥克風、白板可容納 30-40 人，若後續時段無人預訂，則可以半小時為臨時單位延長',
     images: [m7, m3, m5, m6],
