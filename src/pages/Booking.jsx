@@ -9,6 +9,7 @@ import { ROOMS, TIME_CATEGORIES } from '@constants';
 import { useAuth } from '@contexts/AuthContext';
 import { useHintDialog } from '@contexts/HintDialogContext';
 import { useAppNavigate, useBooking, useOpenSettings } from '@hooks';
+import { useRoomBookingBlock } from '@hooks/useRoomBookingBlock';
 import { emailService } from '@services/email';
 import { roomService, userService } from '@services/firestore';
 import { isTimeInRange, isWeekend } from '@utils/date';
@@ -47,10 +48,16 @@ function Booking() {
 
   const timeSlotConfig = getTimeSlotConfig(selectedRoom);
   const intervalLabel = getIntervalLabel(timeSlotConfig.INTERVAL_MINUTES);
+  const isMeetingRoom = selectedRoom.includes('multifunctional-meeting-space');
+  const isGeneralPianoRoom = selectedRoom.includes('general-piano-room');
+  const meetingRoomId = ROOMS.find(room =>
+    room.id.includes('multifunctional-meeting-space')
+  )?.id;
   const isHoliday =
-    selectedDate && selectedRoom.includes('multifunctional-meeting-space')
-      ? isWeekend(selectedDate)
-      : false;
+    selectedDate && isMeetingRoom ? isWeekend(selectedDate) : false;
+  const requiresMinimumTwoSlots = isMeetingRoom;
+  const canOpenBookingForm =
+    !requiresMinimumTwoSlots || selectedTimeSlots.length >= 2;
 
   const generateTimeSlots = () => {
     const config = timeSlotConfig;
@@ -112,6 +119,16 @@ function Booking() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedDate, selectedRoom, loadBookingsForDate]
   );
+
+  const { isCategoryBlocked: isMeetingRoomBlockingCategory } =
+    useRoomBookingBlock({
+      selectedDate,
+      isTargetRoom: isGeneralPianoRoom,
+      blockingRoomId: meetingRoomId,
+      getBookingsForDateAndRoom,
+      loadBookingsForDate,
+      generateTimeSlots,
+    });
 
   const handleTimeSlotClick = timeSlot => {
     if (isTimeSlotBooked(timeSlot, selectedDate, selectedRoom)) {
@@ -367,7 +384,8 @@ function Booking() {
     };
 
     const categoryKey = getCategoryKey(category);
-    const isTimeSlotOpen = timeSlots[categoryKey];
+    const isBlockedByMeetingRoom = isMeetingRoomBlockingCategory(category);
+    const isTimeSlotOpen = timeSlots[categoryKey] && !isBlockedByMeetingRoom;
 
     return (
       <div className={`col-span-full ${!isLastCategory ? 'mb-2 md:mb-4' : ''}`}>
@@ -416,7 +434,11 @@ function Booking() {
               <div className="text-gray-500 text-sm font-medium mb-1">
                 本時段不開放
               </div>
-              <div className="text-gray-400 text-xs">此時段暫停預訂服務</div>
+              <div className="text-gray-400 text-xs">
+                {isBlockedByMeetingRoom
+                  ? '因多功能會議空間已預約，暫停開放'
+                  : '此時段暫停預訂服務'}
+              </div>
             </div>
           </div>
         )}
@@ -452,15 +474,22 @@ function Booking() {
             <div className="bg-white rounded-xl shadow-sm">
               <div className="p-4 md:p-6">
                 <div className="flex items-center justify-between mb-4 md:mb-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    {selectedDate.format('M月D日')}
-                    {isHoliday && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-orange-600">
-                        <Sun className="w-3 h-3" />
-                        (假日)
-                      </span>
+                  <div>
+                    <h3 className="text-xl font-semibold flex items-center gap-2">
+                      {selectedDate.format('M月D日')}
+                      {isHoliday && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-orange-600">
+                          <Sun className="w-3 h-3" />
+                          (假日)
+                        </span>
+                      )}
+                    </h3>
+                    {requiresMinimumTwoSlots && (
+                      <p className="mt-1 text-xs font-semibold text-red-600">
+                        最少預約兩個小時
+                      </p>
                     )}
-                  </h3>
+                  </div>
                   <p className="text-sm" style={{ color: currentRoom?.color }}>
                     {currentRoom?.name} -{' '}
                     {isHoliday && currentRoom?.holidayPrice
@@ -485,9 +514,11 @@ function Booking() {
                   <div className="mb-4">
                     <button
                       onClick={() => {
-                        setShowBookingForm(true);
+                        if (canOpenBookingForm) {
+                          setShowBookingForm(true);
+                        }
                       }}
-                      disabled={isProcessing}
+                      disabled={isProcessing || !canOpenBookingForm}
                       className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
                       {isProcessing

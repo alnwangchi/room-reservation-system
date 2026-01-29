@@ -31,7 +31,7 @@ function RoomCard({ room, intervalLabel }) {
   return (
     <div className="group bg-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 flex flex-col md:flex-row h-auto md:h-[400px]">
       {/* 圖片區 */}
-      <div className="relative w-full md:w-[45%] h-64 md:h-full overflow-hidden">
+      <div className="relative w-full md:w-[45%] h-80 md:h-full overflow-hidden">
         {safeImages.length > 0 ? (
           <img
             src={safeImages[currentIndex]}
@@ -127,14 +127,14 @@ function RoomCard({ room, intervalLabel }) {
                   平日 {room.price} 點
                   <span className="text-gray-500 text-sm font-normal">
                     {' '}
-                    / {intervalLabel}
+                    {intervalLabel}
                   </span>
                 </p>
                 <p className="text-gray-900 text-xl font-bold leading-none mt-2">
                   假日 {room.holidayPrice} 點
                   <span className="text-gray-500 text-sm font-normal">
                     {' '}
-                    / {intervalLabel}
+                    {intervalLabel}
                   </span>
                 </p>
               </>
@@ -143,7 +143,7 @@ function RoomCard({ room, intervalLabel }) {
                 {room.price} 點
                 <span className="text-gray-500 text-sm font-normal">
                   {' '}
-                  / {intervalLabel}
+                  {intervalLabel}
                 </span>
               </p>
             )}
