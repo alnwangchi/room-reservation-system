@@ -36,7 +36,7 @@ function RoomCard({ room, intervalLabel }) {
           <img
             src={safeImages[currentIndex]}
             alt={room.name}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-200" />
@@ -111,7 +111,7 @@ function RoomCard({ room, intervalLabel }) {
           <div className="flex flex-wrap gap-4 pt-2">
             <div className="flex items-center gap-2 text-gray-500">
               <Calendar className="w-5 h-5" />
-              <span className="text-sm">09:00-21:00</span>
+              <span className="text-sm">09:00-22:00</span>
             </div>
             <div className="flex items-center gap-2 text-gray-500">
               <span className="text-sm">計價單位 {intervalLabel}</span>

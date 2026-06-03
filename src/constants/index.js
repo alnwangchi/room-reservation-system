@@ -69,14 +69,14 @@ export const ROOMS = baseRooms.map(room => ({
 // 時段配置
 export const TIME_SLOT_CONFIG = {
   START_HOUR: 9,
-  END_HOUR: 21,
+  END_HOUR: 22,
   INTERVAL_MINUTES: 30,
-  EXCLUDE_LAST_HALF_HOUR: false, // 包含 20:30
+  EXCLUDE_LAST_HALF_HOUR: false, // 包含 21:30
 };
 
 export const MTS_TIME_SLOT_CONFIG = {
   START_HOUR: 9,
-  END_HOUR: 21,
+  END_HOUR: 22,
   INTERVAL_MINUTES: 60,
   EXCLUDE_LAST_HOUR: false,
 };
@@ -85,7 +85,7 @@ export const MTS_TIME_SLOT_CONFIG = {
 export const TIME_CATEGORIES = {
   MORNING: { name: '上午時段', startHour: 9, endHour: 12 },
   AFTERNOON: { name: '下午時段', startHour: 12, endHour: 18 },
-  EVENING: { name: '晚上時段', startHour: 18, endHour: 21 },
+  EVENING: { name: '晚上時段', startHour: 18, endHour: 22 },
 };
 
 // 開發者帳號常數（僅在開發環境使用）

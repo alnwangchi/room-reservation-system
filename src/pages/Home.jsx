@@ -112,7 +112,7 @@ function Home() {
                   </h3>
                   <div className="flex items-center text-sm text-gray-700">
                     <Clock className="w-4 h-4 mr-2" />
-                    <span>09:00-21:00</span>
+                    <span>09:00-22:00</span>
                   </div>
                 </div>
               </div>
