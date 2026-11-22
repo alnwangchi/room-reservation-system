@@ -6,7 +6,7 @@ import {
   Clock,
   Copy,
   CreditCard,
-  Gift,
+  MapPin,
 } from 'lucide-react';
 
 function Home() {
@@ -28,20 +28,22 @@ function Home() {
           {/* 上課地點 */}
           <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
             <div className="flex items-center mb-4">
+              <MapPin className="w-6 h-6 text-blue-600 mr-2" />
               <h2 className="text-xl font-bold text-gray-800">上課地點</h2>
             </div>
-            <div>
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d903.6051801679506!2d121.53031706959824!3d25.053725598612747!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a9673144c98b%3A0xca09d4b13d61e9b5!2zMTA0OTHlj7DljJfluILkuK3lsbHljYDlm5vlubPooZcxN-iZnw!5e0!3m2!1szh-TW!2stw!4v1759746296114!5m2!1szh-TW!2stw"
-                width="100%"
-                height="360"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="上課地點地圖"
-              ></iframe>
-            </div>
+            <p className="mb-4 text-sm text-gray-700">
+              台北市中山區南京東路二段137號5樓(聯邦商業大樓)
+            </p>
+            <iframe
+              src="https://maps.google.com/maps?q=%E5%8F%B0%E5%8C%97%E5%B8%82%E4%B8%AD%E5%B1%B1%E5%8D%80%E5%8D%97%E4%BA%AC%E6%9D%B1%E8%B7%AF%E4%BA%8C%E6%AE%B5137%E8%99%9F5%E6%A8%93(%E8%81%AF%E9%82%A6%E5%95%86%E6%A5%AD%E5%A4%A7%E6%A8%93)&hl=zh-TW&z=17&output=embed"
+              width="100%"
+              height="360"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="上課地點地圖"
+            ></iframe>
           </div>
 
           {/* 儲值說明 + 注意事項 兩欄布局 */}
@@ -89,30 +91,24 @@ function Home() {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center">
-                    <Gift className="w-5 h-5 text-green-600 mr-2" />
-                    <h3 className="font-semibold text-gray-800 text-lg">
-                      儲值優惠
-                    </h3>
-                  </div>
-                  <div className="space-y-2 text-sm text-gray-700">
-                    <p>
-                      <span className="font-medium">最低金額：</span>200 點
-                    </p>
-                    <p>
-                      <span className="font-medium">儲值優惠：</span>
-                      儲值 2000 即贈 200 點
-                    </p>
-                  </div>
+                  <h3 className="font-semibold text-gray-800 text-lg">
+                    最低儲值
+                  </h3>
+                  <p className="text-sm text-gray-700">
+                    <span className="font-medium">最低金額：</span>200 點
+                  </p>
                 </div>
 
                 <div className="space-y-2">
                   <h3 className="font-semibold text-gray-800 text-lg">
                     營業時間
                   </h3>
-                  <div className="flex items-center text-sm text-gray-700">
-                    <Clock className="w-4 h-4 mr-2" />
-                    <span>09:00-22:00</span>
+                  <div className="flex items-start text-sm text-gray-700">
+                    <Clock className="w-4 h-4 mr-2 mt-0.5 shrink-0" />
+                    <span>
+                      12 月起，網站僅開放週一至週五
+                      10:00-18:30。其餘時段請透過官方 LINE 預約。
+                    </span>
                   </div>
                 </div>
               </div>
@@ -135,6 +131,11 @@ function Home() {
                     <li className="flex items-start">
                       <span className="text-orange-600 mr-2">•</span>
                       請於本網站完成預約及付款，方視為成功預訂。
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-orange-600 mr-2">•</span>
+                      12 月起，網站僅開放週一至週五
+                      10:00-18:30，其餘時段請透過官方 LINE 預約。
                     </li>
                     <li className="flex items-start">
                       <span className="text-orange-600 mr-2">•</span>

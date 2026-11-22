@@ -111,7 +111,7 @@ function RoomCard({ room, intervalLabel }) {
           <div className="flex flex-wrap gap-4 pt-2">
             <div className="flex items-center gap-2 text-gray-500">
               <Calendar className="w-5 h-5" />
-              <span className="text-sm">09:00-22:00</span>
+              <span className="text-sm">12月起 週一至週五 10:00-18:30</span>
             </div>
             <div className="flex items-center gap-2 text-gray-500">
               <span className="text-sm">計價單位 {intervalLabel}</span>

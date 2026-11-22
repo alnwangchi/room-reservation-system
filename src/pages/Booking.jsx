@@ -13,7 +13,12 @@ import { useRoomBookingBlock } from '@hooks/useRoomBookingBlock';
 import { emailService } from '@services/email';
 import { roomService, userService } from '@services/firestore';
 import { isTimeInRange, isWeekend } from '@utils/date';
-import { getIntervalLabel, getTimeSlotConfig } from '@utils/timeSlot';
+import {
+  canBookOnWebsite,
+  getIntervalLabel,
+  getTimeSlotConfig,
+  isWebsiteBookingRestrictedDate,
+} from '@utils/timeSlot';
 import dayjs from 'dayjs';
 import { Sun } from 'lucide-react';
 
@@ -134,6 +139,9 @@ function Booking() {
     if (isTimeSlotBooked(timeSlot, selectedDate, selectedRoom)) {
       return; // 已被預訂的時段不能點擊
     }
+    if (!canBookOnWebsite(selectedDate, timeSlot.hour, timeSlot.minute)) {
+      return;
+    }
     // 檢查餘額是否足夠支付新增的時段（admin 無需檢查餘額）
     if (userProfile && userProfile.balance < 1 && !isAdmin) {
       const currentRoom = ROOMS.find(room => room.id === selectedRoom);
@@ -168,6 +176,18 @@ function Booking() {
   };
 
   const onSubmit = async () => {
+    const hasOffWebsiteSlot = selectedTimeSlots.some(
+      slot => !canBookOnWebsite(selectedDate, slot.hour, slot.minute)
+    );
+    if (hasOffWebsiteSlot) {
+      toggleHintDialog({
+        title: '此時段請改由官方 LINE 預約',
+        desc: '12 月起，網站僅開放週一至週五 10:00-18:30。',
+        type: 'warning',
+      });
+      return;
+    }
+
     // 計算總預訂費用
     const currentRoom = ROOMS.find(room => room.id === selectedRoom);
     if (!currentRoom) {
@@ -369,6 +389,9 @@ function Booking() {
   };
 
   const currentRoom = ROOMS.find(room => room.id === selectedRoom);
+  const isRestrictedDate = isWebsiteBookingRestrictedDate(selectedDate);
+  const isRestrictedWeekend =
+    isRestrictedDate && selectedDate ? isWeekend(selectedDate) : false;
 
   // 渲染房間選擇器
   // 渲染時間類別區塊的共用函數
@@ -386,6 +409,19 @@ function Booking() {
     const categoryKey = getCategoryKey(category);
     const isBlockedByMeetingRoom = isMeetingRoomBlockingCategory(category);
     const isTimeSlotOpen = timeSlots[categoryKey] && !isBlockedByMeetingRoom;
+    const isRestrictedDate = isWebsiteBookingRestrictedDate(selectedDate);
+    const categorySlots = generateTimeSlots().filter(
+      slot =>
+        slot.hour >= category.startHour &&
+        slot.hour < category.endHour &&
+        canBookOnWebsite(selectedDate, slot.hour, slot.minute)
+    );
+    const closedByWebsitePolicy =
+      isRestrictedDate && categorySlots.length === 0;
+
+    if (closedByWebsitePolicy) {
+      return null;
+    }
 
     return (
       <div className={`col-span-full ${!isLastCategory ? 'mb-2 md:mb-4' : ''}`}>
@@ -394,39 +430,33 @@ function Booking() {
         </h4>
         {isTimeSlotOpen ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-            {generateTimeSlots()
-              .filter(
-                slot =>
-                  slot.hour >= category.startHour &&
-                  slot.hour < category.endHour
-              )
-              .map((slot, index) => {
-                const isBooked = isTimeSlotBooked(
-                  slot,
-                  selectedDate,
-                  selectedRoom
-                );
-                const booking = getTimeSlotBooking(
-                  slot,
-                  selectedDate,
-                  selectedRoom
-                );
-                const isSelected = selectedTimeSlots.some(
-                  selectedSlot => selectedSlot.time === slot.time
-                );
+            {categorySlots.map((slot, index) => {
+              const isBooked = isTimeSlotBooked(
+                slot,
+                selectedDate,
+                selectedRoom
+              );
+              const booking = getTimeSlotBooking(
+                slot,
+                selectedDate,
+                selectedRoom
+              );
+              const isSelected = selectedTimeSlots.some(
+                selectedSlot => selectedSlot.time === slot.time
+              );
 
-                return (
-                  <TimeSlotButton
-                    key={index}
-                    slot={slot}
-                    isBooked={isBooked}
-                    booking={booking}
-                    isSelected={isSelected}
-                    onClick={() => !isBooked && handleTimeSlotClick(slot)}
-                    disabled={isBooked}
-                  />
-                );
-              })}
+              return (
+                <TimeSlotButton
+                  key={index}
+                  slot={slot}
+                  isBooked={isBooked}
+                  booking={booking}
+                  isSelected={isSelected}
+                  onClick={() => !isBooked && handleTimeSlotClick(slot)}
+                  disabled={isBooked}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
@@ -445,6 +475,18 @@ function Booking() {
       </div>
     );
   };
+
+  if (currentRoom?.isDisabled) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
+        <PageBar
+          title="此空間已停止線上租借"
+          onBack={goToRoomSelection}
+          description="目前僅開放琴房租借"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
@@ -499,16 +541,26 @@ function Booking() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-3 md:mb-4 p-1 md:p-2">
-                  {/* 上午時段 */}
-                  {renderTimeCategory(TIME_CATEGORIES.MORNING)}
+                {isRestrictedDate && (
+                  <div className="mb-4 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+                    {isRestrictedWeekend
+                      ? '週六、週日請透過官方 LINE 預約。'
+                      : '網站僅開放 10:00-18:30，其餘時段請透過官方 LINE 預約。'}
+                  </div>
+                )}
 
-                  {/* 下午時段 */}
-                  {renderTimeCategory(TIME_CATEGORIES.AFTERNOON)}
+                {!isRestrictedWeekend && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-3 md:mb-4 p-1 md:p-2">
+                    {/* 上午時段 */}
+                    {renderTimeCategory(TIME_CATEGORIES.MORNING)}
 
-                  {/* 晚上時段 */}
-                  {renderTimeCategory(TIME_CATEGORIES.EVENING)}
-                </div>
+                    {/* 下午時段 */}
+                    {renderTimeCategory(TIME_CATEGORIES.AFTERNOON)}
+
+                    {/* 晚上時段 */}
+                    {renderTimeCategory(TIME_CATEGORIES.EVENING)}
+                  </div>
+                )}
                 {/* 開啟預訂按鈕 */}
                 {selectedTimeSlots.length > 0 && (
                   <div className="mb-4">

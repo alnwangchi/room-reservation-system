@@ -39,7 +39,7 @@ const baseRooms = [
     images: [p1, p4],
   },
   {
-    isDisabled: false,
+    isDisabled: true,
     id: 'multifunctional-meeting-space',
     name: '多功能會議空間',
     capacity: 30,
@@ -51,6 +51,7 @@ const baseRooms = [
     images: [m7, m3, m5, m6],
   },
   {
+    isDisabled: true,
     id: 'standard-recording-studio',
     name: '標準錄音室',
     capacity: 4,
@@ -65,6 +66,14 @@ export const ROOMS = baseRooms.map(room => ({
   ...room,
   id: isDev() ? `${room.id}-dev` : room.id,
 }));
+
+// 12 月起，網站僅開放週一至週五此時段；其餘時段改由官方 LINE 預約
+export const WEBSITE_BOOKING_POLICY = {
+  START_DATE: '2026-12-01',
+  START_HOUR: 10,
+  END_HOUR: 18,
+  END_MINUTE: 30,
+};
 
 // 時段配置
 export const TIME_SLOT_CONFIG = {

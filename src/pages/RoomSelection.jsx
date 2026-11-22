@@ -10,7 +10,7 @@ function Home() {
       {/* 頁面標題 */}
       <PageBar
         title="空間預訂"
-        description="專業的琴房和錄音室預訂服務，為您提供舒適的音樂練習和錄製環境"
+        description="琴房預訂服務，為您提供舒適的音樂練習環境"
         icon={Calendar}
         iconBgColor="bg-blue-100"
         iconColor="text-blue-600"
@@ -19,7 +19,7 @@ function Home() {
       <div className="py-6 sm:py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 mb-12">
-            {ROOMS.map(room => {
+            {ROOMS.filter(room => !room.isDisabled).map(room => {
               const intervalLabel = getIntervalLabel(
                 getTimeSlotConfig(room.id).INTERVAL_MINUTES
               );
